@@ -18,8 +18,10 @@ class _InvoiceCaptureScreenState extends State<InvoiceCaptureScreen> {
 
   getRecognisedText(XFile image) async{
     final inputImage = InputImage.fromFilePath(image.path);
-    final textRecognizer = TextRecognizer(script: TextRecognitionScript.latin);
+    final textRecognizer = TextRecognizer();
     final RecognizedText recognizedText = await textRecognizer.processImage(inputImage);
+
+    print(recognizedText.text);
 
     scannedText = recognizedText.text;
     textRecognizer.close();

@@ -1,6 +1,7 @@
 import 'package:fastinvoicereader/capturedscreen.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:flutter_expandable_fab/flutter_expandable_fab.dart';
 
 void main() {
   runApp(const MyApp());
@@ -9,7 +10,7 @@ void main() {
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
-  Color ThemeTextColor() => Colors.black87.computeLuminance() > 0.5 ? Colors.white : Colors.black;
+  Color ThemeTextColor(color) => color.computeLuminance() > 0.5 ? Colors.white : Colors.black;
   
   // This widget is the root of your application.
   @override
@@ -19,18 +20,20 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.black87),
         textTheme: Theme.of(context).textTheme.apply(
-        bodyColor: ThemeTextColor(),
-        displayColor: ThemeTextColor(),
-        decorationColor: ThemeTextColor(),
+        bodyColor: Colors.white,
+        displayColor: Colors.white,
+        decorationColor: Colors.white,
       ),
       primaryTextTheme: Theme.of(context).textTheme.apply(
-        bodyColor: ThemeTextColor(),
-        displayColor: ThemeTextColor(),
-        decorationColor: ThemeTextColor(),
+        bodyColor: Colors.white,
+        displayColor: Colors.white,
+        decorationColor: Colors.white,
       ),
       appBarTheme: AppBarTheme(
-          titleTextStyle: TextStyle(color: ThemeTextColor()),
-          backgroundColor: Theme.of(context).colorScheme.inverseSurface.withOpacity(0.5)),
+          titleTextStyle: TextStyle(color: Colors.white,),
+          backgroundColor: Colors.black,
+          iconTheme: IconThemeData(color: Colors.white)
+      ),
       scaffoldBackgroundColor: Colors.black87,
       useMaterial3: true,
       ),
@@ -73,11 +76,6 @@ class _CompanyListState extends State<CompanyList> {
         // the App.build method, and use it to set our appbar title.
         title: Text(widget.title),
         centerTitle: true,
-        actionsIconTheme: IconThemeData(
-            size: 30.0,
-            color: Colors.white,
-            opacity: 10.0
-        ),
         actions: <Widget>[
         IconButton(
         icon: const Icon(Icons.table_chart),
@@ -127,16 +125,45 @@ class _CompanyListState extends State<CompanyList> {
         );},
 
       ),
-      floatingActionButton: Badge(
-        label: Icon(Icons.add),
-        largeSize: 25,
-        child: FloatingActionButton(
-          onPressed: () {getImage();},
-          child: const Icon(Icons.receipt_long, size: 35,),
+      floatingActionButtonLocation: ExpandableFab.location,
+      floatingActionButton: ExpandableFab(
+        key: _key,
+        type: ExpandableFabType.up,
+        distance: 75,
+        fanAngle: 0,
+        openButtonBuilder: RotateFloatingActionButtonBuilder(
+           child: Badge(
+             child: const Icon(Icons.receipt_long, size: 45),
+             label: Icon(Icons.add, color: Colors.white, size: 25),
+             largeSize: 30,
+             backgroundColor: Colors.red,
+             offset: Offset(10, -10),
+           ),
+           fabSize: ExpandableFabSize.regular,
+          heroTag: null,
         ),
+        overlayStyle: ExpandableFabOverlayStyle(
+          // color: Colors.black.withOpacity(0.5),
+          blur: 5,
+        ),
+        children: [
+          FloatingActionButton(
+            heroTag: null,
+            child: const Icon(Icons.camera, size: 45),
+            onPressed: () {getImage(ImageSource.camera);},
+          ),
+          FloatingActionButton(
+            heroTag: null,
+            child: const Icon(Icons.image, size: 45),
+            onPressed: () {getImage(ImageSource.gallery);},
+          ),
+        ],
       ), // This trailing comma makes auto-formatting nicer for build methods.
     );
   }
+
+  final _key = GlobalKey<ExpandableFabState>();
+
 
   bool textScanning = false;
 
@@ -144,10 +171,10 @@ class _CompanyListState extends State<CompanyList> {
 
   String scannedText = "";
 
-  getImage() async {
+  getImage(source) async {
     try
     {
-      final pickedImage = await ImagePicker().pickImage(source: ImageSource.camera);
+      final pickedImage = await ImagePicker().pickImage(source: source);
       if (pickedImage != null)
         Navigator.push(context, MaterialPageRoute(builder: (context) => InvoiceCaptureScreen(imageFile: pickedImage)));
 
