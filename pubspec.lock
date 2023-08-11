@@ -29,26 +29,26 @@ packages:
     dependency: "direct main"
     description:
       name: camera
-      sha256: ebebead3d5ec3d148249331d751d462d7e8c98102b8830a9b45ec96a2bd4333f
+      sha256: b4cede7c66f44fa476272d21bfe143d5f32e75de1ea56f737e3eaf982da23bab
       url: "https://pub.dev"
     source: hosted
-    version: "0.10.5+2"
+    version: "0.10.5+3"
   camera_android:
     dependency: transitive
     description:
       name: camera_android
-      sha256: f2d886ab431e468301eef451a897db8beb8e66a053bb556c3111d3337acc4c7b
+      sha256: "61d62676708f187fb89fb14b371f87470343ba3cb26d08fc358e4f8a18e13150"
       url: "https://pub.dev"
     source: hosted
-    version: "0.10.8+5"
+    version: "0.10.8+6"
   camera_avfoundation:
     dependency: transitive
     description:
       name: camera_avfoundation
-      sha256: "1a416e452b30955b392f4efbf23291d3f2ba3660a85e1628859eb62d2a2bab26"
+      sha256: "332747f20cf911980e38c8442108102d4456752711781108fda237635baf362c"
       url: "https://pub.dev"
     source: hosted
-    version: "0.9.13+2"
+    version: "0.9.13+3"
   camera_platform_interface:
     dependency: transitive
     description:
@@ -133,10 +133,10 @@ packages:
     dependency: transitive
     description:
       name: ffi
-      sha256: ed5337a5660c506388a9f012be0288fb38b49020ce2b45fe1f8b8323fe429f99
+      sha256: "7bf0adc28a23d395f19f3f1eb21dd7cfd1dd9f8e1c50051c069122e6853bc878"
       url: "https://pub.dev"
     source: hosted
-    version: "2.0.2"
+    version: "2.1.0"
   file_selector_linux:
     dependency: transitive
     description:
@@ -198,6 +198,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.0.15"
+  flutter_riverpod:
+    dependency: "direct main"
+    description:
+      name: flutter_riverpod
+      sha256: b83ac5827baadefd331ea1d85110f34645827ea234ccabf53a655f41901a9bf4
+      url: "https://pub.dev"
+    source: hosted
+    version: "2.3.6"
   flutter_test:
     dependency: "direct dev"
     description: flutter
@@ -388,10 +396,10 @@ packages:
     dependency: "direct main"
     description:
       name: path_provider
-      sha256: "3087813781ab814e4157b172f1a11c46be20179fcc9bea043e0fba36bc0acaa2"
+      sha256: "909b84830485dbcd0308edf6f7368bc8fd76afa26a270420f34cabea2a6467a0"
       url: "https://pub.dev"
     source: hosted
-    version: "2.0.15"
+    version: "2.1.0"
   path_provider_android:
     dependency: transitive
     description:
@@ -473,7 +481,7 @@ packages:
     source: hosted
     version: "3.2.1"
   riverpod:
-    dependency: "direct main"
+    dependency: transitive
     description:
       name: riverpod
       sha256: "80e48bebc83010d5e67a11c9514af6b44bbac1ec77b4333c8ea65dbc79e2d8ef"
@@ -537,26 +545,26 @@ packages:
     dependency: transitive
     description:
       name: syncfusion_flutter_core
-      sha256: ee86a4531180216d0229ac83db2b3b8428ad4e2fd5f4aff28b89a5aed149bb55
+      sha256: "33a2e8a86ac013c7929ed2cffa83c44f45ff256e38122de97f3154cb04324a74"
       url: "https://pub.dev"
     source: hosted
-    version: "22.2.7"
+    version: "22.2.8"
   syncfusion_flutter_xlsio:
     dependency: "direct main"
     description:
       name: syncfusion_flutter_xlsio
-      sha256: "6c6f98dd6379c1535a4564106e3fe54ca71780c5f4effdc429162323f0a18829"
+      sha256: "0d5cac44f0e8365e955ecd2bcbc095b3024599f26579ebbfed3d758f7514f41b"
       url: "https://pub.dev"
     source: hosted
-    version: "22.2.7"
+    version: "22.2.8"
   syncfusion_officecore:
     dependency: transitive
     description:
       name: syncfusion_officecore
-      sha256: "6f425a3137e43afda8b8cc5da259e86363e2cf56152f3de0e696c3ed634451e3"
+      sha256: "6df197514cfa8491214568acb3992f62db9cfbc13d663ff84cef5dd2ba99b8aa"
       url: "https://pub.dev"
     source: hosted
-    version: "22.2.7"
+    version: "22.2.8"
   term_glyph:
     dependency: transitive
     description:
@@ -601,10 +609,10 @@ packages:
     dependency: transitive
     description:
       name: xdg_directories
-      sha256: e0b1147eec179d3911f1f19b59206448f78195ca1d20514134e10641b7d7fbff
+      sha256: f0c26453a2d47aa4c2570c6a033246a3fc62da2fe23c7ffdd0a7495086dc0247
       url: "https://pub.dev"
     source: hosted
-    version: "1.0.1"
+    version: "1.0.2"
   xml:
     dependency: transitive
     description:

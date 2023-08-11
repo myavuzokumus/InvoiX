@@ -1,22 +1,23 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_mlkit_text_recognition/google_mlkit_text_recognition.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 
 import 'invoicer_repo.dart';
 
-class InvoiceCaptureScreen extends StatefulWidget {
+class InvoiceCaptureScreen extends ConsumerStatefulWidget {
   InvoiceCaptureScreen({required this.imageFile,super.key});
 
   final XFile imageFile;
 
   @override
-  State<InvoiceCaptureScreen> createState() => _InvoiceCaptureScreenState();
+  ConsumerState<InvoiceCaptureScreen> createState() => _InvoiceCaptureScreenState();
 }
 
-class _InvoiceCaptureScreenState extends State<InvoiceCaptureScreen> {
+class _InvoiceCaptureScreenState extends ConsumerState<InvoiceCaptureScreen> {
 
   late List<String> scannedText;
 
@@ -109,6 +110,8 @@ class _InvoiceCaptureScreenState extends State<InvoiceCaptureScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final InvoicerList = ref.watch(InvoicerListProvider);
+
     return SafeArea(
         child: Scaffold(
           appBar: AppBar(),
@@ -183,7 +186,7 @@ class _InvoiceCaptureScreenState extends State<InvoiceCaptureScreen> {
                   FloatingActionButton(
                       child: Icon(Icons.save_as_rounded),
                       onPressed: () {
-                        InvoicerList.save(CompanyTextController.text, InvoiceNoTextController.text, DateFormat("dd-MM-yyyy").parse(DateTextController.text), double.parse(AmountTextController.text));
+                        ref.read(InvoicerListProvider.notifier).add(InvoiceImage: Image.file(File(widget.imageFile.path)), CompanyName: CompanyTextController.text, InvoiceNo: InvoiceNoTextController.text, Date: DateFormat("dd-MM-yyyy").parse(DateTextController.text), Amount: double.parse(AmountTextController.text));
                       })
                 ],
               ),
@@ -192,3 +195,5 @@ class _InvoiceCaptureScreenState extends State<InvoiceCaptureScreen> {
     ));
   }
 }
+
+final InvoicerListProvider = NotifierProvider<InvoicerList, List<InvoicerRepo>>(InvoicerList.new);

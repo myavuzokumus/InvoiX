@@ -1,10 +1,11 @@
 import 'package:fastinvoicereader/capturedscreen.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:flutter_expandable_fab/flutter_expandable_fab.dart';
 
 void main() {
-  runApp(const MyApp());
+  runApp(const ProviderScope(child: const MyApp()));
 }
 
 class MyApp extends StatelessWidget {
