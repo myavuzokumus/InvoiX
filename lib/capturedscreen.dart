@@ -55,33 +55,34 @@ class _InvoiceCaptureScreenState extends ConsumerState<InvoiceCaptureScreen> {
     RegExp DateRegex = RegExp(r"(0[1-9]|[12][0-9]|3[01])(\/|-)(0[1-9]|1[1,2])(\/|-)(19|20)\d{2}", caseSensitive: false);
     RegExp AmountRegex = RegExp(r"^(\$|\₺|€)(0|[1-9][0-9]{0,2})(,\d{1,4})*(\.\d{1,2})?$|^(0|[1-9][0-9]{0,2})(,\d{1,4})*(\.\d{1,2})?(\$|\₺| TL|TL|€)$", caseSensitive: false);
 
-// ListText içindeki her bir metin için
+    // I know, this section so suck. I will try improve here when I found time.
+// For every each text in ListText
     ListText.forEach((i) {
-      // Metin CompanyRegex ile eşleşiyorsa
+      // Text if match with CompanyRegex
       if (CompanyRegex.hasMatch(i)) {
-        // CompanyTextController.text'e metni ata
+        // Set text to CompanyTextController.text
         CompanyTextController.text = i;
       }
-      // Metin DateRegex ile eşleşiyorsa
+      // Text if match with DateRegex
       else if (DateRegex.hasMatch(i)) {
-        // DateTextController.text'e metni ata
+        // Set text to DateTextController.text
         DateTextController.text = i;
       }
-      // Metnin uzunluğu 16 ise
+      // If text lenght is 16
       else if (i.length == 16) {
-        // InvoiceNoTextController.text'e metni ata
+        // set text to InvoiceNoTextController.text
         InvoiceNoTextController.text = i;
       }
-      // Metin AmountRegex ile eşleşiyorsa
+      // Text if match with AmountRegex
       else if (AmountRegex.hasMatch(i)) {
-        // AmountTextController.text'e metni ata
+        // Set text to AmountTextController.text
         AmountTextController.text = i;
       }
     });
 
   }
 
-  // Fatura no olmasını hesaplayan bir fonksiyon
+  // The function is calculated that its invoice no yes or no
   String getInvoiceNo(ListText) {
     RegExp companyRegex = RegExp('(?:LTD\.|ŞT(İ|Í)\.|A\.Ş\.)', caseSensitive: false);
 
@@ -89,11 +90,8 @@ class _InvoiceCaptureScreenState extends ConsumerState<InvoiceCaptureScreen> {
       if (companyRegex.hasMatch(i)) return i;
     }
 
-    return "Şirket bulunamadı.";
+    return "Company not found.";
   }
-
-
-
 
 
 
@@ -110,8 +108,6 @@ class _InvoiceCaptureScreenState extends ConsumerState<InvoiceCaptureScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final InvoicerList = ref.watch(InvoicerListProvider);
-
     return SafeArea(
         child: Scaffold(
           appBar: AppBar(),
@@ -196,4 +192,3 @@ class _InvoiceCaptureScreenState extends ConsumerState<InvoiceCaptureScreen> {
   }
 }
 
-final InvoicerListProvider = NotifierProvider<InvoicerList, List<InvoicerRepo>>(InvoicerList.new);

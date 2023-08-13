@@ -1,17 +1,27 @@
-
-
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:uuid/uuid.dart';
+
+const _uuid = Uuid();
 
 class InvoicerRepo{
 
+  final Image InvoiceImage;
+  final String id;
   final String CompanyName;
   final String InvoiceNo;
   final DateTime Date;
   final double Amount;
-  final Image InvoiceImage;
 
-  const InvoicerRepo({required this.InvoiceImage, required this.CompanyName, required this.InvoiceNo, required this.Date, required this.Amount});
+  const InvoicerRepo({
+    required this.id,
+    required this.InvoiceImage,
+    required this.CompanyName,
+    required this.InvoiceNo,
+    required this.Date,
+    required this.Amount
+
+  });
 
 }
 
@@ -24,6 +34,7 @@ class InvoicerList extends Notifier<List<InvoicerRepo>>{
     state = [
       ...state,
       InvoicerRepo(
+        id: _uuid.v4(),
         InvoiceImage: InvoiceImage,
         CompanyName: CompanyName,
         InvoiceNo: InvoiceNo,
@@ -34,6 +45,8 @@ class InvoicerList extends Notifier<List<InvoicerRepo>>{
   }
 
   void remove(InvoicerRepo target) {
-    state = state.where((Invoicer) => Invoicer.CompanyName != target.CompanyName).toList();
+    state = state.where((Invoicer) => Invoicer.id != target.id).toList();
   }
 }
+
+final InvoicerListProvider = NotifierProvider<InvoicerList, List<InvoicerRepo>>(InvoicerList.new);
