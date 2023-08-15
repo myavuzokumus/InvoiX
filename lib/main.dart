@@ -1,9 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:hive/hive.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 
-import 'MainPage.dart';
+import 'Pages/Main_Page.dart';
+import 'Models/invoice_data.dart';
 
-void main() {
+void main() async {
+
+  WidgetsFlutterBinding.ensureInitialized();
+  await Hive.initFlutter();
+
+  // Register for invoice class adapter
+  Hive.registerAdapter(InvoiceDataAdapter());
+  // Open user box
+  await Hive.openBox('InvoiceData');
+
   runApp(const ProviderScope(child: const MyApp()));
 }
 

@@ -3,10 +3,11 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_mlkit_text_recognition/google_mlkit_text_recognition.dart';
+import 'package:hive/hive.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 
-import 'invoicer_repo.dart';
+import '../Models/invoice_data.dart';
 
 class InvoiceCaptureScreen extends ConsumerStatefulWidget {
   InvoiceCaptureScreen({required this.imageFile,super.key});
@@ -182,7 +183,11 @@ class _InvoiceCaptureScreenState extends ConsumerState<InvoiceCaptureScreen> {
                   FloatingActionButton(
                       child: Icon(Icons.save_as_rounded),
                       onPressed: () {
-                        ref.read(InvoicerListProvider.notifier).add(InvoiceImage: Image.file(File(widget.imageFile.path)), CompanyName: CompanyTextController.text, InvoiceNo: InvoiceNoTextController.text, Date: DateFormat("dd-MM-yyyy").parse(DateTextController.text), Amount: double.parse(AmountTextController.text));
+                        final InvoiceDataBox = Hive.box('InvoiceData');
+                        final data = InvoiceData(InvoiceImage: Image.file(File(widget.imageFile.path)), CompanyName: CompanyTextController.text, InvoiceNo: InvoiceNoTextController.text, Date: DateFormat("dd-MM-yyyy").parse(DateTextController.text), Amount: double.parse(AmountTextController.text));
+                        InvoiceDataBox.add(data);
+
+                        //ref.read(InvoicerListProvider.notifier).add(InvoiceImage: Image.file(File(widget.imageFile.path)), CompanyName: CompanyTextController.text, InvoiceNo: InvoiceNoTextController.text, Date: DateFormat("dd-MM-yyyy").parse(DateTextController.text), Amount: double.parse(AmountTextController.text));
                       })
                 ],
               ),

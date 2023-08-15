@@ -1,8 +1,10 @@
+import 'package:fastinvoicereader/Models/invoice_data.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_expandable_fab/flutter_expandable_fab.dart';
+import 'package:hive/hive.dart';
 import 'package:image_picker/image_picker.dart';
 
-import 'capturedscreen.dart';
+import '/Pages/Captured_Page.dart';
 
 class CompanyList extends StatefulWidget {
   const CompanyList({super.key, required this.title});
@@ -48,45 +50,7 @@ class _CompanyListState extends State<CompanyList> {
               },
             ),]
       ),
-      body: GridView.builder(
-        // Create a grid with 2 columns. If you change the scrollDirection to
-        // horizontal, this produces 2 rows.
-
-        padding: EdgeInsets.only(left: 10, right: 10, top: 20),
-        // Generate 100 widgets that display their index in the List.
-        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: 2,
-          mainAxisSpacing: 15,
-          crossAxisSpacing: 15,
-          childAspectRatio: 0.60,
-        ),
-        itemBuilder: (BuildContext context, int index) {
-          return ClipRRect(
-            borderRadius: BorderRadius.circular(20.0),
-            child: Container(
-              color: Colors.grey,
-              child: Center(
-                child: Column(
-                  children: [
-                    Expanded(
-                      child: Container(
-                        margin: EdgeInsets.all(15),
-                        color: Colors.blueGrey,
-                      ),
-                    ),
-                    Container(
-                      child: Text(
-                        'Item $index',
-                        style: Theme.of(context).textTheme.headlineSmall,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          );},
-
-      ),
+      body: _ListViewer(),
       floatingActionButtonLocation: ExpandableFab.location,
       floatingActionButton: ExpandableFab(
         key: _key,
@@ -123,6 +87,55 @@ class _CompanyListState extends State<CompanyList> {
       ), // This trailing comma makes auto-formatting nicer for build methods.
     );
   }
+
+  GridView _ListViewer() {
+
+    final InvoiceDataBox = Hive.box('InvoiceData');
+    InvoiceDataBox.watch().listen((event) { });
+    return GridView.builder(
+      // Create a grid with 2 columns. If you change the scrollDirection to
+      // horizontal, this produces 2 rows.
+
+      padding: EdgeInsets.only(left: 10, right: 10, top: 20),
+      // Generate 100 widgets that display their index in the List.
+      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 2,
+        mainAxisSpacing: 15,
+        crossAxisSpacing: 15,
+        childAspectRatio: 0.60,
+      ),
+      itemBuilder: (BuildContext context, int index) {
+        print(InvoiceDataBox.values);
+        final invoice = InvoiceDataBox.getAt(index) as InvoiceData;
+        print(invoice);
+        return ClipRRect(
+          borderRadius: BorderRadius.circular(20.0),
+          child: Container(
+            color: Colors.grey,
+            child: Center(
+              child: Column(
+                children: [
+                  Expanded(
+                    child: Container(
+                      margin: EdgeInsets.all(15),
+                      color: Colors.blueGrey,
+                    ),
+                  ),
+                  Container(
+                    child: Text(
+                      'Item $index',
+                      style: Theme.of(context).textTheme.headlineSmall,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        );},
+
+    );
+  }
+
 
   final _key = GlobalKey<ExpandableFabState>();
 
