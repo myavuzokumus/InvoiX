@@ -51,6 +51,7 @@ class _CompanyListState extends State<CompanyList> {
             ),]
       ),
       body: _ListViewer(),
+
       floatingActionButtonLocation: ExpandableFab.location,
       floatingActionButton: ExpandableFab(
         key: _key,
@@ -88,11 +89,19 @@ class _CompanyListState extends State<CompanyList> {
     );
   }
 
-  GridView _ListViewer() {
+  Widget _ListViewer() {
 
     final InvoiceDataBox = Hive.box('InvoiceData');
-    InvoiceDataBox.watch().listen((event) { });
-    return GridView.builder(
+    //InvoiceDataBox.watch().listen((event) { });
+    print(InvoiceDataBox.values); //Debug
+
+    //“No data were found.” was added to avoid an error."
+    if (InvoiceDataBox.values.isEmpty) {
+      return Center(
+        child: Text("No data are found.", style: TextStyle(fontSize: 25),),
+      );
+    }
+    else return GridView.builder(
       // Create a grid with 2 columns. If you change the scrollDirection to
       // horizontal, this produces 2 rows.
 
@@ -105,7 +114,6 @@ class _CompanyListState extends State<CompanyList> {
         childAspectRatio: 0.60,
       ),
       itemBuilder: (BuildContext context, int index) {
-        print(InvoiceDataBox.values);
         final invoice = InvoiceDataBox.getAt(index) as InvoiceData;
         print(invoice);
         return ClipRRect(
@@ -124,15 +132,18 @@ class _CompanyListState extends State<CompanyList> {
                   Container(
                     child: Text(
                       'Item $index',
-                      style: Theme.of(context).textTheme.headlineSmall,
+                      style: Theme
+                          .of(context)
+                          .textTheme
+                          .headlineSmall,
                     ),
                   ),
                 ],
               ),
             ),
           ),
-        );},
-
+        );
+      }
     );
   }
 
