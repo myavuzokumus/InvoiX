@@ -1,6 +1,7 @@
-# fastinvoicereader
+# FastInvoiceReader
 
 A new Flutter project.
+This project has been started thanks to the SupaBase Hackathon.
 
 ## Getting Started
 
