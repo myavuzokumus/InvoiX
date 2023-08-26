@@ -26,9 +26,6 @@ class _InvoiceCaptureScreenState extends ConsumerState<InvoiceCaptureScreen> {
 
   bool _isLoading = true;
 
-  //TextLabelStyle
-  TextStyle labelStyle = TextStyle(fontWeight: FontWeight.bold, fontSize: 20);
-
   //TextLabelControllers
   TextEditingController CompanyTextController = TextEditingController();
   TextEditingController InvoiceNoTextController = TextEditingController();
@@ -36,6 +33,19 @@ class _InvoiceCaptureScreenState extends ConsumerState<InvoiceCaptureScreen> {
   TextEditingController AmountTextController = TextEditingController();
 
   final _formKey = GlobalKey<FormState>();
+
+  //TextLabelStyle
+  InputDecoration TextFieldDecoration = InputDecoration(
+      border: OutlineInputBorder(),
+      isDense: true,
+      labelText: "",
+      labelStyle: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
+      counterStyle: TextStyle(fontSize: 0)
+  );
+
+  //TODO: INFO OVERLAY WILL BE ADDED.
+  //TODO: Company name selection screen will be added.
+  //TODO: Invoice Type detection will be added.
 
   //Regex
   //RegExp NameRegex = RegExp(r"\b([A-ZÀ-ÿ][-,a-z. ']+[ ]*)+", caseSensitive: false);
@@ -145,13 +155,7 @@ class _InvoiceCaptureScreenState extends ConsumerState<InvoiceCaptureScreen> {
                                 TextFormField(
                                   maxLength: 50,
                                   controller: CompanyTextController,
-                                  decoration: InputDecoration(
-                                      border: OutlineInputBorder(),
-                                      isDense: true,
-                                      labelText: 'Company Name:',
-                                      labelStyle: labelStyle,
-                                      errorStyle: TextStyle(fontSize: 15),
-                                      counterStyle: TextStyle(fontSize: 0)),
+                                  decoration: TextFieldDecoration.copyWith(labelText: "Company name:"),
                                   validator: (value) {
                                     if (value == null ||
                                         value.isEmpty ||
@@ -164,17 +168,12 @@ class _InvoiceCaptureScreenState extends ConsumerState<InvoiceCaptureScreen> {
                                 TextFormField(
                                   maxLength: 50,
                                   controller: InvoiceNoTextController,
-                                  decoration: InputDecoration(
-                                      border: OutlineInputBorder(),
-                                      isDense: true,
-                                      labelText: 'Invoice No:',
-                                      labelStyle: labelStyle,
-                                      counterStyle: TextStyle(fontSize: 0)),
+                                  decoration: TextFieldDecoration.copyWith(labelText: "Invoice No:"),
                                   validator: (value) {
                                     if (value == null ||
                                         value.isEmpty ||
                                         value.length != 16) {
-                                      return 'Please enter some text';
+                                      return "";
                                     }
                                     return null;
                                   },
@@ -183,12 +182,7 @@ class _InvoiceCaptureScreenState extends ConsumerState<InvoiceCaptureScreen> {
                                   maxLength: 50,
                                   controller: DateTextController,
                                   readOnly: true,
-                                  decoration: InputDecoration(
-                                      border: OutlineInputBorder(),
-                                      isDense: true,
-                                      labelText: 'Date:',
-                                      labelStyle: labelStyle,
-                                      counterStyle: TextStyle(fontSize: 0)),
+                                  decoration: TextFieldDecoration.copyWith(labelText: "Date:"),
                                   onTap: () async {
                                     DateTime today = DateTime.now();
                                     DateTime? pickedDate = await showDatePicker(
@@ -221,7 +215,7 @@ class _InvoiceCaptureScreenState extends ConsumerState<InvoiceCaptureScreen> {
                                     if (value == null ||
                                         value.isEmpty ||
                                         !DateRegex.hasMatch(value)) {
-                                      return 'Please enter date.';
+                                      return "";
                                     }
                                     return null;
                                   },
@@ -241,13 +235,7 @@ class _InvoiceCaptureScreenState extends ConsumerState<InvoiceCaptureScreen> {
                                     }
                                     return null;
                                   },
-                                  decoration: InputDecoration(
-                                    border: OutlineInputBorder(),
-                                    isDense: true,
-                                    labelText: 'Amount:',
-                                    labelStyle: labelStyle,
-                                    counterStyle: TextStyle(fontSize: 0),
-                                  ),
+                                  decoration: TextFieldDecoration.copyWith(labelText: "Amount:"),
                                 ),
                               ],
                             ),
