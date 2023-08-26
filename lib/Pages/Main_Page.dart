@@ -102,6 +102,7 @@ class _CompanyListState extends State<CompanyList> {
         childAspectRatio: 0.60,
       ),
         itemCount: InvoiceDataBox.values.length,
+        //TODO: Invoice Type detection will be added.
       itemBuilder: (BuildContext context, int index) {
         final invoice = InvoiceDataBox.getAt(index) as InvoiceData;
         print(invoice);
