@@ -21,7 +21,7 @@ class CompanyList extends StatefulWidget {
 class _CompanyListState extends State<CompanyList> {
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     // This method is rerun every time setState is called, for instance as done
     // by the _incrementCounter method above.
     //
@@ -50,15 +50,15 @@ class _CompanyListState extends State<CompanyList> {
         // Create a grid with 2 columns. If you change the scrollDirection to
         // horizontal, this produces 2 rows.
 
-        padding: EdgeInsets.only(left: 10, right: 10, top: 20),
+        padding: const EdgeInsets.only(left: 10, right: 10, top: 20),
         // Generate 100 widgets that display their index in the List.
-        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
           crossAxisCount: 2,
           mainAxisSpacing: 15,
           crossAxisSpacing: 15,
           childAspectRatio: 0.60,
         ),
-        itemBuilder: (BuildContext context, int index) {
+        itemBuilder: (final BuildContext context, final int index) {
           return ClipRRect(
             borderRadius: BorderRadius.circular(20.0),
             child: Container(
@@ -68,18 +68,16 @@ class _CompanyListState extends State<CompanyList> {
                   children: [
                     Expanded(
                       child: Container(
-                        margin: EdgeInsets.all(15),
+                        margin: const EdgeInsets.all(15),
                         color: Colors.blueGrey,
                       ),
                     ),
-                    Container(
-                      child: Text(
-                        'Item $index',
-                        style: Theme
-                            .of(context)
-                            .textTheme
-                            .headlineSmall,
-                      ),
+                    Text(
+                      'Item $index',
+                      style: Theme
+                          .of(context)
+                          .textTheme
+                          .headlineSmall,
                     ),
                   ],
                 ),

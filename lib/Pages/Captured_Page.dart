@@ -1,18 +1,17 @@
 import 'dart:io';
 
+import 'package:cross_file/cross_file.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_mlkit_text_recognition/google_mlkit_text_recognition.dart';
 import 'package:hive/hive.dart';
-import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 
 import '../Models/invoice_data.dart';
 
 class InvoiceCaptureScreen extends ConsumerStatefulWidget {
-  InvoiceCaptureScreen({required this.imageFile, super.key});
+  const InvoiceCaptureScreen({required this.imageFile, super.key});
 
   final XFile imageFile;
 
@@ -27,26 +26,26 @@ class _InvoiceCaptureScreenState extends ConsumerState<InvoiceCaptureScreen> {
   bool _isLoading = true;
 
   //TextLabelControllers
-  TextEditingController CompanyTextController = TextEditingController();
-  TextEditingController InvoiceNoTextController = TextEditingController();
-  TextEditingController DateTextController = TextEditingController();
-  TextEditingController AmountTextController = TextEditingController();
+  TextEditingController companyTextController = TextEditingController();
+  TextEditingController invoiceNoTextController = TextEditingController();
+  TextEditingController dateTextController = TextEditingController();
+  TextEditingController amountTextController = TextEditingController();
 
   final _formKey = GlobalKey<FormState>();
 
   //TextLabelStyle
-  InputDecoration TextFieldDecoration(text, message) => InputDecoration(
-      border: OutlineInputBorder(),
+  InputDecoration textFieldDecoration(final text, final message) => InputDecoration(
+      border: const OutlineInputBorder(),
       isDense: true,
       labelText: text,
-      labelStyle: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
-      counterStyle: TextStyle(fontSize: 0),
-      errorStyle: TextStyle(fontSize: 0),
+      labelStyle: const TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
+      counterStyle: const TextStyle(fontSize: 0),
+      errorStyle: const TextStyle(fontSize: 0),
       suffixIcon: Tooltip(
           triggerMode: TooltipTriggerMode.tap,
-          showDuration: Duration(seconds: 3),
+          showDuration: const Duration(seconds: 3),
           message: message,
-          child: Icon(Icons.info_outline, size: 24,)
+          child: const Icon(Icons.info_outline, size: 24,)
       )
   );
 
@@ -63,17 +62,17 @@ class _InvoiceCaptureScreenState extends ConsumerState<InvoiceCaptureScreen> {
   // OCR can be used here, but there are a lot of projects already available (GCS also has invoice recognition but it needs a price to use).
   // So I wanna make my own parser or reader for the best use of Google ML Text Recognition.
 
-  RegExp CompanyRegex =
+  final RegExp companyRegex =
       RegExp(r"(?:LTD\.|ŞT(İ|Í)\.|A\.Ş\.)", caseSensitive: false);
-  RegExp DateRegex = RegExp(
+  final RegExp dateRegex = RegExp(
       r"(0[1-9]|[12][0-9]|3[01])(\/|-)(0[1-9]|1[1,2])(\/|-)(19|20)\d{2}",
       caseSensitive: false);
-  RegExp AmountRegex = RegExp(
+  final RegExp amountRegex = RegExp(
       r"^(\$|\₺|€)(0|[1-9][0-9]{0,2})(,\d{1,4})*(\.\d{1,2})?$|^(0|[1-9][0-9]{0,2})(,\d{1,4})*(\.\d{1,2})?(\$|\₺| TL|TL|€)$",
       caseSensitive: false);
 
   //To get readed text
-  getRecognisedText(XFile image) async {
+  Future<void> getRecognisedText(final XFile image) async {
     final inputImage = InputImage.fromFilePath(image.path);
     final textRecognizer = TextRecognizer(script: TextRecognitionScript.latin);
     final RecognizedText recognizedText =
@@ -86,48 +85,48 @@ class _InvoiceCaptureScreenState extends ConsumerState<InvoiceCaptureScreen> {
   }
 
   // The function that calculate which is company
-  getInvoiceThing(List ListText) {
-    CompanyTextController.text = ListText[0];
+  void getInvoiceThing(final List listText) {
+    companyTextController.text = listText[0];
 
     // For every each text in ListText
-    ListText.forEach((i) {
+    listText.forEach((final i) {
       // Text if match with CompanyRegex
-      if (CompanyRegex.hasMatch(i)) {
+      if (companyRegex.hasMatch(i)) {
         // Set text to CompanyTextController.text
-        CompanyTextController.text = i;
+        companyTextController.text = i;
       }
       // Text if match with DateRegex
-      else if (DateRegex.hasMatch(i)) {
+      else if (dateRegex.hasMatch(i)) {
         // Set text to DateTextController.text
-        DateTextController.text = i;
+        dateTextController.text = i;
       }
       // If text lenght is 16
       else if (i.length == 16) {
         // set text to InvoiceNoTextController.text
-        InvoiceNoTextController.text = i;
+        invoiceNoTextController.text = i;
       }
       // Text if match with AmountRegex
-      else if (AmountRegex.hasMatch(i)) {
+      else if (amountRegex.hasMatch(i)) {
         // Set text to AmountTextController.text
-        AmountTextController.text = i;
+        amountTextController.text = i;
       }
     });
     _isLoading = false;
   }
 
-  FieldFiller() async {
+  Future<void> fieldFiller() async {
     await getRecognisedText(widget.imageFile);
     getInvoiceThing(scannedText);
   }
 
   @override
   void initState() {
-    FieldFiller();
+    fieldFiller();
     super.initState();
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     return SafeArea(
       child: Scaffold(
         body: GestureDetector(
@@ -149,12 +148,12 @@ class _InvoiceCaptureScreenState extends ConsumerState<InvoiceCaptureScreen> {
             ),
             SliverToBoxAdapter(
               child: _isLoading
-                  ? CircularProgressIndicator()
+                  ? const CircularProgressIndicator()
                   : Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        Divider(height: 20),
+                        const Divider(height: 20),
                         Form(
                           autovalidateMode: AutovalidateMode.onUserInteraction,
                           key: _formKey,
@@ -166,12 +165,12 @@ class _InvoiceCaptureScreenState extends ConsumerState<InvoiceCaptureScreen> {
                               children: [
                                 TextFormField(
                                   maxLength: 50,
-                                  controller: CompanyTextController,
-                                  decoration: TextFieldDecoration("Company name:", "You must enter a valid company name."),
-                                  validator: (value) {
+                                  controller: companyTextController,
+                                  decoration: textFieldDecoration("Company name:", "You must enter a valid company name."),
+                                  validator: (final value) {
                                     if (value == null ||
                                         value.isEmpty ||
-                                        !CompanyRegex.hasMatch(value)) {
+                                        !companyRegex.hasMatch(value)) {
                                       return 'Please enter some text';
                                     }
                                     return null;
@@ -179,9 +178,9 @@ class _InvoiceCaptureScreenState extends ConsumerState<InvoiceCaptureScreen> {
                                 ),
                                 TextFormField(
                                   maxLength: 50,
-                                  controller: InvoiceNoTextController,
-                                  decoration: TextFieldDecoration("Invoice No:", "You must enter a valid invoice no."),
-                                  validator: (value) {
+                                  controller: invoiceNoTextController,
+                                  decoration: textFieldDecoration("Invoice No:", "You must enter a valid invoice no."),
+                                  validator: (final value) {
                                     if (value == null ||
                                         value.isEmpty ||
                                         value.length != 16) {
@@ -192,12 +191,12 @@ class _InvoiceCaptureScreenState extends ConsumerState<InvoiceCaptureScreen> {
                                 ),
                                 TextFormField(
                                   maxLength: 50,
-                                  controller: DateTextController,
+                                  controller: dateTextController,
                                   readOnly: true,
-                                  decoration: TextFieldDecoration("Date:", "You must enter a valid date."),
+                                  decoration: textFieldDecoration("Date:", "You must enter a valid date."),
                                   onTap: () async {
-                                    DateTime today = DateTime.now();
-                                    DateTime? pickedDate = await showDatePicker(
+                                    final DateTime today = DateTime.now();
+                                    final DateTime? pickedDate = await showDatePicker(
                                         context: context,
                                         initialDate: today,
                                         //get today's date
@@ -207,9 +206,8 @@ class _InvoiceCaptureScreenState extends ConsumerState<InvoiceCaptureScreen> {
                                             today.month, today.day));
 
                                     if (pickedDate != null) {
-                                      print(
-                                          pickedDate); //get the picked date in the format => 2022-07-04 00:00:00.000
-                                      String formattedDate =
+                                      print(pickedDate); //get the picked date in the format => 2022-07-04 00:00:00.000
+                                      final String formattedDate =
                                           DateFormat('dd-MM-yyyy').format(
                                               pickedDate); // format date in required form here we use yyyy-MM-dd that means time is removed
                                       print(
@@ -217,16 +215,15 @@ class _InvoiceCaptureScreenState extends ConsumerState<InvoiceCaptureScreen> {
                                       //You can format date as per your need
 
                                       setState(() {
-                                        DateTextController.text =
+                                        dateTextController.text =
                                             formattedDate; //set formatted date to TextField value.
                                       });
                                     }
-                                    ;
                                   },
-                                  validator: (value) {
+                                  validator: (final value) {
                                     if (value == null ||
                                         value.isEmpty ||
-                                        !DateRegex.hasMatch(value)) {
+                                        !dateRegex.hasMatch(value)) {
                                       return "";
                                     }
                                     return null;
@@ -234,27 +231,27 @@ class _InvoiceCaptureScreenState extends ConsumerState<InvoiceCaptureScreen> {
                                 ),
                                 TextFormField(
                                   maxLength: 50,
-                                  controller: AmountTextController,
+                                  controller: amountTextController,
                                   keyboardType: TextInputType.number,
                                   inputFormatters: <TextInputFormatter>[
                                     FilteringTextInputFormatter.digitsOnly
                                   ],
                                   // Only numbers can be entered
-                                  validator: (value) {
+                                  validator: (final value) {
                                     if (value == null ||
                                         value.isEmpty) {
                                       return "";
                                     }
                                     return null;
                                   },
-                                  decoration: TextFieldDecoration("Amount:", "You must enter a valid amount."),
+                                  decoration: textFieldDecoration("Amount:", "You must enter a valid amount."),
                                 ),
                               ],
                             ),
                           ),
                         ),
                         ElevatedButton(
-                            child: Icon(Icons.save_as_rounded),
+                            child: const Icon(Icons.save_as_rounded),
                             onPressed: () {
                               // Validate returns true if the form is valid, or false otherwise.
                               if (_formKey.currentState!.validate()) {
@@ -265,7 +262,7 @@ class _InvoiceCaptureScreenState extends ConsumerState<InvoiceCaptureScreen> {
                                       content: Text('Processing Data')),
                                 );
 
-                                final InvoiceDataBox = Hive.box('InvoiceData');
+                                final invoiceDataBox = Hive.box('InvoiceData');
 
                                 //For state management
                                 //ref.read(InvoicerListProvider.notifier).add(
@@ -275,16 +272,18 @@ class _InvoiceCaptureScreenState extends ConsumerState<InvoiceCaptureScreen> {
                                 // Date: DateFormat("dd-MM-yyyy").parse(DateTextController.text),
                                 // Amount: double.parse(AmountTextController.text));
 
+
+                                //TODO: Hive format save will be fixed.
                                 final data = InvoiceData(
                                     InvoiceImage:
                                         Image.file(File(widget.imageFile.path)),
-                                    CompanyName: CompanyTextController.text,
-                                    InvoiceNo: InvoiceNoTextController.text,
+                                    CompanyName: companyTextController.text,
+                                    InvoiceNo: invoiceNoTextController.text,
                                     Date: DateFormat("dd-MM-yyyy")
-                                        .parse(DateTextController.text),
+                                        .parse(dateTextController.text),
                                     Amount: double.parse(
-                                        AmountTextController.text));
-                                InvoiceDataBox.add(data);
+                                        amountTextController.text));
+                                invoiceDataBox.add(data);
                               }
                             }),
                       ],

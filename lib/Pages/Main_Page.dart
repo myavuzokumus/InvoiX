@@ -1,8 +1,13 @@
+import 'dart:async';
+
+import 'package:cross_file/cross_file.dart';
+import 'package:edge_detection/edge_detection.dart';
 import 'package:fastinvoicereader/Models/invoice_data.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'package:hive/hive.dart';
-import 'package:image_picker/image_picker.dart';
+import 'package:path/path.dart'as path;
+import 'package:path_provider/path_provider.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 import '/Pages/Captured_Page.dart';
 
@@ -20,7 +25,7 @@ class _CompanyListState extends State<CompanyList> {
   List icons = [Icons.camera, Icons.image];
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     // This method is rerun every time setState is called, for instance as done
     // by the _incrementCounter method above.
     //
@@ -37,74 +42,53 @@ class _CompanyListState extends State<CompanyList> {
             IconButton(
               icon: const Icon(Icons.table_chart),
               tooltip: 'Tüm verileri indir',
-              onPressed: () {
-                ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Dosyalar "Download" klasörüne kaydedildi.')));
-              },
+              onPressed: () => showSnackBar(context, "Dosyalar ""Download"" klasörüne kaydedildi."),
             ),]
       ),
-      body: _ListViewer(),
+      body: listViewer(),
 
       floatingActionButton: Badge(
-        child: SpeedDial(
-            spaceBetweenChildren: 15,
-            spacing: 15,
-            overlayColor: Colors.black,
-            overlayOpacity: 0.3,
-            child: const Icon(Icons.receipt_long, size: 45),
-            activeIcon: Icons.close,
-            children: [
-              for (int i = 0; i < icons.length; ++i)
-                SpeedDialChild(
-                  onTap: () {
-                    switch(i) {
-                      case 0:getImage(ImageSource.camera);break;
-                      case 1:getImage(ImageSource.gallery);break;
-                    }
-                  },
-                  child: Icon(
-                      icons[i],
-                      size: 45
-                  ),
-                ),
-          ],
-        ),
-        label: Icon(Icons.add, color: Colors.white, size: 25),
+        label: const Icon(Icons.add, color: Colors.white, size: 25),
         largeSize: 30,
         backgroundColor: Colors.red,
-        offset: Offset(10, -10),
+        offset: const Offset(10, -10),
+        child: FloatingActionButton(
+            onPressed: getImageFromCamera,
+            child: const Icon(Icons.receipt_long, size: 45)
+        ),
         ),
     );
   }
 
-  Widget _ListViewer() {
+  Widget listViewer() {
 
-    final InvoiceDataBox = Hive.box('InvoiceData');
+    final invoiceDataBox = Hive.box('InvoiceData');
     //InvoiceDataBox.watch().listen((event) { });
-    print(InvoiceDataBox.values); //Debug
+    print(invoiceDataBox.values); //Debug
 
     //“No data were found.” was added to avoid an error."
-    if (InvoiceDataBox.values.isEmpty) {
-      return Center(
+    if (invoiceDataBox.values.isEmpty) {
+      return const Center(
         child: Text("No data are found.", style: TextStyle(fontSize: 25),),
       );
     }
-    else return GridView.builder(
+    else {
+      return GridView.builder(
       // Create a grid with 2 columns. If you change the scrollDirection to
       // horizontal, this produces 2 rows.
 
-      padding: EdgeInsets.only(left: 10, right: 10, top: 20),
+      padding: const EdgeInsets.only(left: 10, right: 10, top: 20),
       // Generate 100 widgets that display their index in the List.
-      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: 2,
         mainAxisSpacing: 15,
         crossAxisSpacing: 15,
         childAspectRatio: 0.60,
       ),
-        itemCount: InvoiceDataBox.values.length,
+        itemCount: invoiceDataBox.values.length,
         //TODO: Invoice Type detection will be added.
-      itemBuilder: (BuildContext context, int index) {
-        final invoice = InvoiceDataBox.getAt(index) as InvoiceData;
+      itemBuilder: (final BuildContext context, final int index) {
+        final invoice = invoiceDataBox.getAt(index) as InvoiceData;
         print(invoice);
         return ClipRRect(
           borderRadius: BorderRadius.circular(20.0),
@@ -115,18 +99,16 @@ class _CompanyListState extends State<CompanyList> {
                 children: [
                   Expanded(
                     child: Container(
-                      margin: EdgeInsets.all(15),
+                      margin: const EdgeInsets.all(15),
                       color: Colors.blueGrey,
                     ),
                   ),
-                  Container(
-                    child: Text(
-                      'Item $index',
-                      style: Theme
-                          .of(context)
-                          .textTheme
-                          .headlineSmall,
-                    ),
+                  Text(
+                    'Item $index',
+                    style: Theme
+                        .of(context)
+                        .textTheme
+                        .headlineSmall,
                   ),
                 ],
               ),
@@ -135,14 +117,72 @@ class _CompanyListState extends State<CompanyList> {
         );
       }
     );
+    }
   }
 
-  getImage(source) async {
+  void showSnackBar(final BuildContext context, final String text) {
+    final snackBar = SnackBar(
+        content: Text(text),
+        backgroundColor: Colors.redAccent,
+        behavior: SnackBarBehavior.floating,
+        margin: const EdgeInsets.all(50),
+        elevation: 30,
+        duration: const Duration(milliseconds: 10000),
+        showCloseIcon: true,
+        );
+    ScaffoldMessenger.of(context).showSnackBar(snackBar);
+  }
 
-    final pickedImage = await ImagePicker().pickImage(source: source);
-    if (pickedImage != null)
-      Navigator.push(context, MaterialPageRoute(builder: (context) => InvoiceCaptureScreen(imageFile: pickedImage)));
+  Future<void> getImageFromCamera() async {
+    bool isCameraGranted = await Permission.camera.request().isGranted;
+    if (!isCameraGranted) {
+      isCameraGranted =
+          await Permission.camera.request() == PermissionStatus.granted;
+    }
+
+    if (!isCameraGranted) {
+      return showSnackBar(context, "You need to give permission to use camera.");
+    }
+
+    // Generate filepath for saving
+    final String imagePath = path.join(
+        (await getApplicationSupportDirectory()).path,
+        "${(DateTime
+            .now()
+            .millisecondsSinceEpoch / 1000).round()}.jpeg"
+    );
+
+    try {
+      final bool success = await EdgeDetection.detectEdge(
+        imagePath,
+        canUseGallery: true,
+        androidScanTitle: 'Scanning',
+        // use custom localizations for android
+        androidCropTitle: 'Crop',
+        androidCropBlackWhiteTitle: 'Black White',
+        androidCropReset: 'Reset',
+      );
+
+      if(success) {
+        unawaited(Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (final context) =>
+                    InvoiceCaptureScreen(
+                        imageFile: XFile(imagePath)
+                    )
+            )
+        ));
+      }
+
+    } catch (e) {
+      print(e);
+
+    }
+
+
 
   }
+
 
 }

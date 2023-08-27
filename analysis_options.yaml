@@ -47,7 +47,7 @@ linter:
     leading_newlines_in_multiline_strings: true
     only_throw_errors: true
     paraneter_assignments: true
-    prefer_constructors_over_static_methods:
+    prefer_constructors_over_static_methods: true
     prefer_contains: true
     prefer_final_in_for_each: true
     prefer_final_locals: true

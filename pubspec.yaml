@@ -38,14 +38,15 @@ dependencies:
   syncfusion_flutter_xlsio: ^22.2.10
   path_provider: ^2.1.0
   path: ^1.8.3
-  image_picker: ^1.0.2
   intl: ^0.18.1
   flutter_riverpod: ^2.3.7
   uuid: ^3.0.7
   hive: ^2.2.3
   hive_flutter: ^1.1.0
   google_mlkit_text_recognition: ^0.10.0
-  flutter_speed_dial: ^7.0.0
+  permission_handler: ^10.4.3
+  edge_detection: ^1.1.2
+  file_selector: ^1.0.0
 
 dev_dependencies:
   flutter_test:

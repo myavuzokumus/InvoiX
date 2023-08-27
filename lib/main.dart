@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:hive/hive.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 
-import 'Pages/Main_Page.dart';
 import 'Models/invoice_data.dart';
+import 'Pages/Main_Page.dart';
 
 void main() async {
 
@@ -16,19 +15,19 @@ void main() async {
   // Open user box
   await Hive.openBox('InvoiceData');
 
-  runApp(const ProviderScope(child: const MyApp()));
+  runApp(const ProviderScope(child: MyApp()));
 }
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
-  Color ThemeTextColor(color) => color.computeLuminance() > 0.5 ? Colors.white : Colors.black;
+  Color themeTextColor(final color) => color.computeLuminance() > 0.5 ? Colors.white : Colors.black;
   
   // This widget is the root of your application.
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     return MaterialApp(
-      title: 'Fast Invoicer Reader',
+      title: 'Fast Invoice Reader',
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.black87),
         textTheme: Theme.of(context).textTheme.apply(
@@ -41,7 +40,7 @@ class MyApp extends StatelessWidget {
         displayColor: Colors.white,
         decorationColor: Colors.white,
       ),
-      appBarTheme: AppBarTheme(
+      appBarTheme: const AppBarTheme(
           titleTextStyle: TextStyle(color: Colors.white,),
           backgroundColor: Colors.black,
           iconTheme: IconThemeData(color: Colors.white)
