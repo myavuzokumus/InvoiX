@@ -35,20 +35,33 @@ class _InvoiceCaptureScreenState extends ConsumerState<InvoiceCaptureScreen> {
   final _formKey = GlobalKey<FormState>();
 
   //TextLabelStyle
-  InputDecoration TextFieldDecoration = InputDecoration(
+  InputDecoration TextFieldDecoration(text, message) => InputDecoration(
       border: OutlineInputBorder(),
       isDense: true,
-      labelText: "",
+      labelText: text,
       labelStyle: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
-      counterStyle: TextStyle(fontSize: 0)
+      counterStyle: TextStyle(fontSize: 0),
+      errorStyle: TextStyle(fontSize: 0),
+      suffixIcon: Tooltip(
+          triggerMode: TooltipTriggerMode.tap,
+          showDuration: Duration(seconds: 3),
+          message: message,
+          child: Icon(Icons.info_outline, size: 24,)
+      )
   );
 
-  //TODO: INFO OVERLAY WILL BE ADDED.
   //TODO: Company name selection screen will be added.
   //TODO: Invoice Type detection will be added.
 
   //Regex
   //RegExp NameRegex = RegExp(r"\b([A-ZÀ-ÿ][-,a-z. ']+[ ]*)+", caseSensitive: false);
+
+  // I need to find a different solution here, because it is not working perfectly.
+  // I inspected some similar projects and they are working perfectly but they are not open source. They probably using OCR.
+  // I am open to contributions.
+  // Google ML Text Recognition is not working perfectly, so it can’t read everything properly.
+  // OCR can be used here, but there are a lot of projects already available (GCS also has invoice recognition but it needs a price to use).
+  // So I wanna make my own parser or reader for the best use of Google ML Text Recognition.
 
   RegExp CompanyRegex =
       RegExp(r"(?:LTD\.|ŞT(İ|Í)\.|A\.Ş\.)", caseSensitive: false);
@@ -76,7 +89,6 @@ class _InvoiceCaptureScreenState extends ConsumerState<InvoiceCaptureScreen> {
   getInvoiceThing(List ListText) {
     CompanyTextController.text = ListText[0];
 
-    // I know, this section so suck. I will try improve here when I found time.
     // For every each text in ListText
     ListText.forEach((i) {
       // Text if match with CompanyRegex
@@ -155,7 +167,7 @@ class _InvoiceCaptureScreenState extends ConsumerState<InvoiceCaptureScreen> {
                                 TextFormField(
                                   maxLength: 50,
                                   controller: CompanyTextController,
-                                  decoration: TextFieldDecoration.copyWith(labelText: "Company name:"),
+                                  decoration: TextFieldDecoration("Company name:", "You must enter a valid company name."),
                                   validator: (value) {
                                     if (value == null ||
                                         value.isEmpty ||
@@ -168,7 +180,7 @@ class _InvoiceCaptureScreenState extends ConsumerState<InvoiceCaptureScreen> {
                                 TextFormField(
                                   maxLength: 50,
                                   controller: InvoiceNoTextController,
-                                  decoration: TextFieldDecoration.copyWith(labelText: "Invoice No:"),
+                                  decoration: TextFieldDecoration("Invoice No:", "You must enter a valid invoice no."),
                                   validator: (value) {
                                     if (value == null ||
                                         value.isEmpty ||
@@ -182,7 +194,7 @@ class _InvoiceCaptureScreenState extends ConsumerState<InvoiceCaptureScreen> {
                                   maxLength: 50,
                                   controller: DateTextController,
                                   readOnly: true,
-                                  decoration: TextFieldDecoration.copyWith(labelText: "Date:"),
+                                  decoration: TextFieldDecoration("Date:", "You must enter a valid date."),
                                   onTap: () async {
                                     DateTime today = DateTime.now();
                                     DateTime? pickedDate = await showDatePicker(
@@ -235,7 +247,7 @@ class _InvoiceCaptureScreenState extends ConsumerState<InvoiceCaptureScreen> {
                                     }
                                     return null;
                                   },
-                                  decoration: TextFieldDecoration.copyWith(labelText: "Amount:"),
+                                  decoration: TextFieldDecoration("Amount:", "You must enter a valid amount."),
                                 ),
                               ],
                             ),
