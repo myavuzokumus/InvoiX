@@ -3,7 +3,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 
 import 'Models/invoice_data.dart';
-import 'Pages/Main_Page.dart';
+import 'Pages/main_page.dart';
+
+final invoiceDataBox = Hive.box('InvoiceData').values;
 
 void main() async {
 

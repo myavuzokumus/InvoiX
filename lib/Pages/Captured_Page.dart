@@ -54,6 +54,7 @@ class _InvoiceCaptureScreenState extends ConsumerState<InvoiceCaptureScreen> {
 
   //TODO: Company name selection screen will be added.
   //TODO: Invoice Type detection will be added.
+  //TODO: It will work in harmony with the edit page.
 
   //Regex
   //RegExp NameRegex = RegExp(r"\b([A-ZÀ-ÿ][-,a-z. ']+[ ]*)+", caseSensitive: false);

@@ -4,14 +4,15 @@ import 'package:cross_file/cross_file.dart';
 import 'package:edge_detection/edge_detection.dart';
 import 'package:fastinvoicereader/Models/invoice_data.dart';
 import 'package:flutter/material.dart';
-import 'package:hive/hive.dart';
 import 'package:path/path.dart'as path;
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
 
-import '../toast.dart';
+import '../main.dart';
 import '/Pages/Captured_Page.dart';
-import 'InvoiceList_Page.dart';
+import '../company_name_filter.dart';
+import '../toast.dart';
+import 'invoicelist_page.dart';
 
 class CompanyList extends StatefulWidget {
   const CompanyList({super.key, required this.title});
@@ -64,51 +65,62 @@ class _CompanyListState extends State<CompanyList> {
 
   Widget listViewer() {
 
-    final invoiceDataBox = Hive.box('InvoiceData');
     //InvoiceDataBox.watch().listen((event) { });
 
     //“No data were found.” was added to avoid an error."
-    if (invoiceDataBox.values.isEmpty) {
+    if (invoiceDataBox.isEmpty) {
       return const Center(
         child: Text("No data are found.", style: TextStyle(fontSize: 25),),
       );
-    }
-    else {
-      final List<InvoiceData> companys = companyList(invoiceDataBox.values.cast<InvoiceData>());
-      return ListView.separated(
-      padding: const EdgeInsets.only(left: 10, right: 10, top: 20),
-      itemCount: companys.length,
-
-      separatorBuilder: (final BuildContext context, final int index) => const Divider(),
-      itemBuilder: (final BuildContext context, final int index) {
-
-        final companyListName = companys.elementAt(index).companyName;
-        return ClipRRect(
-          borderRadius: BorderRadius.circular(20.0),
-          child: ListTile(
-              tileColor: Colors.grey,
-              title: Text(
-                '${companyListName}',
-                style: Theme
-                    .of(context)
-                    .textTheme
-                    .headlineSmall,
-              ),
-            onTap: () {
-                Navigator.push(
-                context,
-                MaterialPageRoute(
-                    builder: (final context) =>
-                        InvoiceListScreen(
-                            companyName: companyListName
-                        )
-                )
-            );
-                },
-          ),
-        );
       }
-    );
+    else {
+      return FutureBuilder<List<InvoiceData>>(
+        future: getInvoiceDataList(listType.company ,invoiceDataBox.cast<InvoiceData>()),
+        builder: (final BuildContext context, final AsyncSnapshot<List<InvoiceData>> company) {
+
+          if (company.hasData) {
+            return ListView.separated(
+                padding: const EdgeInsets.only(left: 10, right: 10, top: 20),
+                itemCount: company.data!.length,
+
+                separatorBuilder: (final BuildContext context, final int index) => const Divider(),
+                itemBuilder: (final BuildContext context, final int index) {
+
+                  final companyListName = company.data!.elementAt(index).companyName;
+                  return ClipRRect(
+                    borderRadius: BorderRadius.circular(20.0),
+                    child: ListTile(
+                      tileColor: Colors.grey,
+                      title: Text(
+                        companyListName,
+                        style: Theme
+                            .of(context)
+                            .textTheme
+                            .headlineSmall,
+                      ),
+                      onTap: () {
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (final context) =>
+                                    InvoiceListScreen(
+                                      companyName: companyListName
+                                    )
+                            )
+                        );
+                      },
+                    ),
+                  );
+                }
+            );
+          } else {
+            return const CircularProgressIndicator();
+          }
+
+
+
+        },
+      );
     }
   }
 
@@ -161,13 +173,5 @@ class _CompanyListState extends State<CompanyList> {
     }
 
   }
-
-  List<InvoiceData> companyList(final Iterable<InvoiceData> savedList) {
-    List<InvoiceData> savedCompanys = [];
-    savedCompanys = savedList.where((final element) => !savedCompanys.contains(element.companyName)).toList();
-    print(savedCompanys);
-    return savedCompanys;
-  }
-
 
 }
