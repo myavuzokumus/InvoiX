@@ -9,7 +9,9 @@ import 'package:path/path.dart'as path;
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
 
+import '../toast.dart';
 import '/Pages/Captured_Page.dart';
+import 'InvoiceList_Page.dart';
 
 class CompanyList extends StatefulWidget {
   const CompanyList({super.key, required this.title});
@@ -42,7 +44,7 @@ class _CompanyListState extends State<CompanyList> {
             IconButton(
               icon: const Icon(Icons.table_chart),
               tooltip: 'Tüm verileri indir',
-              onPressed: () => showSnackBar(context, "Dosyalar ""Download"" klasörüne kaydedildi."),
+              onPressed: () => showSnackBar(context, text: "Dosyalar ""Download"" klasörüne kaydedildi."),
             ),]
       ),
       body: listViewer(),
@@ -64,7 +66,6 @@ class _CompanyListState extends State<CompanyList> {
 
     final invoiceDataBox = Hive.box('InvoiceData');
     //InvoiceDataBox.watch().listen((event) { });
-    print(invoiceDataBox.values); //Debug
 
     //“No data were found.” was added to avoid an error."
     if (invoiceDataBox.values.isEmpty) {
@@ -73,64 +74,42 @@ class _CompanyListState extends State<CompanyList> {
       );
     }
     else {
-      return GridView.builder(
-      // Create a grid with 2 columns. If you change the scrollDirection to
-      // horizontal, this produces 2 rows.
-
+      final List<InvoiceData> companys = companyList(invoiceDataBox.values.cast<InvoiceData>());
+      return ListView.separated(
       padding: const EdgeInsets.only(left: 10, right: 10, top: 20),
-      // Generate 100 widgets that display their index in the List.
-      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 2,
-        mainAxisSpacing: 15,
-        crossAxisSpacing: 15,
-        childAspectRatio: 0.60,
-      ),
-        itemCount: invoiceDataBox.values.length,
-        //TODO: Invoice Type detection will be added.
+      itemCount: companys.length,
+
+      separatorBuilder: (final BuildContext context, final int index) => const Divider(),
       itemBuilder: (final BuildContext context, final int index) {
-        final invoice = invoiceDataBox.getAt(index) as InvoiceData;
-        print(invoice);
+
+        final companyListName = companys.elementAt(index).companyName;
         return ClipRRect(
           borderRadius: BorderRadius.circular(20.0),
-          child: Container(
-            color: Colors.grey,
-            child: Center(
-              child: Column(
-                children: [
-                  Expanded(
-                    child: Container(
-                      margin: const EdgeInsets.all(15),
-                      color: Colors.blueGrey,
-                    ),
-                  ),
-                  Text(
-                    'Item $index',
-                    style: Theme
-                        .of(context)
-                        .textTheme
-                        .headlineSmall,
-                  ),
-                ],
+          child: ListTile(
+              tileColor: Colors.grey,
+              title: Text(
+                '${companyListName}',
+                style: Theme
+                    .of(context)
+                    .textTheme
+                    .headlineSmall,
               ),
-            ),
+            onTap: () {
+                Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (final context) =>
+                        InvoiceListScreen(
+                            companyName: companyListName
+                        )
+                )
+            );
+                },
           ),
         );
       }
     );
     }
-  }
-
-  void showSnackBar(final BuildContext context, final String text) {
-    final snackBar = SnackBar(
-        content: Text(text),
-        backgroundColor: Colors.redAccent,
-        behavior: SnackBarBehavior.floating,
-        margin: const EdgeInsets.all(50),
-        elevation: 30,
-        duration: const Duration(milliseconds: 10000),
-        showCloseIcon: true,
-        );
-    ScaffoldMessenger.of(context).showSnackBar(snackBar);
   }
 
   Future<void> getImageFromCamera() async {
@@ -141,7 +120,7 @@ class _CompanyListState extends State<CompanyList> {
     }
 
     if (!isCameraGranted) {
-      return showSnackBar(context, "You need to give permission to use camera.");
+      return showSnackBar(context, text: "You need to give permission to use camera.", color: Colors.redAccent);
     }
 
     // Generate filepath for saving
@@ -177,11 +156,17 @@ class _CompanyListState extends State<CompanyList> {
 
     } catch (e) {
       print(e);
+      showSnackBar(context, text: "Something went wrong.", color: Colors.redAccent);
 
     }
 
+  }
 
-
+  List<InvoiceData> companyList(final Iterable<InvoiceData> savedList) {
+    List<InvoiceData> savedCompanys = [];
+    savedCompanys = savedList.where((final element) => !savedCompanys.contains(element.companyName)).toList();
+    print(savedCompanys);
+    return savedCompanys;
   }
 
 

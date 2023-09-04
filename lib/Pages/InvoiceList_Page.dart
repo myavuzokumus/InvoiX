@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-class CompanyList extends StatefulWidget {
-  const CompanyList({super.key, required this.title});
+class InvoiceListScreen extends StatefulWidget {
+  const InvoiceListScreen({super.key, required this.companyName});
 
   // This widget is the home page of your application. It is stateful, meaning
   // that it has a State object (defined below) that contains fields that affect
@@ -12,13 +12,13 @@ class CompanyList extends StatefulWidget {
   // used by the build method of the State. Fields in a Widget subclass are
   // always marked "final".
 
-  final String title;
+  final String companyName;
 
   @override
-  State<CompanyList> createState() => _CompanyListState();
+  State<InvoiceListScreen> createState() => _InvoiceListScreenState();
 }
 
-class _CompanyListState extends State<CompanyList> {
+class _InvoiceListScreenState extends State<InvoiceListScreen> {
 
   @override
   Widget build(final BuildContext context) {
@@ -32,7 +32,7 @@ class _CompanyListState extends State<CompanyList> {
       appBar: AppBar(
         // Here we take the value from the MyHomePage object that was created by
         // the App.build method, and use it to set our appbar title.
-          title: Text(widget.title),
+          title: Text(widget.companyName),
           centerTitle: true,
           actions: <Widget>[
             IconButton(

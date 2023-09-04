@@ -9,6 +9,7 @@ import 'package:hive/hive.dart';
 import 'package:intl/intl.dart';
 
 import '../Models/invoice_data.dart';
+import '../toast.dart';
 
 class InvoiceCaptureScreen extends ConsumerStatefulWidget {
   const InvoiceCaptureScreen({required this.imageFile, super.key});
@@ -24,6 +25,8 @@ class _InvoiceCaptureScreenState extends ConsumerState<InvoiceCaptureScreen> {
   late List<String> scannedText;
 
   bool _isLoading = true;
+
+  bool _saveButtonState = true;
 
   //TextLabelControllers
   TextEditingController companyTextController = TextEditingController();
@@ -77,7 +80,7 @@ class _InvoiceCaptureScreenState extends ConsumerState<InvoiceCaptureScreen> {
     final textRecognizer = TextRecognizer(script: TextRecognitionScript.latin);
     final RecognizedText recognizedText =
         await textRecognizer.processImage(inputImage);
-    textRecognizer.close();
+    await textRecognizer.close();
     setState(() {
       scannedText = recognizedText.text.split("\n");
     });
@@ -251,19 +254,14 @@ class _InvoiceCaptureScreenState extends ConsumerState<InvoiceCaptureScreen> {
                           ),
                         ),
                         ElevatedButton(
-                            child: const Icon(Icons.save_as_rounded),
-                            onPressed: () {
+                            onPressed: _saveButtonState ? () async {
                               // Validate returns true if the form is valid, or false otherwise.
+                              _saveButtonState = false;
                               if (_formKey.currentState!.validate()) {
                                 // If the form is valid, display a snackbar. In the real world,
                                 // you'd often call a server or save the information in a database.
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(
-                                      content: Text('Processing Data')),
-                                );
-
+                                showSnackBar(context, text: "Processing Data...", color: Colors.deepOrangeAccent);
                                 final invoiceDataBox = Hive.box('InvoiceData');
-
                                 //For state management
                                 //ref.read(InvoicerListProvider.notifier).add(
                                 // InvoiceImage: Image.file(File(widget.imageFile.path)),
@@ -275,17 +273,19 @@ class _InvoiceCaptureScreenState extends ConsumerState<InvoiceCaptureScreen> {
 
                                 //TODO: Hive format save will be fixed.
                                 final data = InvoiceData(
-                                    InvoiceImage:
-                                        Image.file(File(widget.imageFile.path)),
-                                    CompanyName: companyTextController.text,
-                                    InvoiceNo: invoiceNoTextController.text,
-                                    Date: DateFormat("dd-MM-yyyy")
+                                    invoiceImageData: await XFile(widget.imageFile.path).readAsBytes(),
+                                    companyName: companyTextController.text,
+                                    invoiceNo: invoiceNoTextController.text,
+                                    date: DateFormat("dd-MM-yyyy")
                                         .parse(dateTextController.text),
-                                    Amount: double.parse(
+                                    amount: double.parse(
                                         amountTextController.text));
-                                invoiceDataBox.add(data);
+                                await invoiceDataBox.add(data);
                               }
-                            }),
+                              _saveButtonState = true;
+                            } : null,
+                            child: const Icon(Icons.save_as_rounded),
+                            ),
                       ],
                     ),
             ),

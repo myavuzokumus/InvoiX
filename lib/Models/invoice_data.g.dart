@@ -17,11 +17,11 @@ class InvoiceDataAdapter extends TypeAdapter<InvoiceData> {
       for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
     };
     return InvoiceData(
-      InvoiceImage: fields[0] as Image,
-      CompanyName: fields[2] as String,
-      InvoiceNo: fields[3] as String,
-      Date: fields[4] as DateTime,
-      Amount: fields[5] as double,
+      invoiceImageData: fields[0] as Uint8List,
+      companyName: fields[2] as String,
+      invoiceNo: fields[3] as String,
+      date: fields[4] as DateTime,
+      amount: fields[5] as double,
     );
   }
 
@@ -30,17 +30,17 @@ class InvoiceDataAdapter extends TypeAdapter<InvoiceData> {
     writer
       ..writeByte(6)
       ..writeByte(0)
-      ..write(obj.InvoiceImage)
+      ..write(obj.invoiceImageData)
       ..writeByte(1)
       ..write(obj.id)
       ..writeByte(2)
-      ..write(obj.CompanyName)
+      ..write(obj.companyName)
       ..writeByte(3)
-      ..write(obj.InvoiceNo)
+      ..write(obj.invoiceNo)
       ..writeByte(4)
-      ..write(obj.Date)
+      ..write(obj.date)
       ..writeByte(5)
-      ..write(obj.Amount);
+      ..write(obj.amount);
   }
 
   @override
