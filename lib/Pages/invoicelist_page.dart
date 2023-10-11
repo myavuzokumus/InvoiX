@@ -51,7 +51,7 @@ class _InvoiceListScreenState extends State<InvoiceListScreen> {
           ]
       ),
       body: FutureBuilder<List<InvoiceData>>(
-        future: getInvoiceDataList(listType.company ,invoiceDataBox.cast<InvoiceData>()),
+        future: getInvoiceDataList(listType.invoice ,invoiceDataBox.cast<InvoiceData>(), widget.companyName),
         builder: (final BuildContext context, final AsyncSnapshot<List<InvoiceData>> invoice) {
 
           if (invoice.hasData) {

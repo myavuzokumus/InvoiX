@@ -12,9 +12,10 @@ import '../Models/invoice_data.dart';
 import '../toast.dart';
 
 class InvoiceCaptureScreen extends ConsumerStatefulWidget {
-  const InvoiceCaptureScreen({required this.imageFile, super.key});
+  InvoiceCaptureScreen({required this.imageFile, editMode, super.key});
 
   final XFile imageFile;
+  final bool editMode = false;
 
   @override
   ConsumerState<InvoiceCaptureScreen> createState() =>
@@ -67,14 +68,14 @@ class _InvoiceCaptureScreenState extends ConsumerState<InvoiceCaptureScreen> {
   // So I wanna make my own parser or reader for the best use of Google ML Text Recognition.
 
   final RegExp companyRegex =
-      RegExp(r"(?:LTD\.|ŞT(İ|Í)\.|A\.Ş\.)", caseSensitive: false);
+      RegExp(r"(?:LTD\.|ŞT(İ|Í)\.|A\.Ş\.|A\.S\.)", caseSensitive: false);
   final RegExp dateRegex = RegExp(
       r"(0[1-9]|[12][0-9]|3[01])(\/|-)(0[1-9]|1[1,2])(\/|-)(19|20)\d{2}",
       caseSensitive: false);
   final RegExp amountRegex = RegExp(
       r"^(\$|\₺|€)(0|[1-9][0-9]{0,2})(,\d{1,4})*(\.\d{1,2})?$|^(0|[1-9][0-9]{0,2})(,\d{1,4})*(\.\d{1,2})?(\$|\₺| TL|TL|€)$",
       caseSensitive: false);
-
+  
   //To get readed text
   Future<void> getRecognisedText(final XFile image) async {
     final inputImage = InputImage.fromFilePath(image.path);
@@ -125,7 +126,7 @@ class _InvoiceCaptureScreenState extends ConsumerState<InvoiceCaptureScreen> {
 
   @override
   void initState() {
-    fieldFiller();
+    widget.editMode ? null : fieldFiller();
     super.initState();
   }
 
@@ -170,7 +171,7 @@ class _InvoiceCaptureScreenState extends ConsumerState<InvoiceCaptureScreen> {
                                 TextFormField(
                                   maxLength: 50,
                                   controller: companyTextController,
-                                  decoration: textFieldDecoration("Company name:", "You must enter a valid company name."),
+                                  decoration: textFieldDecoration("Company name:", "You must enter a valid company name. Need include 'A.S., LTD. etc.'"),
                                   validator: (final value) {
                                     if (value == null ||
                                         value.isEmpty ||
@@ -183,7 +184,7 @@ class _InvoiceCaptureScreenState extends ConsumerState<InvoiceCaptureScreen> {
                                 TextFormField(
                                   maxLength: 50,
                                   controller: invoiceNoTextController,
-                                  decoration: textFieldDecoration("Invoice No:", "You must enter a valid invoice no."),
+                                  decoration: textFieldDecoration("Invoice No:", "You must enter a valid invoice no. Need 16 character."),
                                   validator: (final value) {
                                     if (value == null ||
                                         value.isEmpty ||
@@ -226,8 +227,7 @@ class _InvoiceCaptureScreenState extends ConsumerState<InvoiceCaptureScreen> {
                                   },
                                   validator: (final value) {
                                     if (value == null ||
-                                        value.isEmpty ||
-                                        !dateRegex.hasMatch(value)) {
+                                        value.isEmpty) {
                                       return "";
                                     }
                                     return null;

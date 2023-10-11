@@ -25,8 +25,6 @@ class CompanyList extends StatefulWidget {
 
 class _CompanyListState extends State<CompanyList> {
 
-  List icons = [Icons.camera, Icons.image];
-
   @override
   Widget build(final BuildContext context) {
     // This method is rerun every time setState is called, for instance as done
