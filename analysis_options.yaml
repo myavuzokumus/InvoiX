@@ -46,7 +46,7 @@ linter:
     eol_at_end_of_file: true
     leading_newlines_in_multiline_strings: true
     only_throw_errors: true
-    paraneter_assignments: true
+    parameter_assignments: true
     prefer_constructors_over_static_methods: true
     prefer_contains: true
     prefer_final_in_for_each: true
@@ -61,7 +61,7 @@ linter:
     use_if_null_to_convert_nulls_to_bools: true
     use_is_even_rather_than_modulo: true
     use_late_for_private_fields_and_variables: true
-    depend_cn_referenced_packages: true
+    depend_on_referenced_packages: true
 
 # Additional information about this file can be found at
 # https://dart.dev/guides/language/analysis-options

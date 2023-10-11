@@ -93,7 +93,7 @@ class _InvoiceCaptureScreenState extends ConsumerState<InvoiceCaptureScreen> {
     companyTextController.text = listText[0];
 
     // For every each text in ListText
-    listText.forEach((final i) {
+    for (final i in listText) {
       // Text if match with CompanyRegex
       if (companyRegex.hasMatch(i)) {
         // Set text to CompanyTextController.text
@@ -114,7 +114,7 @@ class _InvoiceCaptureScreenState extends ConsumerState<InvoiceCaptureScreen> {
         // Set text to AmountTextController.text
         amountTextController.text = i;
       }
-    });
+    }
     _isLoading = false;
   }
 
