@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:fastinvoicereader/Models/invoice_data.dart';
 import 'package:file_selector/file_selector.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 import '../company_name_filter.dart';
 import '../main.dart';
@@ -76,7 +77,6 @@ class _InvoiceListScreenState extends State<InvoiceListScreen> {
 
               return InkWell(
                   onTap: () {
-                    print(index);
                     Navigator.push(
                         context,
                         MaterialPageRoute(
@@ -113,7 +113,10 @@ class _InvoiceListScreenState extends State<InvoiceListScreen> {
                                 ),
                                 ListTile(
                                   title: const Text("Date:", style: TextStyle(fontSize: 20)),
-                                  trailing: Text(invoiceData.date.toLocal().toString().replaceAll("00:00:00.000", ""), style: const TextStyle(fontSize: 16)),
+                                  trailing: Text(
+                                      DateFormat("dd-MM-yyyy")
+                                          .format(invoiceData.date),
+                                      style: const TextStyle(fontSize: 16)),
                                 ),
                                 ListTile(
                                   title: const Text("Amount:", style: TextStyle(fontSize: 20)),

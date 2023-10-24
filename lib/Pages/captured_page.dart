@@ -133,8 +133,10 @@ class _InvoiceCaptureScreenState extends ConsumerState<InvoiceCaptureScreen> {
 
     companyTextController.text = item.companyName;
     invoiceNoTextController.text = item.invoiceNo;
-    dateTextController.text = item.date.toString();
+    dateTextController.text = DateFormat("dd-MM-yyyy")
+        .format(item.date);
     amountTextController.text = item.amount.toString();
+
 
     _isLoading = false;
 
@@ -280,15 +282,19 @@ class _InvoiceCaptureScreenState extends ConsumerState<InvoiceCaptureScreen> {
                           onPressed: _saveButtonState
                               ? () async {
                                   // Validate returns true if the form is valid, or false otherwise.
-                                  setState(() {
-                                    _saveButtonState = false;
-                                  });
                                   if (_formKey.currentState!.validate()) {
+
+                                    setState(() {
+                                      _saveButtonState = false;
+                                    });
+
                                     // If the form is valid, display a snackbar. In the real world,
                                     // you'd often call a server or save the information in a database.
-                                    showSnackBar(context,
+                                    showSnackBar(
+                                        context,
                                         text: "Processing Data...",
-                                        color: Colors.deepOrangeAccent);
+                                        color: Colors.deepOrangeAccent
+                                    );
 
                                     final invoiceDataBox = Hive.box('InvoiceData');
                                     //For state management
@@ -315,9 +321,11 @@ class _InvoiceCaptureScreenState extends ConsumerState<InvoiceCaptureScreen> {
                                         ? await invoiceDataBox.add(data)
                                         : await invoiceDataBox.putAt(widget.editIndex!, data);
 
-                                    showSnackBar(context,
+                                    showSnackBar(
+                                        context,
                                         text: "Data Proccesed!",
-                                        color: Colors.greenAccent);
+                                        color: Colors.greenAccent
+                                    );
 
                                     setState(() {
                                       _saveButtonState = true;
@@ -327,6 +335,7 @@ class _InvoiceCaptureScreenState extends ConsumerState<InvoiceCaptureScreen> {
 
                                 }
                               : null,
+
                           child: _saveButtonState ? const Icon(Icons.save_as_rounded) : const CircularProgressIndicator(),
                         ),
                       ],

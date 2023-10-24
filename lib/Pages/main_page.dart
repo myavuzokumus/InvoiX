@@ -130,7 +130,10 @@ class _CompanyListState extends State<CompanyList> {
     }
 
     if (!isCameraGranted) {
-      return showSnackBar(context, text: "You need to give permission to use camera.", color: Colors.redAccent);
+      return showSnackBar(
+          context,
+          text: "You need to give permission to use camera.",
+          color: Colors.redAccent);
     }
 
     // Generate filepath for saving
@@ -166,7 +169,10 @@ class _CompanyListState extends State<CompanyList> {
 
     } catch (e) {
       print(e);
-      showSnackBar(context, text: "Something went wrong.", color: Colors.redAccent);
+      showSnackBar(
+          context,
+          text: "Something went wrong.",
+          color: Colors.redAccent);
 
     }
 
