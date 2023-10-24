@@ -275,11 +275,14 @@ class _InvoiceCaptureScreenState extends ConsumerState<InvoiceCaptureScreen> {
                             ),
                           ),
                         ),
+
                         ElevatedButton(
                           onPressed: _saveButtonState
                               ? () async {
                                   // Validate returns true if the form is valid, or false otherwise.
-                                  _saveButtonState = false;
+                                  setState(() {
+                                    _saveButtonState = false;
+                                  });
                                   if (_formKey.currentState!.validate()) {
                                     // If the form is valid, display a snackbar. In the real world,
                                     // you'd often call a server or save the information in a database.
@@ -311,16 +314,20 @@ class _InvoiceCaptureScreenState extends ConsumerState<InvoiceCaptureScreen> {
                                     widget.editIndex == null
                                         ? await invoiceDataBox.add(data)
                                         : await invoiceDataBox.putAt(widget.editIndex!, data);
+
+                                    showSnackBar(context,
+                                        text: "Data Proccesed!",
+                                        color: Colors.greenAccent);
+
+                                    setState(() {
+                                      _saveButtonState = true;
+                                    });
                                   }
 
-                                  showSnackBar(context,
-                                      text: "Data Proccesed!",
-                                      color: Colors.greenAccent);
 
-                                  _saveButtonState = true;
                                 }
                               : null,
-                          child: const Icon(Icons.save_as_rounded),
+                          child: _saveButtonState ? const Icon(Icons.save_as_rounded) : const CircularProgressIndicator(),
                         ),
                       ],
                     ),
