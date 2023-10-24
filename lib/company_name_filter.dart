@@ -11,12 +11,10 @@ Future<List<InvoiceData>> getInvoiceDataList(final listType type, final Iterable
   switch (type) {
     case listType.company:
       returnList = savedList.where((final element) => !returnList.contains(element.companyName)).toList();
-      print(returnList);
       return returnList;
 
     case listType.invoice:
       returnList = savedList.where((final element) => companyName == element.companyName).toList();
-      print(returnList);
       return returnList;
   }
 

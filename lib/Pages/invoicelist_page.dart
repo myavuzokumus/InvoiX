@@ -58,44 +58,53 @@ class _InvoiceListScreenState extends State<InvoiceListScreen> {
             return GridView.builder(
             // Create a grid with 2 columns. If you change the scrollDirection to
             // horizontal, this produces 2 rows.
-
-            padding: const EdgeInsets.only(left: 10, right: 10, top: 20),
             // Generate 100 widgets that display their index in the List.
             gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 2,
+              crossAxisCount: 1,
               mainAxisSpacing: 15,
               crossAxisSpacing: 15,
-              childAspectRatio: 0.60,
+              childAspectRatio: 0.9,
             ),
             itemCount: invoice.data!.length,
             itemBuilder: (final BuildContext context, final int index) {
 
               final invoiceData = invoice.data!.elementAt(index);
 
-              return ClipRRect(
-                borderRadius: BorderRadius.circular(20.0),
-                child: Container(
-                  color: Colors.grey,
-                  child: Center(
-                    child: Column(
-                      children: [
-                        Expanded(
-                          child: Container(
-                            margin: const EdgeInsets.all(15),
-                            color: Colors.blueGrey,
-                            child: Image.memory(invoiceData.invoiceImageData),
+              return ListTile(
+                title: ClipRRect(
+                  borderRadius: BorderRadius.circular(20.0),
+                  child: Container(
+                    color: Colors.grey,
+                    child: Center(
+                      child: Column(
+                        children: [
+                          Expanded(
+                            child: Container(
+                              margin: const EdgeInsets.all(15),
+                              color: Colors.blueGrey,
+                              child: Image.memory(invoiceData.invoiceImageData),
+                            ),
                           ),
-                        ),
-                        Text(
-                          "No: ${invoiceData.invoiceNo}"
-                          "Date: ${invoiceData.date}"
-                          "Amount: ${invoiceData.amount}",
-                          style: Theme
-                              .of(context)
-                              .textTheme
-                              .headlineSmall,
-                        ),
-                      ],
+                          ListView(
+                            shrinkWrap: true,
+                            physics: const NeverScrollableScrollPhysics(),
+                            children: <Widget>[
+                              ListTile(
+                                title: const Text("Invoice No:", style: TextStyle(fontSize: 20)),
+                                trailing: Text(invoiceData.invoiceNo, style: const TextStyle(fontSize: 16)),
+                              ),
+                              ListTile(
+                                title: const Text("Date:", style: TextStyle(fontSize: 20)),
+                                trailing: Text(invoiceData.date.toLocal().toString().replaceAll("00:00:00.000", ""), style: const TextStyle(fontSize: 16)),
+                              ),
+                              ListTile(
+                                title: const Text("Amount:", style: TextStyle(fontSize: 20)),
+                                trailing: Text(invoiceData.amount.toString(), style: const TextStyle(fontSize: 16)),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                 ),

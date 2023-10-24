@@ -12,7 +12,7 @@ import '../Models/invoice_data.dart';
 import '../toast.dart';
 
 class InvoiceCaptureScreen extends ConsumerStatefulWidget {
-  InvoiceCaptureScreen({required this.imageFile, editMode, super.key});
+  const InvoiceCaptureScreen({required this.imageFile, super.key});
 
   final XFile imageFile;
   final bool editMode = false;
