@@ -1,4 +1,4 @@
-import 'dart:typed_data';
+
 
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:uuid/uuid.dart';
@@ -10,7 +10,7 @@ part 'invoice_data.g.dart';
 class InvoiceData extends HiveObject{
 
   @HiveField(0)
-  final Uint8List invoiceImageData;
+  final String ImagePath;
   @HiveField(1)
   final String id = const Uuid().toString();
   @HiveField(2)
@@ -23,7 +23,7 @@ class InvoiceData extends HiveObject{
   final double amount;
 
   InvoiceData({
-    required this.invoiceImageData,
+    required this.ImagePath,
     required this.companyName,
     required this.invoiceNo,
     required this.date,
@@ -32,6 +32,9 @@ class InvoiceData extends HiveObject{
   );
 
 }
+
+//final Uint8List ImagePath;
+//import 'dart:typed_data';
 
 //Under section will be useless in the future.
 // class InvoicerList extends Notifier<List<InvoicerData>>{

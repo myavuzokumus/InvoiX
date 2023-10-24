@@ -1,8 +1,12 @@
+import 'dart:io';
+
 import 'package:fastinvoicereader/Models/invoice_data.dart';
+import 'package:file_selector/file_selector.dart';
 import 'package:flutter/material.dart';
 
 import '../company_name_filter.dart';
 import '../main.dart';
+import 'captured_page.dart';
 
 class InvoiceListScreen extends StatefulWidget {
   const InvoiceListScreen({super.key, required this.companyName});
@@ -51,7 +55,7 @@ class _InvoiceListScreenState extends State<InvoiceListScreen> {
           ]
       ),
       body: FutureBuilder<List<InvoiceData>>(
-        future: getInvoiceDataList(listType.invoice ,invoiceDataBox.cast<InvoiceData>(), widget.companyName),
+        future: getInvoiceDataList(listType.invoice, invoiceDataBox.cast<InvoiceData>(), widget.companyName),
         builder: (final BuildContext context, final AsyncSnapshot<List<InvoiceData>> invoice) {
 
           if (invoice.hasData) {
@@ -70,40 +74,55 @@ class _InvoiceListScreenState extends State<InvoiceListScreen> {
 
               final invoiceData = invoice.data!.elementAt(index);
 
-              return ListTile(
-                title: ClipRRect(
-                  borderRadius: BorderRadius.circular(20.0),
-                  child: Container(
-                    color: Colors.grey,
-                    child: Center(
-                      child: Column(
-                        children: [
-                          Expanded(
-                            child: Container(
-                              margin: const EdgeInsets.all(15),
-                              color: Colors.blueGrey,
-                              child: Image.memory(invoiceData.invoiceImageData),
+              return InkWell(
+                  onTap: () {
+                    print(index);
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (final context) =>
+                                InvoiceCaptureScreen(
+                                  editIndex: index,
+                                  imageFile: XFile(invoiceData.ImagePath),
+                                )
+                        )
+                    );
+                  },
+                  child: ListTile(
+                  title: ClipRRect(
+                    borderRadius: BorderRadius.circular(20.0),
+                    child: Container(
+                      color: Colors.grey,
+                      child: Center(
+                        child: Column(
+                          children: [
+                            Expanded(
+                              child: Container(
+                                margin: const EdgeInsets.all(15),
+                                color: Colors.blueGrey,
+                                child: Image.file(File(XFile(invoiceData.ImagePath).path)),
+                              ),
                             ),
-                          ),
-                          ListView(
-                            shrinkWrap: true,
-                            physics: const NeverScrollableScrollPhysics(),
-                            children: <Widget>[
-                              ListTile(
-                                title: const Text("Invoice No:", style: TextStyle(fontSize: 20)),
-                                trailing: Text(invoiceData.invoiceNo, style: const TextStyle(fontSize: 16)),
-                              ),
-                              ListTile(
-                                title: const Text("Date:", style: TextStyle(fontSize: 20)),
-                                trailing: Text(invoiceData.date.toLocal().toString().replaceAll("00:00:00.000", ""), style: const TextStyle(fontSize: 16)),
-                              ),
-                              ListTile(
-                                title: const Text("Amount:", style: TextStyle(fontSize: 20)),
-                                trailing: Text(invoiceData.amount.toString(), style: const TextStyle(fontSize: 16)),
-                              ),
-                            ],
-                          ),
-                        ],
+                            ListView(
+                              shrinkWrap: true,
+                              physics: const NeverScrollableScrollPhysics(),
+                              children: <Widget>[
+                                ListTile(
+                                  title: const Text("Invoice No:", style: TextStyle(fontSize: 20)),
+                                  trailing: Text(invoiceData.invoiceNo, style: const TextStyle(fontSize: 16)),
+                                ),
+                                ListTile(
+                                  title: const Text("Date:", style: TextStyle(fontSize: 20)),
+                                  trailing: Text(invoiceData.date.toLocal().toString().replaceAll("00:00:00.000", ""), style: const TextStyle(fontSize: 16)),
+                                ),
+                                ListTile(
+                                  title: const Text("Amount:", style: TextStyle(fontSize: 20)),
+                                  trailing: Text(invoiceData.amount.toString(), style: const TextStyle(fontSize: 16)),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
                       ),
                     ),
                   ),

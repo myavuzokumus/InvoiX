@@ -4,14 +4,14 @@ import 'package:cross_file/cross_file.dart';
 import 'package:edge_detection/edge_detection.dart';
 import 'package:fastinvoicereader/Models/invoice_data.dart';
 import 'package:flutter/material.dart';
-import 'package:path/path.dart'as path;
+import 'package:path/path.dart' as path;
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
 
-import '../main.dart';
-import '/Pages/Captured_Page.dart';
 import '../company_name_filter.dart';
+import '../main.dart';
 import '../toast.dart';
+import 'captured_page.dart';
 import 'invoicelist_page.dart';
 
 class CompanyList extends StatefulWidget {
@@ -57,7 +57,7 @@ class _CompanyListState extends State<CompanyList> {
             onPressed: getImageFromCamera,
             child: const Icon(Icons.receipt_long, size: 45)
         ),
-        ),
+      ),
     );
   }
 
@@ -70,7 +70,7 @@ class _CompanyListState extends State<CompanyList> {
       return const Center(
         child: Text("No data are found.", style: TextStyle(fontSize: 25),),
       );
-      }
+    }
     else {
       return FutureBuilder<List<InvoiceData>>(
         future: getInvoiceDataList(listType.company ,invoiceDataBox.cast<InvoiceData>()),
@@ -102,7 +102,7 @@ class _CompanyListState extends State<CompanyList> {
                             MaterialPageRoute(
                                 builder: (final context) =>
                                     InvoiceListScreen(
-                                      companyName: companyListName
+                                        companyName: companyListName
                                     )
                             )
                         );
