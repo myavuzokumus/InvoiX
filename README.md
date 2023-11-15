@@ -6,15 +6,15 @@ A Flutter application that allows you to quickly read the invoices at hand, get 
 
 1. Create a new Flutter project:
 ```
-flutter create weather_app
+flutter create fastinvoicereader
 ```
 
 2. Clone the repository:
 ```
-git clone https://github.com/OverBrave/WeatherApp.git
+git clone https://github.com/OverBrave/FastInvoiceReader.git
 ```
 
-3. Test your changes by running the app on an emulator or a physical device:
+3. Test your changes by running the app on a physical device:
 ```
 flutter run
 ```
