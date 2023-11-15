@@ -2,6 +2,12 @@
 
 A Flutter application that allows you to quickly read the invoices at hand, get the necessary information and then output it as an .xls file.
 
+### TODO: 
+- Add Excell function to save data.
+- Removing companies and invoices will be added.
+- List refresh after added new invoice.
+- Remake UI.
+
 ## Installation
 
 1. Create a new Flutter project:
