@@ -26,6 +26,7 @@ class CompanyList extends StatefulWidget {
 class _CompanyListState extends State<CompanyList> {
 
   //TODO: Add Excell function to save data
+  //TODO: Removing companies and invoices will be added.
 
   @override
   Widget build(final BuildContext context) {
