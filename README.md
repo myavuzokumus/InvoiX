@@ -1,17 +1,27 @@
 # FastInvoiceReader
 
-A new Flutter project.
-This project has been started thanks to the SupaBase Hackathon.
+A Flutter application that allows you to quickly read the invoices at hand, get the necessary information and then output it as an .xls file.
 
-## Getting Started
+## Installation
 
-This project is a starting point for a Flutter application.
+1. Create a new Flutter project:
+```
+flutter create weather_app
+```
 
-A few resources to get you started if this is your first Flutter project:
+2. Clone the repository:
+```
+git clone https://github.com/OverBrave/WeatherApp.git
+```
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+3. Test your changes by running the app on an emulator or a physical device:
+```
+flutter run
+```
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+## Packages
+
+- [hive](https://pub.dev/packages/hive) - To save for the user’s invoices data in device’s storage.
+- [syncfusion_flutter_xlsio](https://pub.dev/packages/syncfusion_flutter_xlsio) - To export invoices data with image to .xls file.
+- [google_mlkit_text_recognition](https://pub.dev/packages/google_mlkit_text_recognition) - To read texts in image.
+- opencv - It reads the corners of the invoice and ensures that it is trimmed.
