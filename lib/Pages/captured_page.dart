@@ -20,8 +20,7 @@ class InvoiceCaptureScreen extends StatefulWidget {
   final int? editIndex;
 
   @override
-  State<InvoiceCaptureScreen> createState() =>
-      _InvoiceCaptureScreenState();
+  State<InvoiceCaptureScreen> createState() => _InvoiceCaptureScreenState();
 }
 
 class _InvoiceCaptureScreenState extends State<InvoiceCaptureScreen> {
@@ -301,31 +300,33 @@ class _InvoiceCaptureScreenState extends State<InvoiceCaptureScreen> {
 
       for (final element in companyList) {
         final double similarity =
-        (companyTextController.text).similarityTo(element.companyName);
+            (companyTextController.text).similarityTo(element.companyName);
 
         if (similarity >= 0.4) {
           if (mounted) {
             await showDialog<bool>(
               context: context,
-              builder: (final BuildContext context) =>
-                  AlertDialog(
-                    title: const Text('Similar Company Found!',
-                      style: TextStyle(color: Colors.redAccent),),
-                    content: Text('Do you want to merge with it?'
-                        '\n${companyTextController.text} -> ${element
-                        .companyName}',
-                      style: const TextStyle(color: Colors.blueAccent),),
-                    actions: <Widget>[
-                      TextButton(
-                        onPressed: () => Navigator.pop(context, false),
-                        child: const Text('Cancel'),
-                      ),
-                      TextButton(
-                        onPressed: () => Navigator.pop(context, true),
-                        child: const Text('Yes!'),
-                      ),
-                    ],
+              builder: (final BuildContext context) => AlertDialog(
+                title: const Text(
+                  'Similar Company Found!',
+                  style: TextStyle(color: Colors.redAccent),
+                ),
+                content: Text(
+                  'Do you want to merge with it?'
+                  '\n${companyTextController.text} -> ${element.companyName}',
+                  style: const TextStyle(color: Colors.blueAccent),
+                ),
+                actions: <Widget>[
+                  TextButton(
+                    onPressed: () => Navigator.pop(context, false),
+                    child: const Text('Cancel'),
                   ),
+                  TextButton(
+                    onPressed: () => Navigator.pop(context, true),
+                    child: const Text('Yes!'),
+                  ),
+                ],
+              ),
             ).then((final value) {
               if (value == true) {
                 setState(() {
@@ -335,51 +336,48 @@ class _InvoiceCaptureScreenState extends State<InvoiceCaptureScreen> {
             });
           }
 
-          print(element.companyName);
           break;
         }
       }
 
-        print("dddd");
-        if (mounted) {
-          showSnackBar(context,
-            text: "Processing Data...", color: Colors.deepOrangeAccent);
-        }
-
-        print(companyTextController.text);
-        //For state management
-        //ref.read(InvoicerListProvider.notifier).add(
-        // InvoiceImage: Image.file(File(widget.imageFile.path)),
-        // CompanyName: CompanyTextController.text,
-        // InvoiceNo: InvoiceNoTextController.text,
-        // Date: DateFormat("dd-MM-yyyy").parse(DateTextController.text),
-        // Amount: double.parse(AmountTextController.text));
-
-        final data = InvoiceData(
-            ImagePath: widget.imageFile.path,
-            companyName: companyTextController.text,
-            invoiceNo: invoiceNoTextController.text,
-            date: DateFormat("dd-MM-yyyy").parse(dateTextController.text),
-            amount: double.parse(amountTextController.text));
-
-        widget.editIndex == null
-            ? await invoiceDataBox.add(data)
-            : await invoiceDataBox.putAt(widget.editIndex!, data);
-
-        if (!mounted) {
-          return;
-        }
-
+      if (mounted) {
         showSnackBar(context,
-            text: "Data Processed!", color: Colors.greenAccent);
+            text: "Processing Data...", color: Colors.deepOrangeAccent);
+      }
 
-        if (mounted) {
-          setState(() {
-            _saveButtonState = true;
-          });
+      print(companyTextController.text);
+      //For state management
+      //ref.read(InvoicerListProvider.notifier).add(
+      // InvoiceImage: Image.file(File(widget.imageFile.path)),
+      // CompanyName: CompanyTextController.text,
+      // InvoiceNo: InvoiceNoTextController.text,
+      // Date: DateFormat("dd-MM-yyyy").parse(DateTextController.text),
+      // Amount: double.parse(AmountTextController.text));
 
-          Navigator.pop(context);
-        }
+      final data = InvoiceData(
+          ImagePath: widget.imageFile.path,
+          companyName: companyTextController.text,
+          invoiceNo: invoiceNoTextController.text,
+          date: DateFormat("dd-MM-yyyy").parse(dateTextController.text),
+          amount: double.parse(amountTextController.text));
+
+      widget.editIndex == null
+          ? await invoiceDataBox.add(data)
+          : await invoiceDataBox.putAt(widget.editIndex!, data);
+
+      if (!mounted) {
+        return;
+      }
+
+      showSnackBar(context, text: "Data Processed!", color: Colors.greenAccent);
+
+      if (mounted) {
+        setState(() {
+          _saveButtonState = true;
+        });
+
+        Navigator.pop(context);
       }
     }
+  }
 }
