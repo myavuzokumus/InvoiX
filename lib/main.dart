@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 
 import 'Models/invoice_data.dart';
@@ -17,7 +16,7 @@ void main() async {
   // Open user box
   await Hive.openBox('InvoiceData');
 
-  runApp(const ProviderScope(child: MyApp()));
+  runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
@@ -50,7 +49,7 @@ class MyApp extends StatelessWidget {
         scaffoldBackgroundColor: Colors.black87,
         useMaterial3: true,
       ),
-      home: const CompanyList(title: 'Fast Invoicer Reader'),
+      home: const CompanyList(title: 'Fast Invoice Reader'),
     );
   }
 }

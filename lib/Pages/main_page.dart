@@ -25,6 +25,8 @@ class CompanyList extends StatefulWidget {
 
 class _CompanyListState extends State<CompanyList> {
 
+  //TODO: Add Excell function to save data
+
   @override
   Widget build(final BuildContext context) {
     // This method is rerun every time setState is called, for instance as done
@@ -73,7 +75,7 @@ class _CompanyListState extends State<CompanyList> {
     }
     else {
       return FutureBuilder<List<InvoiceData>>(
-        future: getInvoiceDataList(listType.company ,invoiceDataBox.cast<InvoiceData>()),
+        future: getInvoiceDataList(listType.company, invoiceDataBox.cast<InvoiceData>()),
         builder: (final BuildContext context, final AsyncSnapshot<List<InvoiceData>> company) {
 
           if (company.hasData) {
@@ -115,8 +117,6 @@ class _CompanyListState extends State<CompanyList> {
             return const CircularProgressIndicator();
           }
 
-
-
         },
       );
     }
@@ -128,6 +128,8 @@ class _CompanyListState extends State<CompanyList> {
       isCameraGranted =
           await Permission.camera.request() == PermissionStatus.granted;
     }
+
+    if(!mounted) return;
 
     if (!isCameraGranted) {
       return showSnackBar(
@@ -144,6 +146,7 @@ class _CompanyListState extends State<CompanyList> {
             .millisecondsSinceEpoch / 1000).round()}.jpeg"
     );
 
+
     try {
       final bool success = await EdgeDetection.detectEdge(
         imagePath,
@@ -155,6 +158,8 @@ class _CompanyListState extends State<CompanyList> {
         androidCropReset: 'Reset',
       );
 
+      if(!mounted) return;
+
       if(success) {
         unawaited(Navigator.push(
             context,
@@ -165,9 +170,12 @@ class _CompanyListState extends State<CompanyList> {
                     )
             )
         ));
+
       }
 
+
     } catch (e) {
+
       print(e);
       showSnackBar(
           context,
