@@ -17,5 +17,4 @@ Future<List<InvoiceData>> getInvoiceDataList(final listType type, final Iterable
       returnList = savedList.where((final element) => companyName == element.companyName).toList();
       return returnList;
   }
-
 }
