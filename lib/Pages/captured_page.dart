@@ -3,15 +3,16 @@ import 'dart:io';
 import 'package:cross_file/cross_file.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_mlkit_text_recognition/google_mlkit_text_recognition.dart';
 import 'package:hive/hive.dart';
 import 'package:intl/intl.dart';
+import 'package:string_similarity/string_similarity.dart';
 
 import '../Models/invoice_data.dart';
+import '../company_name_filter.dart';
 import '../toast.dart';
 
-class InvoiceCaptureScreen extends ConsumerStatefulWidget {
+class InvoiceCaptureScreen extends StatefulWidget {
   const InvoiceCaptureScreen(
       {this.editIndex, required this.imageFile, super.key});
 
@@ -19,11 +20,11 @@ class InvoiceCaptureScreen extends ConsumerStatefulWidget {
   final int? editIndex;
 
   @override
-  ConsumerState<InvoiceCaptureScreen> createState() =>
+  State<InvoiceCaptureScreen> createState() =>
       _InvoiceCaptureScreenState();
 }
 
-class _InvoiceCaptureScreenState extends ConsumerState<InvoiceCaptureScreen> {
+class _InvoiceCaptureScreenState extends State<InvoiceCaptureScreen> {
   late List<String> scannedText;
 
   bool _isLoading = true;
@@ -78,68 +79,6 @@ class _InvoiceCaptureScreenState extends ConsumerState<InvoiceCaptureScreen> {
   final RegExp amountRegex = RegExp(
       r"^(\$|\₺|€)(0|[1-9][0-9]{0,2})(,\d{1,4})*(\.\d{1,2})?$|^(0|[1-9][0-9]{0,2})(,\d{1,4})*(\.\d{1,2})?(\$|\₺| TL|TL|€)$",
       caseSensitive: false);
-
-  //To get readed text
-  Future<void> getRecognisedText(final XFile image) async {
-    final inputImage = InputImage.fromFilePath(image.path);
-    final textRecognizer = TextRecognizer(script: TextRecognitionScript.latin);
-    final RecognizedText recognizedText =
-        await textRecognizer.processImage(inputImage);
-    await textRecognizer.close();
-    setState(() {
-      scannedText = recognizedText.text.split("\n");
-    });
-    print(scannedText);
-  }
-
-  // The function that calculate which is company
-  void getInvoiceThing(final List listText) {
-    companyTextController.text = listText[0];
-
-    // For every each text in ListText
-    for (final i in listText) {
-      // Text if match with CompanyRegex
-      if (companyRegex.hasMatch(i)) {
-        // Set text to CompanyTextController.text
-        companyTextController.text = i;
-      }
-      // Text if match with DateRegex
-      else if (dateRegex.hasMatch(i)) {
-        // Set text to DateTextController.text
-        dateTextController.text = i;
-      }
-      // If text lenght is 16
-      else if (i.length == 16) {
-        // set text to InvoiceNoTextController.text
-        invoiceNoTextController.text = i;
-      }
-      // Text if match with AmountRegex
-      else if (amountRegex.hasMatch(i)) {
-        // Set text to AmountTextController.text
-        amountTextController.text = i;
-      }
-    }
-    _isLoading = false;
-  }
-
-  Future<void> fieldFiller() async {
-    await getRecognisedText(widget.imageFile);
-    getInvoiceThing(scannedText);
-  }
-
-  fetchInvoiceData() async {
-    final InvoiceData item = Hive.box('InvoiceData').getAt(widget.editIndex!);
-
-    companyTextController.text = item.companyName;
-    invoiceNoTextController.text = item.invoiceNo;
-    dateTextController.text = DateFormat("dd-MM-yyyy")
-        .format(item.date);
-    amountTextController.text = item.amount.toString();
-
-
-    _isLoading = false;
-
-  }
 
   @override
   void initState() {
@@ -233,14 +172,9 @@ class _InvoiceCaptureScreenState extends ConsumerState<InvoiceCaptureScreen> {
                                                 today.month, today.day));
 
                                     if (pickedDate != null) {
-                                      print(
-                                          pickedDate); //get the picked date in the format => 2022-07-04 00:00:00.000
                                       final String formattedDate =
                                           DateFormat('dd-MM-yyyy').format(
                                               pickedDate); // format date in required form here we use yyyy-MM-dd that means time is removed
-                                      print(
-                                          formattedDate); //formatted date output using intl package =>  2022-07-04
-                                      //You can format date as per your need
 
                                       setState(() {
                                         dateTextController.text =
@@ -276,65 +210,11 @@ class _InvoiceCaptureScreenState extends ConsumerState<InvoiceCaptureScreen> {
                             ),
                           ),
                         ),
-
                         ElevatedButton(
-                          onPressed: _saveButtonState
-                              ? () async {
-                                  // Validate returns true if the form is valid, or false otherwise.
-                                  if (_formKey.currentState!.validate()) {
-
-                                    setState(() {
-                                      _saveButtonState = false;
-                                    });
-
-                                    // If the form is valid, display a snackbar. In the real world,
-                                    // you'd often call a server or save the information in a database.
-                                    showSnackBar(
-                                        context,
-                                        text: "Processing Data...",
-                                        color: Colors.deepOrangeAccent
-                                    );
-
-                                    final invoiceDataBox = Hive.box('InvoiceData');
-                                    //For state management
-                                    //ref.read(InvoicerListProvider.notifier).add(
-                                    // InvoiceImage: Image.file(File(widget.imageFile.path)),
-                                    // CompanyName: CompanyTextController.text,
-                                    // InvoiceNo: InvoiceNoTextController.text,
-                                    // Date: DateFormat("dd-MM-yyyy").parse(DateTextController.text),
-                                    // Amount: double.parse(AmountTextController.text));
-
-                                    final data = InvoiceData(
-                                        ImagePath: widget.imageFile.path,
-                                        companyName: companyTextController
-                                            .text,
-                                        invoiceNo: invoiceNoTextController
-                                            .text,
-                                        date: DateFormat("dd-MM-yyyy")
-                                            .parse(dateTextController.text),
-                                        amount: double.parse(
-                                            amountTextController.text));
-
-                                    widget.editIndex == null
-                                        ? await invoiceDataBox.add(data)
-                                        : await invoiceDataBox.putAt(widget.editIndex!, data);
-
-                                    showSnackBar(
-                                        context,
-                                        text: "Data Proccesed!",
-                                        color: Colors.greenAccent
-                                    );
-
-                                    setState(() {
-                                      _saveButtonState = true;
-                                    });
-                                  }
-
-
-                                }
-                              : null,
-
-                          child: _saveButtonState ? const Icon(Icons.save_as_rounded) : const CircularProgressIndicator(),
+                          onPressed: _saveButtonState ? saveInvoice : null,
+                          child: _saveButtonState
+                              ? const Icon(Icons.save_as_rounded)
+                              : const CircularProgressIndicator(),
                         ),
                       ],
                     ),
@@ -344,4 +224,162 @@ class _InvoiceCaptureScreenState extends ConsumerState<InvoiceCaptureScreen> {
       ),
     );
   }
+
+  //To get readed text
+  Future<void> getRecognisedText(final XFile image) async {
+    final inputImage = InputImage.fromFilePath(image.path);
+    final textRecognizer = TextRecognizer(script: TextRecognitionScript.latin);
+    final RecognizedText recognizedText =
+        await textRecognizer.processImage(inputImage);
+    await textRecognizer.close();
+    setState(() {
+      scannedText = recognizedText.text.split("\n");
+    });
+    print(scannedText);
+  }
+
+  // The function that calculate which is company
+  void getInvoiceThing(final List listText) {
+    companyTextController.text = listText[0];
+
+    // For every each text in ListText
+    for (final i in listText) {
+      // Text if match with CompanyRegex
+      if (companyRegex.hasMatch(i)) {
+        // Set text to CompanyTextController.text
+        companyTextController.text = i;
+      }
+      // Text if match with DateRegex
+      else if (dateRegex.hasMatch(i)) {
+        // Set text to DateTextController.text
+        dateTextController.text = i;
+      }
+      // If text lenght is 16
+      else if (i.length == 16) {
+        // set text to InvoiceNoTextController.text
+        invoiceNoTextController.text = i;
+      }
+      // Text if match with AmountRegex
+      else if (amountRegex.hasMatch(i)) {
+        // Set text to AmountTextController.text
+        amountTextController.text = i;
+      }
+    }
+    _isLoading = false;
+  }
+
+  Future<void> fieldFiller() async {
+    await getRecognisedText(widget.imageFile);
+    getInvoiceThing(scannedText);
+  }
+
+  Future<void> fetchInvoiceData() async {
+    final InvoiceData item = Hive.box('InvoiceData').getAt(widget.editIndex!);
+
+    companyTextController.text = item.companyName;
+    invoiceNoTextController.text = item.invoiceNo;
+    dateTextController.text = DateFormat("dd-MM-yyyy").format(item.date);
+    amountTextController.text = item.amount.toString();
+
+    _isLoading = false;
+  }
+
+  Future<void> saveInvoice() async {
+    // Validate returns true if the form is valid, or false otherwise.
+    if (_formKey.currentState!.validate()) {
+      setState(() {
+        _saveButtonState = false;
+      });
+
+      // If the form is valid, display a snackbar. In the real world,
+      // you'd often call a server or save the information in a database.
+
+      final invoiceDataBox = Hive.box('InvoiceData');
+
+      final List<InvoiceData> companyList = await getInvoiceDataList(
+          listType.company, invoiceDataBox.values.cast<InvoiceData>());
+
+      for (final element in companyList) {
+        final double similarity =
+        (companyTextController.text).similarityTo(element.companyName);
+
+        if (similarity >= 0.4) {
+          if (mounted) {
+            await showDialog<bool>(
+              context: context,
+              builder: (final BuildContext context) =>
+                  AlertDialog(
+                    title: const Text('Similar Company Found!',
+                      style: TextStyle(color: Colors.redAccent),),
+                    content: Text('Do you want to merge with it?'
+                        '\n${companyTextController.text} -> ${element
+                        .companyName}',
+                      style: const TextStyle(color: Colors.blueAccent),),
+                    actions: <Widget>[
+                      TextButton(
+                        onPressed: () => Navigator.pop(context, false),
+                        child: const Text('Cancel'),
+                      ),
+                      TextButton(
+                        onPressed: () => Navigator.pop(context, true),
+                        child: const Text('Yes!'),
+                      ),
+                    ],
+                  ),
+            ).then((final value) {
+              if (value == true) {
+                setState(() {
+                  companyTextController.text = element.companyName;
+                });
+              }
+            });
+          }
+
+          print(element.companyName);
+          break;
+        }
+      }
+
+        print("dddd");
+        if (mounted) {
+          showSnackBar(context,
+            text: "Processing Data...", color: Colors.deepOrangeAccent);
+        }
+
+        print(companyTextController.text);
+        //For state management
+        //ref.read(InvoicerListProvider.notifier).add(
+        // InvoiceImage: Image.file(File(widget.imageFile.path)),
+        // CompanyName: CompanyTextController.text,
+        // InvoiceNo: InvoiceNoTextController.text,
+        // Date: DateFormat("dd-MM-yyyy").parse(DateTextController.text),
+        // Amount: double.parse(AmountTextController.text));
+
+        final data = InvoiceData(
+            ImagePath: widget.imageFile.path,
+            companyName: companyTextController.text,
+            invoiceNo: invoiceNoTextController.text,
+            date: DateFormat("dd-MM-yyyy").parse(dateTextController.text),
+            amount: double.parse(amountTextController.text));
+
+        widget.editIndex == null
+            ? await invoiceDataBox.add(data)
+            : await invoiceDataBox.putAt(widget.editIndex!, data);
+
+        if (!mounted) {
+          return;
+        }
+
+        showSnackBar(context,
+            text: "Data Processed!", color: Colors.greenAccent);
+
+        if (mounted) {
+          setState(() {
+            _saveButtonState = true;
+          });
+
+          Navigator.pop(context);
+        }
+      }
+    }
 }
