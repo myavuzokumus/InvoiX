@@ -25,8 +25,9 @@ class CompanyList extends StatefulWidget {
 
 class _CompanyListState extends State<CompanyList> {
 
-  //TODO: Add Excell function to save data
+  //TODO: Add Excel function to save data
   //TODO: Removing companies and invoices will be added.
+  //TODO: List will be refreshed after added new invoice.
 
   @override
   Widget build(final BuildContext context) {
@@ -45,8 +46,8 @@ class _CompanyListState extends State<CompanyList> {
           actions: <Widget>[
             IconButton(
               icon: const Icon(Icons.table_chart),
-              tooltip: 'Tüm verileri indir',
-              onPressed: () => showSnackBar(context, text: "Dosyalar ""Download"" klasörüne kaydedildi."),
+              tooltip: 'Export all data to Excel',
+              onPressed: () => showSnackBar(context, text: "Files are saved in ""Download"" file."),
             ),]
       ),
       body: listViewer(),
@@ -124,19 +125,13 @@ class _CompanyListState extends State<CompanyList> {
   }
 
   Future<void> getImageFromCamera() async {
-    bool isCameraGranted = await Permission.camera.request().isGranted;
-    if (!isCameraGranted) {
-      isCameraGranted =
-          await Permission.camera.request() == PermissionStatus.granted;
-    }
+    final bool isCameraGranted = await Permission.camera.request().isGranted;
 
-    if(!mounted) return;
-
-    if (!isCameraGranted) {
-      return showSnackBar(
-          context,
-          text: "You need to give permission to use camera.",
-          color: Colors.redAccent);
+    if (mounted && !isCameraGranted) {
+    return showSnackBar(
+        context,
+        text: "You need to give permission to use camera.",
+        color: Colors.redAccent);
     }
 
     // Generate filepath for saving
@@ -159,30 +154,28 @@ class _CompanyListState extends State<CompanyList> {
         androidCropReset: 'Reset',
       );
 
-      if(!mounted) return;
-
-      if(success) {
-        unawaited(Navigator.push(
-            context,
-            MaterialPageRoute(
-                builder: (final context) =>
-                    InvoiceCaptureScreen(
-                        imageFile: XFile(imagePath)
-                    )
-            )
-        ));
-
+      if (mounted && success) {
+      unawaited(Navigator.push(
+          context,
+          MaterialPageRoute(
+              builder: (final context) =>
+                  InvoiceCaptureScreen(
+                      imageFile: XFile(imagePath)
+                  )
+          )
+      ));
       }
 
 
     } catch (e) {
 
-      print(e);
-      showSnackBar(
+      if (mounted) {
+        showSnackBar(
           context,
-          text: "Something went wrong.",
+          text: "Something went wrong."
+              "$e",
           color: Colors.redAccent);
-
+      }
     }
 
   }
