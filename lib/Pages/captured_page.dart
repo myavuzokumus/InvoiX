@@ -37,6 +37,7 @@ class _InvoiceCaptureScreenState extends State<InvoiceCaptureScreen> {
   TextEditingController amountTextController = TextEditingController();
 
   final _formKey = GlobalKey<FormState>();
+  final DateFormat dateFormat = DateFormat("dd-MM-yyyy");
 
   //TextLabelStyle
   InputDecoration textFieldDecoration(final text, final message) =>
@@ -172,7 +173,7 @@ class _InvoiceCaptureScreenState extends State<InvoiceCaptureScreen> {
 
                                     if (pickedDate != null) {
                                       final String formattedDate =
-                                          DateFormat('dd-MM-yyyy').format(
+                                          dateFormat.format(
                                               pickedDate); // format date in required form here we use yyyy-MM-dd that means time is removed
 
                                       setState(() {
@@ -234,6 +235,8 @@ class _InvoiceCaptureScreenState extends State<InvoiceCaptureScreen> {
     setState(() {
       scannedText = recognizedText.text.split("\n");
     });
+
+    //For test
     print(scannedText);
   }
 
@@ -251,9 +254,9 @@ class _InvoiceCaptureScreenState extends State<InvoiceCaptureScreen> {
       // Text if match with DateRegex
       else if (dateRegex.hasMatch(i)) {
         // Set text to DateTextController.text
-        dateTextController.text = i;
+        dateTextController.text = dateFormat.format(dateFormat.parse(i));
       }
-      // If text lenght is 16
+      // If text length is 16
       else if (i.length == 16) {
         // set text to InvoiceNoTextController.text
         invoiceNoTextController.text = i;
@@ -277,7 +280,7 @@ class _InvoiceCaptureScreenState extends State<InvoiceCaptureScreen> {
 
     companyTextController.text = item.companyName;
     invoiceNoTextController.text = item.invoiceNo;
-    dateTextController.text = DateFormat("dd-MM-yyyy").format(item.date);
+    dateTextController.text = dateFormat.format(item.date);
     amountTextController.text = item.amount.toString();
 
     _isLoading = false;
@@ -290,7 +293,7 @@ class _InvoiceCaptureScreenState extends State<InvoiceCaptureScreen> {
         _saveButtonState = false;
       });
 
-      // If the form is valid, display a snackbar. In the real world,
+      // If the form is valid, display a snack bar. In the real world,
       // you'd often call a server or save the information in a database.
 
       final invoiceDataBox = Hive.box('InvoiceData');
@@ -298,45 +301,47 @@ class _InvoiceCaptureScreenState extends State<InvoiceCaptureScreen> {
       final List<InvoiceData> companyList = await getInvoiceDataList(
           listType.company, invoiceDataBox.values.cast<InvoiceData>());
 
-      for (final element in companyList) {
-        final double similarity =
-            (companyTextController.text).similarityTo(element.companyName);
+      if (widget.editIndex != null) {
+        for (final element in companyList) {
+          final companyName = element.companyName;
+          final double similarity =
+              (companyTextController.text).similarityTo(companyName);
 
-        if (similarity >= 0.4) {
-          if (mounted) {
-            await showDialog<bool>(
-              context: context,
-              builder: (final BuildContext context) => AlertDialog(
-                title: const Text(
-                  'Similar Company Found!',
-                  style: TextStyle(color: Colors.redAccent),
-                ),
-                content: Text(
-                  'Do you want to merge with it?'
-                  '\n${companyTextController.text} -> ${element.companyName}',
-                  style: const TextStyle(color: Colors.blueAccent),
-                ),
-                actions: <Widget>[
-                  TextButton(
-                    onPressed: () => Navigator.pop(context, false),
-                    child: const Text('Cancel'),
+          if (similarity >= 0.4) {
+            if (mounted) {
+              await showDialog<bool>(
+                context: context,
+                builder: (final BuildContext context) => AlertDialog(
+                  title: const Text(
+                    'Similar Company Found!',
+                    style: TextStyle(color: Colors.redAccent),
                   ),
-                  TextButton(
-                    onPressed: () => Navigator.pop(context, true),
-                    child: const Text('Yes!'),
+                  content: Text(
+                    'Do you want to merge with it?'
+                    '\n${companyTextController.text} -> $companyName',
+                    style: const TextStyle(color: Colors.black),
                   ),
-                ],
-              ),
-            ).then((final value) {
-              if (value == true) {
-                setState(() {
-                  companyTextController.text = element.companyName;
-                });
-              }
-            });
+                  actions: <Widget>[
+                    TextButton(
+                      onPressed: () => Navigator.pop(context, false),
+                      child: const Text('Cancel'),
+                    ),
+                    TextButton(
+                      onPressed: () => Navigator.pop(context, true),
+                      child: const Text('Yes!'),
+                    ),
+                  ],
+                ),
+              ).then((final value) {
+                if (value == true) {
+                  setState(() {
+                    companyTextController.text = companyName;
+                  });
+                }
+              });
+            }
+            break;
           }
-
-          break;
         }
       }
 
@@ -345,9 +350,8 @@ class _InvoiceCaptureScreenState extends State<InvoiceCaptureScreen> {
             text: "Processing Data...", color: Colors.deepOrangeAccent);
       }
 
-      print(companyTextController.text);
       //For state management
-      //ref.read(InvoicerListProvider.notifier).add(
+      //ref.read(InvoiceListProvider.notifier).add(
       // InvoiceImage: Image.file(File(widget.imageFile.path)),
       // CompanyName: CompanyTextController.text,
       // InvoiceNo: InvoiceNoTextController.text,
@@ -358,7 +362,7 @@ class _InvoiceCaptureScreenState extends State<InvoiceCaptureScreen> {
           ImagePath: widget.imageFile.path,
           companyName: companyTextController.text,
           invoiceNo: invoiceNoTextController.text,
-          date: DateFormat("dd-MM-yyyy").parse(dateTextController.text),
+          date: dateFormat.parse(dateTextController.text),
           amount: double.parse(amountTextController.text));
 
       widget.editIndex == null
