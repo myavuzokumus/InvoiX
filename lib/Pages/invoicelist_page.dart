@@ -7,6 +7,7 @@ import 'package:intl/intl.dart';
 
 import '../company_name_filter.dart';
 import '../main.dart';
+import '../toast.dart';
 import 'captured_page.dart';
 
 class InvoiceListScreen extends StatefulWidget {
@@ -46,12 +47,8 @@ class _InvoiceListScreenState extends State<InvoiceListScreen> {
           actions: <Widget>[
             IconButton(
               icon: const Icon(Icons.table_chart),
-              tooltip: 'Tüm verileri indir',
-              onPressed: () {
-                ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text(
-                        'Dosyalar "Download" klasörüne kaydedildi.')));
-              },
+              tooltip: 'Export all data to Excel',
+              onPressed: () => showSnackBar(context, text: "Files are saved in ""Download"" file."),
             ),
           ]
       ),
@@ -96,7 +93,7 @@ class _InvoiceListScreenState extends State<InvoiceListScreen> {
                       child: Center(
                         child: Column(
                           children: [
-                            Expanded(
+                            Flexible(
                               child: Container(
                                 margin: const EdgeInsets.all(15),
                                 color: Colors.blueGrey,
@@ -105,13 +102,14 @@ class _InvoiceListScreenState extends State<InvoiceListScreen> {
                             ),
                             ListView(
                               shrinkWrap: true,
-                              physics: const NeverScrollableScrollPhysics(),
                               children: <Widget>[
                                 ListTile(
+                                  visualDensity: const VisualDensity(vertical: -4),
                                   title: const Text("Invoice No:", style: TextStyle(fontSize: 20)),
                                   trailing: Text(invoiceData.invoiceNo, style: const TextStyle(fontSize: 16)),
                                 ),
                                 ListTile(
+                                  visualDensity: const VisualDensity(vertical: -4),
                                   title: const Text("Date:", style: TextStyle(fontSize: 20)),
                                   trailing: Text(
                                       DateFormat("dd-MM-yyyy")
@@ -119,6 +117,7 @@ class _InvoiceListScreenState extends State<InvoiceListScreen> {
                                       style: const TextStyle(fontSize: 16)),
                                 ),
                                 ListTile(
+                                  visualDensity: const VisualDensity(vertical: -4),
                                   title: const Text("Amount:", style: TextStyle(fontSize: 20)),
                                   trailing: Text(invoiceData.amount.toString(), style: const TextStyle(fontSize: 16)),
                                 ),
