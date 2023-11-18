@@ -301,7 +301,7 @@ class _InvoiceCaptureScreenState extends State<InvoiceCaptureScreen> {
       final List<InvoiceData> companyList = await getInvoiceDataList(
           listType.company, invoiceDataBox.values.cast<InvoiceData>());
 
-      if (widget.editIndex != null) {
+      if (widget.editIndex == null) {
         for (final element in companyList) {
           final companyName = element.companyName;
           final double similarity =
@@ -310,6 +310,7 @@ class _InvoiceCaptureScreenState extends State<InvoiceCaptureScreen> {
           if (similarity >= 0.4) {
             if (mounted) {
               await showDialog<bool>(
+                barrierDismissible: false,
                 context: context,
                 builder: (final BuildContext context) => AlertDialog(
                   title: const Text(
