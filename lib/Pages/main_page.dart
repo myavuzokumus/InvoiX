@@ -4,6 +4,7 @@ import 'package:cross_file/cross_file.dart';
 import 'package:edge_detection/edge_detection.dart';
 import 'package:fastinvoicereader/Models/invoice_data.dart';
 import 'package:flutter/material.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 import 'package:path/path.dart' as path;
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -24,10 +25,8 @@ class CompanyList extends StatefulWidget {
 }
 
 class _CompanyListState extends State<CompanyList> {
-
   //TODO: Add Excel function to save data
   //TODO: Removing companies and invoices will be added.
-  //TODO: List will be refreshed after added new invoice.
 
   @override
   Widget build(final BuildContext context) {
@@ -39,109 +38,89 @@ class _CompanyListState extends State<CompanyList> {
     // than having to individually change instances of widgets.
     return Scaffold(
       appBar: AppBar(
-        // Here we take the value from the MyHomePage object that was created by
-        // the App.build method, and use it to set our appbar title.
+          // Here we take the value from the MyHomePage object that was created by
+          // the App.build method, and use it to set our appbar title.
           title: Text(widget.title),
           centerTitle: true,
           actions: <Widget>[
             IconButton(
               icon: const Icon(Icons.table_chart),
               tooltip: 'Export all data to Excel',
-              onPressed: () => showSnackBar(context, text: "Files are saved in ""Download"" file."),
-            ),]
-      ),
+              onPressed: () => showSnackBar(context, text: "Files are saved in " "Download" " file."),
+            ),
+          ]),
       body: listViewer(),
-
       floatingActionButton: Badge(
         label: const Icon(Icons.add, color: Colors.white, size: 25),
         largeSize: 30,
         backgroundColor: Colors.red,
         offset: const Offset(10, -10),
-        child: FloatingActionButton(
-            onPressed: getImageFromCamera,
-            child: const Icon(Icons.receipt_long, size: 45)
-        ),
+        child: FloatingActionButton(onPressed: getImageFromCamera, child: const Icon(Icons.receipt_long, size: 45)),
       ),
     );
   }
 
   Widget listViewer() {
-
     //InvoiceDataBox.watch().listen((event) { });
 
-    //“No data were found.” was added to avoid an error."
-    if (invoiceDataBox.isEmpty) {
-      return const Center(
-        child: Text("No data are found.", style: TextStyle(fontSize: 25),),
-      );
-    }
-    else {
-      return FutureBuilder<List<InvoiceData>>(
-        future: getInvoiceDataList(listType.company, invoiceDataBox.cast<InvoiceData>()),
-        builder: (final BuildContext context, final AsyncSnapshot<List<InvoiceData>> company) {
-
-          if (company.hasData) {
-            return ListView.separated(
-                padding: const EdgeInsets.only(left: 10, right: 10, top: 20),
-                itemCount: company.data!.length,
-
-                separatorBuilder: (final BuildContext context, final int index) => const Divider(),
-                itemBuilder: (final BuildContext context, final int index) {
-
-                  final companyListName = company.data!.elementAt(index).companyName;
-                  return ClipRRect(
-                    borderRadius: BorderRadius.circular(20.0),
-                    child: ListTile(
-                      tileColor: Colors.grey,
-                      title: Text(
-                        companyListName,
-                        style: Theme
-                            .of(context)
-                            .textTheme
-                            .headlineSmall,
-                      ),
-                      onTap: () {
-                        Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (final context) =>
-                                    InvoiceListScreen(
-                                        companyName: companyListName
-                                    )
-                            )
-                        );
-                      },
-                    ),
-                  );
-                }
+    return ValueListenableBuilder<Box>(
+        valueListenable: Hive.box('InvoiceData').listenable(),
+        builder: (final BuildContext context, final Box<dynamic> value, final Widget? child) {
+          //“No data were found.” was added to avoid an error."
+          if (invoiceDataBox.isEmpty) {
+            return const Center(
+              child: Text(
+                "No data are found.",
+                style: TextStyle(fontSize: 25),
+              ),
             );
           } else {
-            return const CircularProgressIndicator();
+            return FutureBuilder<List<InvoiceData>>(
+              future: getInvoiceDataList(listType.company, invoiceDataBox.cast<InvoiceData>()),
+              builder: (final BuildContext context, final AsyncSnapshot<List<InvoiceData>> company) {
+                if (company.hasData) {
+                  return ListView.separated(
+                      padding: const EdgeInsets.only(left: 10, right: 10, top: 20),
+                      itemCount: company.data!.length,
+                      separatorBuilder: (final BuildContext context, final int index) => const Divider(),
+                      itemBuilder: (final BuildContext context, final int index) {
+                        final companyListName = company.data!.elementAt(index).companyName;
+                        return ClipRRect(
+                          borderRadius: BorderRadius.circular(20.0),
+                          child: ListTile(
+                            tileColor: Colors.grey,
+                            title: Text(
+                              companyListName,
+                              style: Theme.of(context).textTheme.headlineSmall,
+                            ),
+                            onTap: () {
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (final context) => InvoiceListScreen(companyName: companyListName)));
+                            },
+                          ),
+                        );
+                      });
+                } else {
+                  return const CircularProgressIndicator();
+                }
+              },
+            );
           }
-
-        },
-      );
-    }
+        });
   }
 
   Future<void> getImageFromCamera() async {
     final bool isCameraGranted = await Permission.camera.request().isGranted;
 
     if (mounted && !isCameraGranted) {
-    return showSnackBar(
-        context,
-        text: "You need to give permission to use camera.",
-        color: Colors.redAccent);
+      return showSnackBar(context, text: "You need to give permission to use camera.", color: Colors.redAccent);
     }
 
     // Generate filepath for saving
-    final String imagePath = path.join(
-        (await getApplicationSupportDirectory()).path,
-        "${(DateTime
-            .now()
-            .millisecondsSinceEpoch / 1000).round()}.jpeg"
-    );
-
+    final String imagePath = path.join((await getApplicationSupportDirectory()).path,
+        "${(DateTime.now().millisecondsSinceEpoch / 1000).round()}.jpeg");
 
     try {
       final bool success = await EdgeDetection.detectEdge(
@@ -155,29 +134,16 @@ class _CompanyListState extends State<CompanyList> {
       );
 
       if (mounted && success) {
-      unawaited(Navigator.push(
-          context,
-          MaterialPageRoute(
-              builder: (final context) =>
-                  InvoiceCaptureScreen(
-                      imageFile: XFile(imagePath)
-                  )
-          )
-      ));
+        unawaited(Navigator.push(
+            context, MaterialPageRoute(builder: (final context) => InvoiceCaptureScreen(imageFile: XFile(imagePath)))));
       }
-
-
     } catch (e) {
-
       if (mounted) {
-        showSnackBar(
-          context,
-          text: "Something went wrong."
-              "$e",
-          color: Colors.redAccent);
+        showSnackBar(context,
+            text: "Something went wrong."
+                "$e",
+            color: Colors.redAccent);
       }
     }
-
   }
-
 }
