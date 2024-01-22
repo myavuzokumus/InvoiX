@@ -17,6 +17,7 @@ void main() async {
   await Hive.openBox('InvoiceData');
 
   runApp(const MyApp());
+  
 }
 
 class MyApp extends StatelessWidget {
@@ -30,6 +31,16 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Fast Invoice Reader',
       theme: ThemeData(
+        inputDecorationTheme: const InputDecorationTheme(
+          labelStyle:
+          TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
+          border: OutlineInputBorder(),
+          isDense: true,
+          counterStyle: TextStyle(fontSize: 0),
+          errorStyle: TextStyle(fontSize: 0),
+        ),
+
+
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.black87),
         textTheme: Theme.of(context).textTheme.apply(
           bodyColor: Colors.white,
