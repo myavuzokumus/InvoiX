@@ -5,7 +5,7 @@ A Flutter application that allows you to quickly read the invoices at hand, get 
 ### TODO: 
 - Add Excel function to save data.
 - Removing companies and invoices will be added.
-- Remake UI.
+- Remake UI & made modular code base (IN PROGRESS)
 
 ## Installation
 
