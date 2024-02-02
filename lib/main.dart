@@ -40,26 +40,29 @@ class MyApp extends StatelessWidget {
           errorStyle: TextStyle(fontSize: 0),
         ),
 
-
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.black87),
         textTheme: Theme.of(context).textTheme.apply(
           bodyColor: Colors.white,
           displayColor: Colors.white,
           decorationColor: Colors.white,
         ),
+
         primaryTextTheme: Theme.of(context).textTheme.apply(
           bodyColor: Colors.white,
           displayColor: Colors.white,
           decorationColor: Colors.white,
         ),
+
         appBarTheme: const AppBarTheme(
             titleTextStyle: TextStyle(color: Colors.white,),
             backgroundColor: Colors.black,
             iconTheme: IconThemeData(color: Colors.white)
         ),
+
         scaffoldBackgroundColor: Colors.black87,
         useMaterial3: true,
       ),
+
       home: const CompanyList(title: 'Fast Invoice Reader'),
     );
   }

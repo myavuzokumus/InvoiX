@@ -41,13 +41,6 @@ class _InvoiceCaptureScreenState extends State<InvoiceCaptureScreen> {
   final _formKey = GlobalKey<FormState>();
   final DateFormat dateFormat = DateFormat("dd-MM-yyyy");
 
-  //TextLabelStyle
-  InputDecoration textFieldDecoration(final text, final message) =>
-      InputDecoration(
-          labelText: text,
-          suffixIcon: WarnIcon(message: message)
-      );
-
   //TODO: Company name selection screen will be added.
   //TODO: Invoice Type detection will be added.
 
@@ -98,9 +91,10 @@ class _InvoiceCaptureScreenState extends State<InvoiceCaptureScreen> {
                                 TextFormField(
                                   maxLength: 50,
                                   controller: companyTextController,
-                                  decoration: textFieldDecoration(
-                                      "Company name:",
-                                      "You must enter a valid company name. Need include 'A.S., LTD. etc.'"),
+                                  decoration: const InputDecoration(
+                                      labelText: "Company name:",
+                                      suffixIcon: WarnIcon(message: "You must enter a valid company name. Need include 'A.S., LTD. etc.'")
+                                  ),
                                   validator: (final value) {
                                     if (value == null ||
                                         value.isEmpty ||
@@ -113,8 +107,10 @@ class _InvoiceCaptureScreenState extends State<InvoiceCaptureScreen> {
                                 TextFormField(
                                   maxLength: 50,
                                   controller: invoiceNoTextController,
-                                  decoration: textFieldDecoration("Invoice No:",
-                                      "You must enter a valid invoice no. Need 16 character."),
+                                  decoration: const InputDecoration(
+                                      labelText: "Invoice No:",
+                                      suffixIcon: WarnIcon(message: "You must enter a valid invoice no. Need 16 character.")
+                                      ),
                                   validator: (final value) {
                                     if (value == null ||
                                         value.isEmpty ||
@@ -128,8 +124,10 @@ class _InvoiceCaptureScreenState extends State<InvoiceCaptureScreen> {
                                   maxLength: 50,
                                   controller: dateTextController,
                                   readOnly: true,
-                                  decoration: textFieldDecoration(
-                                      "Date:", "You must enter a valid date."),
+                                  decoration: const InputDecoration(
+                                      labelText: "Date:",
+                                      suffixIcon: WarnIcon(message: "You must enter a valid date.")
+                                  ),
                                   onTap: () async {
                                     final DateTime today = DateTime.now();
                                     final DateTime? pickedDate =
@@ -174,8 +172,10 @@ class _InvoiceCaptureScreenState extends State<InvoiceCaptureScreen> {
                                     }
                                     return null;
                                   },
-                                  decoration: textFieldDecoration("Amount:",
-                                      "You must enter a valid amount."),
+                                  decoration: const InputDecoration(
+                                      labelText: "Amount:",
+                                      suffixIcon: WarnIcon(message: "You must enter a valid amount.")
+                                  ),
                                 ),
                               ],
                             ),
