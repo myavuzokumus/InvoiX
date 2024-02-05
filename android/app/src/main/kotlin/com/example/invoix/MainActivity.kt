@@ -1,4 +1,4 @@
-package games.sc_riber.fastinvoicereader.fastinvoicereader
+package com.example.invoix
 
 import io.flutter.embedding.android.FlutterActivity
 
