@@ -1,4 +1,4 @@
-# FastInvoiceReader
+# Invoix
 
 A Flutter application that allows you to quickly read the invoices at hand, get the necessary information and then output it as an .xls file.
 
@@ -11,12 +11,12 @@ A Flutter application that allows you to quickly read the invoices at hand, get 
 
 1. Create a new Flutter project:
 ```
-flutter create fastinvoicereader
+flutter create invoix
 ```
 
 2. Clone the repository:
 ```
-git clone https://github.com/OverBrave/FastInvoiceReader.git
+git clone https://github.com/myavuzokumus/Invoix.git
 ```
 
 3. Test your changes by running the app on a physical device:
