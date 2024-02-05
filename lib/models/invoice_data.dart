@@ -1,5 +1,3 @@
-
-
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:uuid/uuid.dart';
 //import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -7,8 +5,7 @@ import 'package:uuid/uuid.dart';
 part 'invoice_data.g.dart';
 
 @HiveType(typeId: 0)
-class InvoiceData extends HiveObject{
-
+class InvoiceData extends HiveObject {
   @HiveField(0)
   final String ImagePath;
   @HiveField(1)
@@ -22,15 +19,12 @@ class InvoiceData extends HiveObject{
   @HiveField(5)
   final double amount;
 
-  InvoiceData({
-    required this.ImagePath,
-    required this.companyName,
-    required this.invoiceNo,
-    required this.date,
-    required this.amount
-  }
-  );
-
+  InvoiceData(
+      {required this.ImagePath,
+      required this.companyName,
+      required this.invoiceNo,
+      required this.date,
+      required this.amount});
 }
 
 //final Uint8List ImagePath;

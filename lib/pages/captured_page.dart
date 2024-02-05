@@ -8,10 +8,10 @@ import 'package:hive/hive.dart';
 import 'package:intl/intl.dart';
 import 'package:string_similarity/string_similarity.dart';
 
-import '../Models/invoice_data.dart';
-import '../company_name_filter.dart';
-import '../toast.dart';
+import '../models/invoice_data.dart';
+import '../utils/company_name_filter.dart';
 import '../utils/image_to_text_regex.dart';
+import '../widgets/toast.dart';
 import '../widgets/warn_icon.dart';
 
 class InvoiceCaptureScreen extends StatefulWidget {
@@ -93,8 +93,9 @@ class _InvoiceCaptureScreenState extends State<InvoiceCaptureScreen> {
                                   controller: companyTextController,
                                   decoration: const InputDecoration(
                                       labelText: "Company name:",
-                                      suffixIcon: WarnIcon(message: "You must enter a valid company name. Need include 'A.S., LTD. etc.'")
-                                  ),
+                                      suffixIcon: WarnIcon(
+                                          message:
+                                              "You must enter a valid company name. Need include 'A.S., LTD. etc.'")),
                                   validator: (final value) {
                                     if (value == null ||
                                         value.isEmpty ||
@@ -109,8 +110,9 @@ class _InvoiceCaptureScreenState extends State<InvoiceCaptureScreen> {
                                   controller: invoiceNoTextController,
                                   decoration: const InputDecoration(
                                       labelText: "Invoice No:",
-                                      suffixIcon: WarnIcon(message: "You must enter a valid invoice no. Need 16 character.")
-                                      ),
+                                      suffixIcon: WarnIcon(
+                                          message:
+                                              "You must enter a valid invoice no. Need 16 character.")),
                                   validator: (final value) {
                                     if (value == null ||
                                         value.isEmpty ||
@@ -126,8 +128,9 @@ class _InvoiceCaptureScreenState extends State<InvoiceCaptureScreen> {
                                   readOnly: true,
                                   decoration: const InputDecoration(
                                       labelText: "Date:",
-                                      suffixIcon: WarnIcon(message: "You must enter a valid date.")
-                                  ),
+                                      suffixIcon: WarnIcon(
+                                          message:
+                                              "You must enter a valid date.")),
                                   onTap: () async {
                                     final DateTime today = DateTime.now();
                                     final DateTime? pickedDate =
@@ -174,8 +177,9 @@ class _InvoiceCaptureScreenState extends State<InvoiceCaptureScreen> {
                                   },
                                   decoration: const InputDecoration(
                                       labelText: "Amount:",
-                                      suffixIcon: WarnIcon(message: "You must enter a valid amount.")
-                                  ),
+                                      suffixIcon: WarnIcon(
+                                          message:
+                                              "You must enter a valid amount.")),
                                 ),
                               ],
                             ),
@@ -270,7 +274,7 @@ class _InvoiceCaptureScreenState extends State<InvoiceCaptureScreen> {
       final invoiceDataBox = Hive.box('InvoiceData');
 
       final List<InvoiceData> companyList = await getInvoiceDataList(
-          listType.company, invoiceDataBox.values.cast<InvoiceData>());
+          ListType.company, invoiceDataBox.values.cast<InvoiceData>());
 
       if (widget.editIndex == null) {
         for (final element in companyList) {

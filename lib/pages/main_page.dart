@@ -2,16 +2,16 @@ import 'dart:async';
 
 import 'package:cross_file/cross_file.dart';
 import 'package:edge_detection/edge_detection.dart';
-import 'package:fastinvoicereader/Models/invoice_data.dart';
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:path/path.dart' as path;
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
 
-import '../company_name_filter.dart';
 import '../main.dart';
-import '../toast.dart';
+import '../models/invoice_data.dart';
+import '../utils/company_name_filter.dart';
+import '../widgets/toast.dart';
 import 'captured_page.dart';
 import 'invoicelist_page.dart';
 
@@ -45,8 +45,9 @@ class _CompanyListState extends State<CompanyList> {
           actions: <Widget>[
             IconButton(
               icon: const Icon(Icons.table_chart),
-              tooltip: 'Export all data to Excel',
-              onPressed: () => showSnackBar(context, text: "Files are saved in " "Download" " file."),
+              tooltip: "Export all data to Excel",
+              onPressed: () => showSnackBar(context,
+                  text: "Files are saved in ""Download"" file."),
             ),
           ]),
       body: listViewer(),
@@ -55,7 +56,9 @@ class _CompanyListState extends State<CompanyList> {
         largeSize: 30,
         backgroundColor: Colors.red,
         offset: const Offset(10, -10),
-        child: FloatingActionButton(onPressed: getImageFromCamera, child: const Icon(Icons.receipt_long, size: 45)),
+        child: FloatingActionButton(
+            onPressed: getImageFromCamera,
+            child: const Icon(Icons.receipt_long, size: 45)),
       ),
     );
   }
@@ -65,7 +68,8 @@ class _CompanyListState extends State<CompanyList> {
 
     return ValueListenableBuilder<Box>(
         valueListenable: Hive.box('InvoiceData').listenable(),
-        builder: (final BuildContext context, final Box<dynamic> value, final Widget? child) {
+        builder: (final BuildContext context, final Box<dynamic> value,
+            final Widget? child) {
           //“No data were found.” was added to avoid an error."
           if (invoiceDataBox.isEmpty) {
             return const Center(
@@ -76,15 +80,22 @@ class _CompanyListState extends State<CompanyList> {
             );
           } else {
             return FutureBuilder<List<InvoiceData>>(
-              future: getInvoiceDataList(listType.company, invoiceDataBox.cast<InvoiceData>()),
-              builder: (final BuildContext context, final AsyncSnapshot<List<InvoiceData>> company) {
+              future: getInvoiceDataList(
+                  ListType.company, invoiceDataBox.cast<InvoiceData>()),
+              builder: (final BuildContext context,
+                  final AsyncSnapshot<List<InvoiceData>> company) {
                 if (company.hasData) {
                   return ListView.separated(
-                      padding: const EdgeInsets.only(left: 10, right: 10, top: 20),
+                      padding:
+                          const EdgeInsets.only(left: 10, right: 10, top: 20),
                       itemCount: company.data!.length,
-                      separatorBuilder: (final BuildContext context, final int index) => const Divider(),
-                      itemBuilder: (final BuildContext context, final int index) {
-                        final companyListName = company.data!.elementAt(index).companyName;
+                      separatorBuilder:
+                          (final BuildContext context, final int index) =>
+                              const Divider(),
+                      itemBuilder:
+                          (final BuildContext context, final int index) {
+                        final companyListName =
+                            company.data!.elementAt(index).companyName;
                         return ClipRRect(
                           borderRadius: BorderRadius.circular(20.0),
                           child: ListTile(
@@ -97,7 +108,9 @@ class _CompanyListState extends State<CompanyList> {
                               Navigator.push(
                                   context,
                                   MaterialPageRoute(
-                                      builder: (final context) => InvoiceListScreen(companyName: companyListName)));
+                                      builder: (final context) =>
+                                          InvoiceListScreen(
+                                              companyName: companyListName)));
                             },
                           ),
                         );
@@ -115,11 +128,14 @@ class _CompanyListState extends State<CompanyList> {
     final bool isCameraGranted = await Permission.camera.request().isGranted;
 
     if (mounted && !isCameraGranted) {
-      return showSnackBar(context, text: "You need to give permission to use camera.", color: Colors.redAccent);
+      return showSnackBar(context,
+          text: "You need to give permission to use camera.",
+          color: Colors.redAccent);
     }
 
     // Generate filepath for saving
-    final String imagePath = path.join((await getApplicationSupportDirectory()).path,
+    final String imagePath = path.join(
+        (await getApplicationSupportDirectory()).path,
         "${(DateTime.now().millisecondsSinceEpoch / 1000).round()}.jpeg");
 
     try {
@@ -135,7 +151,10 @@ class _CompanyListState extends State<CompanyList> {
 
       if (mounted && success) {
         unawaited(Navigator.push(
-            context, MaterialPageRoute(builder: (final context) => InvoiceCaptureScreen(imageFile: XFile(imagePath)))));
+            context,
+            MaterialPageRoute(
+                builder: (final context) =>
+                    InvoiceCaptureScreen(imageFile: XFile(imagePath)))));
       }
     } catch (e) {
       if (mounted) {

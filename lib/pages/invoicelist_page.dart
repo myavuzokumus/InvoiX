@@ -1,14 +1,14 @@
 import 'dart:io';
 
-import 'package:fastinvoicereader/Models/invoice_data.dart';
 import 'package:file_selector/file_selector.dart';
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:intl/intl.dart';
 
-import '../company_name_filter.dart';
 import '../main.dart';
-import '../toast.dart';
+import '../models/invoice_data.dart';
+import '../utils/company_name_filter.dart';
+import '../widgets/toast.dart';
 import 'captured_page.dart';
 
 class InvoiceListScreen extends StatefulWidget {
@@ -48,21 +48,26 @@ class _InvoiceListScreenState extends State<InvoiceListScreen> {
             IconButton(
               icon: const Icon(Icons.table_chart),
               tooltip: 'Export all data to Excel',
-              onPressed: () => showSnackBar(context, text: "Files are saved in " "Download" " file."),
+              onPressed: () => showSnackBar(context,
+                  text: "Files are saved in " "Download" " file."),
             ),
           ]),
       body: ValueListenableBuilder<Box>(
         valueListenable: Hive.box('InvoiceData').listenable(),
-        builder: (final BuildContext context, final Box<dynamic> value, final Widget? child) {
+        builder: (final BuildContext context, final Box<dynamic> value,
+            final Widget? child) {
           return FutureBuilder<List<InvoiceData>>(
-              future: getInvoiceDataList(listType.invoice, invoiceDataBox.cast<InvoiceData>(), widget.companyName),
-              builder: (final BuildContext context, final AsyncSnapshot<List<InvoiceData>> invoice) {
+              future: getInvoiceDataList(ListType.invoice,
+                  invoiceDataBox.cast<InvoiceData>(), widget.companyName),
+              builder: (final BuildContext context,
+                  final AsyncSnapshot<List<InvoiceData>> invoice) {
                 if (invoice.hasData) {
                   return GridView.builder(
                     // Create a grid with 2 columns. If you change the scrollDirection to
                     // horizontal, this produces 2 rows.
                     // Generate 100 widgets that display their index in the List.
-                    gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                    gridDelegate:
+                        const SliverGridDelegateWithFixedCrossAxisCount(
                       crossAxisCount: 1,
                       mainAxisSpacing: 15,
                       crossAxisSpacing: 15,
@@ -77,7 +82,8 @@ class _InvoiceListScreenState extends State<InvoiceListScreen> {
                           Navigator.push(
                               context,
                               MaterialPageRoute(
-                                  builder: (final context) => InvoiceCaptureScreen(
+                                  builder: (final context) =>
+                                      InvoiceCaptureScreen(
                                         editIndex: index,
                                         imageFile: XFile(invoiceData.ImagePath),
                                       )));
@@ -94,28 +100,42 @@ class _InvoiceListScreenState extends State<InvoiceListScreen> {
                                       child: Container(
                                         margin: const EdgeInsets.all(15),
                                         color: Colors.blueGrey,
-                                        child: Image.file(File(XFile(invoiceData.ImagePath).path)),
+                                        child: Image.file(File(
+                                            XFile(invoiceData.ImagePath).path)),
                                       ),
                                     ),
                                     ListView(
                                       shrinkWrap: true,
                                       children: <Widget>[
                                         ListTile(
-                                          visualDensity: const VisualDensity(vertical: -4),
-                                          title: const Text("Invoice No:", style: TextStyle(fontSize: 20)),
-                                          trailing: Text(invoiceData.invoiceNo, style: const TextStyle(fontSize: 16)),
+                                          visualDensity:
+                                              const VisualDensity(vertical: -4),
+                                          title: const Text("Invoice No:",
+                                              style: TextStyle(fontSize: 20)),
+                                          trailing: Text(invoiceData.invoiceNo,
+                                              style: const TextStyle(
+                                                  fontSize: 16)),
                                         ),
                                         ListTile(
-                                          visualDensity: const VisualDensity(vertical: -4),
-                                          title: const Text("Date:", style: TextStyle(fontSize: 20)),
-                                          trailing: Text(DateFormat("dd-MM-yyyy").format(invoiceData.date),
-                                              style: const TextStyle(fontSize: 16)),
+                                          visualDensity:
+                                              const VisualDensity(vertical: -4),
+                                          title: const Text("Date:",
+                                              style: TextStyle(fontSize: 20)),
+                                          trailing: Text(
+                                              DateFormat("dd-MM-yyyy")
+                                                  .format(invoiceData.date),
+                                              style: const TextStyle(
+                                                  fontSize: 16)),
                                         ),
                                         ListTile(
-                                          visualDensity: const VisualDensity(vertical: -4),
-                                          title: const Text("Amount:", style: TextStyle(fontSize: 20)),
-                                          trailing:
-                                              Text(invoiceData.amount.toString(), style: const TextStyle(fontSize: 16)),
+                                          visualDensity:
+                                              const VisualDensity(vertical: -4),
+                                          title: const Text("Amount:",
+                                              style: TextStyle(fontSize: 20)),
+                                          trailing: Text(
+                                              invoiceData.amount.toString(),
+                                              style: const TextStyle(
+                                                  fontSize: 16)),
                                         ),
                                       ],
                                     )
