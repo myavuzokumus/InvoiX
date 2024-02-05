@@ -28,7 +28,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(final BuildContext context) {
     return MaterialApp(
-      title: 'Fast Invoice Reader',
+      title: 'Invoix',
       theme: ThemeData(
         inputDecorationTheme: const InputDecorationTheme(
           labelStyle: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
@@ -57,7 +57,7 @@ class MyApp extends StatelessWidget {
         scaffoldBackgroundColor: Colors.black87,
         useMaterial3: true,
       ),
-      home: const CompanyList(title: 'Fast Invoice Reader'),
+      home: const CompanyList(),
     );
   }
 }

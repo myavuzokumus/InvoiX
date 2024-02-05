@@ -16,9 +16,7 @@ import 'captured_page.dart';
 import 'invoicelist_page.dart';
 
 class CompanyList extends StatefulWidget {
-  const CompanyList({super.key, required this.title});
-
-  final String title;
+  const CompanyList({super.key});
 
   @override
   State<CompanyList> createState() => _CompanyListState();
@@ -40,7 +38,7 @@ class _CompanyListState extends State<CompanyList> {
       appBar: AppBar(
           // Here we take the value from the MyHomePage object that was created by
           // the App.build method, and use it to set our appbar title.
-          title: Text(widget.title),
+          title: const Text("Invoix"),
           centerTitle: true,
           actions: <Widget>[
             IconButton(

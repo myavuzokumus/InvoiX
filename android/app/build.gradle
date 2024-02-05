@@ -23,7 +23,7 @@ if (flutterVersionName == null) {
 }
 
 android {
-    namespace "com.example.invoix"
+    namespace "games.sc_riber.invoix"
     compileSdkVersion flutter.compileSdkVersion
     ndkVersion flutter.ndkVersion
 
