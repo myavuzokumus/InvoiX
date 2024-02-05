@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 
 import 'models/invoice_data.dart';
-import 'pages/main_page.dart';
+import 'pages/company_list.dart';
 
 final invoiceDataBox = Hive.box('InvoiceData').values;
 

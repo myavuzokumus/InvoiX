@@ -9,7 +9,7 @@ import '../main.dart';
 import '../models/invoice_data.dart';
 import '../utils/company_name_filter.dart';
 import '../widgets/toast.dart';
-import 'captured_page.dart';
+import 'invoice_edit.dart';
 
 class InvoiceListScreen extends StatefulWidget {
   const InvoiceListScreen({super.key, required this.companyName});

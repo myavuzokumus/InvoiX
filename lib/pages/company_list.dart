@@ -12,8 +12,8 @@ import '../main.dart';
 import '../models/invoice_data.dart';
 import '../utils/company_name_filter.dart';
 import '../widgets/toast.dart';
-import 'captured_page.dart';
-import 'invoicelist_page.dart';
+import 'invoice_edit.dart';
+import 'invoice_list.dart';
 
 class CompanyList extends StatefulWidget {
   const CompanyList({super.key});
