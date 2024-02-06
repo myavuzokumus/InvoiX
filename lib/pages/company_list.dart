@@ -104,9 +104,26 @@ class _CompanyPageState extends State<CompanyPage> {
   }
 }
 
+enum CompanyType { LTD, STI, all }
+
 // Return list of companies
-class CompanyList extends StatelessWidget {
+class CompanyList extends StatefulWidget {
   const CompanyList({super.key});
+
+  @override
+  State<CompanyList> createState() => _CompanyListState();
+}
+
+class _CompanyListState extends State<CompanyList> {
+
+  late CompanyType companyView;
+
+  @override
+  void initState() {
+    companyView = CompanyType.all;
+    super.initState();
+  }
+
 
   @override
   Widget build(final BuildContext context) {
@@ -129,6 +146,19 @@ class CompanyList extends StatelessWidget {
               builder: (final BuildContext context,
                   final AsyncSnapshot<List<InvoiceData>> company) {
                 if (company.hasData) {
+
+                  switch (companyView) {
+                    case CompanyType.LTD:
+                      company.data!.removeWhere((final InvoiceData element) =>
+                          !element.companyName.toUpperCase().contains("LTD."));
+                      break;
+                    case CompanyType.STI:
+                      company.data!.removeWhere((final InvoiceData element) =>
+                          !element.companyName.contains("ŞTİ."));
+                      break;
+                    default:
+                      break;
+                  }
                   final List<InvoiceData> companyList = company.data!;
 
                   return Column(
@@ -136,6 +166,29 @@ class CompanyList extends StatelessWidget {
                       FilledButton(
                         onPressed: () {},
                         child: Text(companyList.length.toString()),
+                      ),
+                      const SizedBox(
+                        height: 10,
+                      ),
+                      SegmentedButton(segments: const <ButtonSegment<CompanyType>>[
+                        ButtonSegment<CompanyType>(
+                            value: CompanyType.all,
+                            label: Text('All'),
+                            icon: Icon(Icons.all_inclusive)),
+                        ButtonSegment<CompanyType>(
+                            value: CompanyType.LTD,
+                            label: Text('LTD.'),
+                            icon: Icon(Icons.business_sharp)),
+                        ButtonSegment<CompanyType>(
+                            value: CompanyType.STI,
+                            label: Text('ŞTİ.'),
+                            icon: Icon(Icons.calendar_view_week)),
+                    ], selected: <CompanyType>{companyView},
+                onSelectionChanged: (final Set<CompanyType> newSelection) {
+                  setState(() {
+                    companyView = newSelection.first;
+                  });
+                },
                       ),
                       ListView.separated(
                           shrinkWrap: true,
