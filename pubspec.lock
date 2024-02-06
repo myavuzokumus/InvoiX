@@ -162,7 +162,7 @@ packages:
     source: hosted
     version: "3.1.1"
   cross_file:
-    dependency: transitive
+    dependency: "direct main"
     description:
       name: cross_file
       sha256: fedaadfa3a6996f75211d835aaeb8fede285dae94262485698afd832371b9a5e
@@ -769,26 +769,26 @@ packages:
     dependency: transitive
     description:
       name: syncfusion_flutter_core
-      sha256: c0693d88cbdef2af5da286c605e5e8f33216c8f6cb3bc92a88a51decfb62bace
+      sha256: e8580e201c7197feac830b501889e877796a9fabbe20dcdbe90a981603939101
       url: "https://pub.dev"
     source: hosted
-    version: "24.2.3"
+    version: "24.2.4"
   syncfusion_flutter_xlsio:
     dependency: "direct main"
     description:
       name: syncfusion_flutter_xlsio
-      sha256: "57872e229433fa7e8d4740c709445855df9c6442d36b248c8ed399eadc75ad3b"
+      sha256: "0d06e279ab4f9ac45c554621ed29953f6411815eff2acfd62d8fac2af2f5ad0d"
       url: "https://pub.dev"
     source: hosted
-    version: "24.2.3"
+    version: "24.2.4"
   syncfusion_officecore:
     dependency: transitive
     description:
       name: syncfusion_officecore
-      sha256: b4ae7840468d19edd716ea8c70c4a78be8b2d865da1bbcf621055331b2ba0b13
+      sha256: "034ce937ef6a74aa9f6a5a2bb5a625607172ef6311b03cdf361bdad8c1d178d4"
       url: "https://pub.dev"
     source: hosted
-    version: "24.2.3"
+    version: "24.2.4"
   term_glyph:
     dependency: transitive
     description:

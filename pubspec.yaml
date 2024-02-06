@@ -47,6 +47,7 @@ dependencies:
   edge_detection: ^1.1.2
   file_selector: ^1.0.0
   string_similarity: ^2.0.0
+  cross_file: ^0.3.3+8
 
 dev_dependencies:
   flutter_test:
