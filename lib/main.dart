@@ -3,6 +3,7 @@ import 'package:hive_flutter/hive_flutter.dart';
 
 import 'models/invoice_data.dart';
 import 'pages/company_list.dart';
+import 'theme.dart';
 
 final invoiceDataBox = Hive.box('InvoiceData').values;
 
@@ -27,37 +28,47 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(final BuildContext context) {
+
     return MaterialApp(
-      title: 'Invoix',
-      theme: ThemeData(
-        inputDecorationTheme: const InputDecorationTheme(
-          labelStyle: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
-          border: OutlineInputBorder(),
-          isDense: true,
-          counterStyle: TextStyle(fontSize: 0),
-          errorStyle: TextStyle(fontSize: 0),
-        ),
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.black87),
-        textTheme: Theme.of(context).textTheme.apply(
-              bodyColor: Colors.white,
-              displayColor: Colors.white,
-              decorationColor: Colors.white,
-            ),
-        primaryTextTheme: Theme.of(context).textTheme.apply(
-              bodyColor: Colors.white,
-              displayColor: Colors.white,
-              decorationColor: Colors.white,
-            ),
-        appBarTheme: const AppBarTheme(
-            titleTextStyle: TextStyle(
-              color: Colors.white,
-            ),
-            backgroundColor: Colors.black,
-            iconTheme: IconThemeData(color: Colors.white)),
-        scaffoldBackgroundColor: Colors.black87,
-        useMaterial3: true,
+      title: 'InvoiX',
+      theme: const MaterialTheme(TextTheme()).dark().copyWith(
+
+      inputDecorationTheme: const InputDecorationTheme(
+             labelStyle: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
+             border: OutlineInputBorder(),
+             isDense: true,
+             counterStyle: TextStyle(fontSize: 0),
+             errorStyle: TextStyle(fontSize: 0),
+         ),
       ),
-      home: const CompanyList(),
+      home: const CompanyPage(),
     );
   }
 }
+
+
+//        inputDecorationTheme: const InputDecorationTheme(
+//           labelStyle: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
+//           border: OutlineInputBorder(),
+//           isDense: true,
+//           counterStyle: TextStyle(fontSize: 0),
+//           errorStyle: TextStyle(fontSize: 0),
+//         ),
+//         textTheme: Theme.of(context).textTheme.apply(
+//               bodyColor: Colors.white,
+//               displayColor: Colors.white,
+//               decorationColor: Colors.white,
+//             ),
+//         primaryTextTheme: Theme.of(context).textTheme.apply(
+//               bodyColor: Colors.white,
+//               displayColor: Colors.white,
+//               decorationColor: Colors.white,
+//             ),
+//         appBarTheme: const AppBarTheme(
+//             titleTextStyle: TextStyle(
+//               color: Colors.white,
+//               fontSize: 28,
+//             ),
+//             iconTheme: IconThemeData(color: Colors.white)
+//         ),
+//         scaffoldBackgroundColor: Colors.black87,
