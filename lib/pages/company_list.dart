@@ -15,40 +15,38 @@ import '../widgets/toast.dart';
 import 'invoice_edit.dart';
 import 'invoice_list.dart';
 
-class CompanyList extends StatefulWidget {
-  const CompanyList({super.key});
+//TODO: Add Excel function to save data
+//TODO: Removing companies and invoices will be added.
+
+class CompanyPage extends StatefulWidget {
+  const CompanyPage({super.key});
 
   @override
-  State<CompanyList> createState() => _CompanyListState();
+  State<CompanyPage> createState() => _CompanyPageState();
 }
 
-class _CompanyListState extends State<CompanyList> {
-  //TODO: Add Excel function to save data
-  //TODO: Removing companies and invoices will be added.
+class _CompanyPageState extends State<CompanyPage> {
 
   @override
   Widget build(final BuildContext context) {
-    // This method is rerun every time setState is called, for instance as done
-    // by the _incrementCounter method above.
-    //
-    // The Flutter framework has been optimized to make rerunning build methods
-    // fast, so that you can just rebuild anything that needs updating rather
-    // than having to individually change instances of widgets.
     return Scaffold(
       appBar: AppBar(
-          // Here we take the value from the MyHomePage object that was created by
-          // the App.build method, and use it to set our appbar title.
-          title: const Text("Invoix"),
+          title: Hero(
+              tag: "InvoiX",
+              child: RichText(
+                  text: const TextSpan(
+                    text: "InvoiX",
+                    style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold)))),
           centerTitle: true,
           actions: <Widget>[
             IconButton(
               icon: const Icon(Icons.table_chart),
               tooltip: "Export all data to Excel",
               onPressed: () => showSnackBar(context,
-                  text: "Files are saved in ""Download"" file."),
+                  text: "Excel files are saved in ""Download"" file.", color: Colors.green),
             ),
           ]),
-      body: listViewer(),
+      body: const CompanyList(),
       floatingActionButton: Badge(
         label: const Icon(Icons.add, color: Colors.white, size: 25),
         largeSize: 30,
@@ -61,67 +59,7 @@ class _CompanyListState extends State<CompanyList> {
     );
   }
 
-  Widget listViewer() {
-    //InvoiceDataBox.watch().listen((event) { });
-
-    return ValueListenableBuilder<Box>(
-        valueListenable: Hive.box('InvoiceData').listenable(),
-        builder: (final BuildContext context, final Box<dynamic> value,
-            final Widget? child) {
-          //“No data were found.” was added to avoid an error."
-          if (invoiceDataBox.isEmpty) {
-            return const Center(
-              child: Text(
-                "No data are found.",
-                style: TextStyle(fontSize: 25),
-              ),
-            );
-          } else {
-            return FutureBuilder<List<InvoiceData>>(
-              future: getInvoiceDataList(
-                  ListType.company, invoiceDataBox.cast<InvoiceData>()),
-              builder: (final BuildContext context,
-                  final AsyncSnapshot<List<InvoiceData>> company) {
-                if (company.hasData) {
-                  return ListView.separated(
-                      padding:
-                          const EdgeInsets.only(left: 10, right: 10, top: 20),
-                      itemCount: company.data!.length,
-                      separatorBuilder:
-                          (final BuildContext context, final int index) =>
-                              const Divider(),
-                      itemBuilder:
-                          (final BuildContext context, final int index) {
-                        final companyListName =
-                            company.data!.elementAt(index).companyName;
-                        return ClipRRect(
-                          borderRadius: BorderRadius.circular(20.0),
-                          child: ListTile(
-                            tileColor: Colors.grey,
-                            title: Text(
-                              companyListName,
-                              style: Theme.of(context).textTheme.headlineSmall,
-                            ),
-                            onTap: () {
-                              Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (final context) =>
-                                          InvoiceListScreen(
-                                              companyName: companyListName)));
-                            },
-                          ),
-                        );
-                      });
-                } else {
-                  return const CircularProgressIndicator();
-                }
-              },
-            );
-          }
-        });
-  }
-
+  // Get image from camera
   Future<void> getImageFromCamera() async {
     final bool isCameraGranted = await Permission.camera.request().isGranted;
 
@@ -162,5 +100,72 @@ class _CompanyListState extends State<CompanyList> {
             color: Colors.redAccent);
       }
     }
+  }
+}
+
+
+// Return list of companies
+class CompanyList extends StatelessWidget {
+  const CompanyList({super.key});
+
+  @override
+  Widget build(final BuildContext context) {
+    return ValueListenableBuilder<Box>(
+        valueListenable: Hive.box('InvoiceData').listenable(),
+        builder: (final BuildContext context, final Box<dynamic> value,
+            final Widget? child) {
+
+          // Check if there is any invoice data
+          if (invoiceDataBox.isEmpty) {
+            return const Center(
+              child: Text(
+                "No invoice added yet.",
+                style: TextStyle(fontSize: 25),
+              ),
+            );
+          } else {
+            return FutureBuilder<List<InvoiceData>>(
+              future: getInvoiceDataList(
+                  ListType.company, invoiceDataBox.cast<InvoiceData>()),
+              builder: (final BuildContext context,
+                  final AsyncSnapshot<List<InvoiceData>> company) {
+                if (company.hasData) {
+                  return ListView.separated(
+                      padding:
+                      const EdgeInsets.only(left: 10, right: 10, top: 20),
+                      itemCount: company.data!.length,
+                      separatorBuilder:
+                          (final BuildContext context, final int index) =>
+                      const Divider(),
+                      itemBuilder:
+                          (final BuildContext context, final int index) {
+                        final companyListName =
+                            company.data!.elementAt(index).companyName;
+                        return ClipRRect(
+                          borderRadius: BorderRadius.circular(20.0),
+                          child: ListTile(
+                            tileColor: Colors.grey,
+                            title: Text(
+                              companyListName,
+                              style: Theme.of(context).textTheme.headlineSmall,
+                            ),
+                            onTap: () {
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (final context) =>
+                                          InvoicePage(
+                                              companyName: companyListName)));
+                            },
+                          ),
+                        );
+                      });
+                } else {
+                  return const CircularProgressIndicator();
+                }
+              },
+            );
+          }
+        });
   }
 }
