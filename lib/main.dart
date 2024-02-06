@@ -40,6 +40,12 @@ class MyApp extends StatelessWidget {
              counterStyle: TextStyle(fontSize: 0),
              errorStyle: TextStyle(fontSize: 0),
          ),
+        listTileTheme: const ListTileThemeData(
+          shape: Border.symmetric(
+            vertical: BorderSide(color: Colors.white, width: 2.5),
+          ),
+          titleTextStyle: TextStyle(fontSize: 24),
+        )
       ),
       home: const CompanyPage(),
     );
