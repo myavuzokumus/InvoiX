@@ -54,8 +54,6 @@ class _InvoiceCaptureScreenState extends State<InvoiceCaptureScreen> {
     super.initState();
   }
 
-  String selectedItem = '';
-
   @override
   Widget build(final BuildContext context) {
     return SafeArea(
@@ -71,6 +69,7 @@ class _InvoiceCaptureScreenState extends State<InvoiceCaptureScreen> {
           onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
           child: CustomScrollView(slivers: [
             SliverAppBar(
+              actions: const [SizedBox()],
               expandedHeight: 375,
               flexibleSpace: FlexibleSpaceBar(
                 background: InteractiveViewer(
@@ -135,7 +134,7 @@ class _InvoiceCaptureScreenState extends State<InvoiceCaptureScreen> {
                                     ),
                                     Padding(
                                       padding: const EdgeInsets.only(left: 15),
-                                      child: IconButton(onPressed: () {scaffoldKey.currentState!.openEndDrawer();}, icon: const Icon(Icons.search)),
+                                      child: IconButton.filledTonal(onPressed: () {scaffoldKey.currentState!.openEndDrawer();}, icon: const Icon(Icons.search)),
                                     )
                                   ],
                                 ),
