@@ -4,12 +4,12 @@ import 'package:cross_file/cross_file.dart';
 import 'package:edge_detection/edge_detection.dart';
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
+import 'package:invoix/models/invoice_data.dart';
 import 'package:path/path.dart' as path;
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
 
 import '../main.dart';
-import '../models/invoice_data.dart';
 import '../utils/company_name_filter.dart';
 import '../widgets/toast.dart';
 import 'invoice_edit.dart';
@@ -47,7 +47,11 @@ class _CompanyPageState extends State<CompanyPage> {
                   color: Colors.green),
             ),
           ]),
+
+      //CompanyList widget is added to the body of the scaffold
       body: const CompanyList(),
+
+      //Invoice Capture button
       floatingActionButton: Badge(
         label: const Icon(Icons.add, color: Colors.white, size: 20),
         largeSize: 28,
@@ -163,12 +167,12 @@ class _CompanyListState extends State<CompanyList> {
 
                   return Column(
                     children: [
-                      FilledButton(
-                        onPressed: () {},
-                        child: Text(companyList.length.toString()),
-                      ),
-                      const SizedBox(
-                        height: 10,
+                      Padding(
+                        padding: const EdgeInsets.only(bottom: 10, top: 10),
+                        child: FilledButton(
+                          onPressed: () {},
+                          child: Text(companyList.length.toString()),
+                        ),
                       ),
                       SegmentedButton(segments: const <ButtonSegment<CompanyType>>[
                         ButtonSegment<CompanyType>(

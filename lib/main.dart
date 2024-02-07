@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
+import 'package:invoix/models/invoice_data.dart';
 
-import 'models/invoice_data.dart';
 import 'pages/company_list.dart';
 import 'theme.dart';
 

@@ -1,4 +1,4 @@
-import '../models/invoice_data.dart';
+import 'package:invoix/models/invoice_data.dart';
 
 enum ListType { company, invoice }
 
