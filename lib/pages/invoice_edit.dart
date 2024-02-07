@@ -6,9 +6,9 @@ import 'package:flutter/services.dart';
 import 'package:google_mlkit_text_recognition/google_mlkit_text_recognition.dart';
 import 'package:hive/hive.dart';
 import 'package:intl/intl.dart';
+import 'package:invoix/models/invoice_data.dart';
 import 'package:string_similarity/string_similarity.dart';
 
-import '../models/invoice_data.dart';
 import '../utils/company_name_filter.dart';
 import '../utils/image_to_text_regex.dart';
 import '../widgets/toast.dart';
@@ -63,10 +63,13 @@ class _InvoiceCaptureScreenState extends State<InvoiceCaptureScreen> {
                 background: InteractiveViewer(
                   child: AspectRatio(
                       aspectRatio: 1,
-                      child: Image.file(
-                        File(widget.imageFile.path),
-                        fit: BoxFit.fitHeight,
-                        width: double.maxFinite,
+                      child: Hero(
+                        tag: widget.imageFile.path,
+                        child: Image.file(
+                          File(widget.imageFile.path),
+                          fit: BoxFit.fitHeight,
+                          width: double.maxFinite,
+                        ),
                       )),
                 ),
               ),
