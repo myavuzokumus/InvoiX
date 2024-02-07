@@ -58,7 +58,19 @@ class InvoiceCard extends StatelessWidget {
                 tag: invoiceData.ImagePath,
                 child: Image.file(File(
                     XFile(invoiceData.ImagePath).path),
-                width: 144,),
+                width: 144,
+                frameBuilder: (final BuildContext context, final Widget child, final int? frame, final bool wasSynchronouslyLoaded) {
+                  if (wasSynchronouslyLoaded) {
+                    return child;
+                  }
+                  return AnimatedOpacity(
+                    opacity: frame == null ? 0 : 1,
+                    duration: const Duration(seconds: 1),
+                    curve: Curves.easeOut,
+                    child: child,
+                  );
+                },
+                ),
               ), // Adds a price to the bottom of the card
             ],
           ),
