@@ -4,7 +4,6 @@ import 'package:cross_file/cross_file.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_mlkit_text_recognition/google_mlkit_text_recognition.dart';
-import 'package:hive/hive.dart';
 import 'package:intl/intl.dart';
 import 'package:invoix/main.dart';
 import 'package:invoix/models/invoice_data.dart';
@@ -286,7 +285,7 @@ class _InvoiceCaptureScreenState extends State<InvoiceCaptureScreen> {
   }
 
   Future<void> fetchInvoiceData() async {
-    final InvoiceData item = Hive.box('InvoiceData').getAt(editIndex!);
+    final InvoiceData item = invoiceDataBox.getAt(editIndex!);
 
     companyTextController.text = item.companyName;
     invoiceNoTextController.text = item.invoiceNo;
