@@ -6,6 +6,7 @@ import 'package:flutter/services.dart';
 import 'package:google_mlkit_text_recognition/google_mlkit_text_recognition.dart';
 import 'package:hive/hive.dart';
 import 'package:intl/intl.dart';
+import 'package:invoix/main.dart';
 import 'package:invoix/models/invoice_data.dart';
 import 'package:string_similarity/string_similarity.dart';
 
@@ -29,8 +30,9 @@ class _InvoiceCaptureScreenState extends State<InvoiceCaptureScreen> {
   late List<String> scannedText;
 
   bool _isLoading = true;
-
   bool _saveButtonState = true;
+
+  late int? editIndex;
 
   //TextLabelControllers
   TextEditingController companyTextController = TextEditingController();
@@ -46,7 +48,9 @@ class _InvoiceCaptureScreenState extends State<InvoiceCaptureScreen> {
 
   @override
   void initState() {
-    widget.editIndex == null ? fieldFiller() : fetchInvoiceData();
+    editIndex = widget.editIndex;
+
+    editIndex == null ? fieldFiller() : fetchInvoiceData();
     super.initState();
   }
 
@@ -254,7 +258,7 @@ class _InvoiceCaptureScreenState extends State<InvoiceCaptureScreen> {
   }
 
   Future<void> fetchInvoiceData() async {
-    final InvoiceData item = Hive.box('InvoiceData').getAt(widget.editIndex!);
+    final InvoiceData item = Hive.box('InvoiceData').getAt(editIndex!);
 
     companyTextController.text = item.companyName;
     invoiceNoTextController.text = item.invoiceNo;
@@ -274,12 +278,10 @@ class _InvoiceCaptureScreenState extends State<InvoiceCaptureScreen> {
       // If the form is valid, display a snack bar. In the real world,
       // you'd often call a server or save the information in a database.
 
-      final invoiceDataBox = Hive.box('InvoiceData');
-
       final List<InvoiceData> companyList = await getInvoiceDataList(
           ListType.company, invoiceDataBox.values.cast<InvoiceData>());
 
-      if (widget.editIndex == null) {
+      if (editIndex == null) {
         for (final element in companyList) {
           final companyName = element.companyName;
           final double similarity =
@@ -298,7 +300,6 @@ class _InvoiceCaptureScreenState extends State<InvoiceCaptureScreen> {
                   content: Text(
                     'Do you want to merge with it?'
                     '\n${companyTextController.text} -> $companyName',
-                    style: const TextStyle(color: Colors.black),
                   ),
                   actions: <Widget>[
                     TextButton(
@@ -344,9 +345,9 @@ class _InvoiceCaptureScreenState extends State<InvoiceCaptureScreen> {
           date: dateFormat.parse(dateTextController.text),
           amount: double.parse(amountTextController.text));
 
-      widget.editIndex == null
+      editIndex == null
           ? await invoiceDataBox.add(data)
-          : await invoiceDataBox.putAt(widget.editIndex!, data);
+          : await invoiceDataBox.putAt(editIndex!, data);
 
       if (!mounted) {
         return;

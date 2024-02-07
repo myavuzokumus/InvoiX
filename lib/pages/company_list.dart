@@ -136,7 +136,7 @@ class _CompanyListState extends State<CompanyList> {
         builder: (final BuildContext context, final Box<dynamic> value,
             final Widget? child) {
           // Check if there is any invoice data
-          if (invoiceDataBox.isEmpty) {
+          if (invoiceDataBox.values.isEmpty) {
             return const Center(
               child: Text(
                 "No invoice added yet.",
@@ -146,7 +146,7 @@ class _CompanyListState extends State<CompanyList> {
           } else {
             return FutureBuilder<List<InvoiceData>>(
               future: getInvoiceDataList(
-                  ListType.company, invoiceDataBox.cast<InvoiceData>()),
+                  ListType.company, invoiceDataBox.values.cast<InvoiceData>()),
               builder: (final BuildContext context,
                   final AsyncSnapshot<List<InvoiceData>> company) {
                 if (company.hasData) {
@@ -158,7 +158,7 @@ class _CompanyListState extends State<CompanyList> {
                       break;
                     case CompanyType.STI:
                       company.data!.removeWhere((final InvoiceData element) =>
-                          !element.companyName.contains("ŞTİ."));
+                          !element.companyName.toUpperCase().contains("ŞTİ."));
                       break;
                     default:
                       break;
@@ -206,28 +206,26 @@ class _CompanyListState extends State<CompanyList> {
                               (final BuildContext context, final int index) {
                             final companyListName =
                                 companyList.elementAt(index).companyName;
-                            return ClipRRect(
-                              borderRadius: BorderRadius.circular(20.0),
-                              child: ListTile(
-                                title: Text(
-                                  companyListName,
-                                ),
-                                onTap: () {
-                                  Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                          builder: (final context) =>
-                                              InvoicePage(
-                                                  companyName:
-                                                      companyListName)));
-                                },
+
+                            return ListTile(
+                              title: Text(
+                                companyListName,
                               ),
+                              onTap: () {
+                                Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (final context) =>
+                                            InvoicePage(
+                                                companyName:
+                                                    companyListName)));
+                              },
                             );
                           }),
                     ],
                   );
                 } else {
-                  return const CircularProgressIndicator();
+                  return const Center(child: CircularProgressIndicator());
                 }
               },
             );

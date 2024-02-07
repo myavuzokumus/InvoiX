@@ -66,7 +66,7 @@ class InvoiceList extends StatelessWidget {
           final Widget? child) {
         return FutureBuilder<List<InvoiceData>>(
             future: getInvoiceDataList(ListType.invoice,
-                invoiceDataBox.cast<InvoiceData>(), companyName),
+                invoiceDataBox.values.cast<InvoiceData>(), companyName),
             builder: (final BuildContext context,
                 final AsyncSnapshot<List<InvoiceData>> invoice) {
 

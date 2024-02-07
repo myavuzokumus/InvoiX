@@ -5,7 +5,7 @@ import 'package:invoix/models/invoice_data.dart';
 import 'pages/company_list.dart';
 import 'theme.dart';
 
-final invoiceDataBox = Hive.box('InvoiceData').values;
+final invoiceDataBox = Hive.box('InvoiceData');
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
