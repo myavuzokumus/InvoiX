@@ -277,7 +277,7 @@ class _InvoiceCaptureScreenState extends State<InvoiceCaptureScreen> {
         amountTextController.text = i;
       }
     }
-    //_isLoading = false;
+    _isLoading = false;
   }
 
   Future<void> fieldFiller() async {
@@ -293,7 +293,7 @@ class _InvoiceCaptureScreenState extends State<InvoiceCaptureScreen> {
     dateTextController.text = dateFormat.format(item.date);
     amountTextController.text = item.amount.toString();
 
-    //_isLoading = false;
+    _isLoading = false;
   }
 
   Future<void> saveInvoice() async {
