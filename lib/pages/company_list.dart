@@ -112,7 +112,9 @@ enum CompanyType { LTD, STI, all }
 
 // Return list of companies
 class CompanyList extends StatefulWidget {
-  const CompanyList({super.key});
+  const CompanyList({super.key, this.onTap});
+
+  final Function(String)? onTap;
 
   @override
   State<CompanyList> createState() => _CompanyListState();
@@ -212,6 +214,10 @@ class _CompanyListState extends State<CompanyList> {
                                 companyListName,
                               ),
                               onTap: () {
+                                if (widget.onTap != null) {
+                                  widget.onTap!(companyListName);
+                                  return;
+                                }
                                 Navigator.push(
                                     context,
                                     MaterialPageRoute(
