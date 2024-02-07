@@ -8,6 +8,7 @@ import 'package:hive/hive.dart';
 import 'package:intl/intl.dart';
 import 'package:invoix/main.dart';
 import 'package:invoix/models/invoice_data.dart';
+import 'package:invoix/pages/company_list.dart';
 import 'package:string_similarity/string_similarity.dart';
 
 import '../utils/company_name_filter.dart';
@@ -40,10 +41,10 @@ class _InvoiceCaptureScreenState extends State<InvoiceCaptureScreen> {
   TextEditingController dateTextController = TextEditingController();
   TextEditingController amountTextController = TextEditingController();
 
+  final GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
   final _formKey = GlobalKey<FormState>();
   final DateFormat dateFormat = DateFormat("dd-MM-yyyy");
 
-  //TODO: Company name selection screen will be added.
   //TODO: Invoice Type detection will be added.
 
   @override
@@ -54,10 +55,19 @@ class _InvoiceCaptureScreenState extends State<InvoiceCaptureScreen> {
     super.initState();
   }
 
+  String selectedItem = '';
+
   @override
   Widget build(final BuildContext context) {
     return SafeArea(
       child: Scaffold(
+        key: scaffoldKey,
+        endDrawer: NavigationDrawer(children: [CompanyList(onTap: (final item) {
+          scaffoldKey.currentState!.closeEndDrawer();
+          setState(() {
+            companyTextController.text = item;
+          });
+        },)],),
         body: GestureDetector(
           onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
           child: CustomScrollView(slivers: [
@@ -95,22 +105,34 @@ class _InvoiceCaptureScreenState extends State<InvoiceCaptureScreen> {
                             child: Wrap(
                               runSpacing: 16.0,
                               children: [
-                                TextFormField(
-                                  maxLength: 50,
-                                  controller: companyTextController,
-                                  decoration: const InputDecoration(
-                                      labelText: "Company name:",
-                                      suffixIcon: WarnIcon(
-                                          message:
-                                              "You must enter a valid company name. Need include 'A.S., LTD. etc.'")),
-                                  validator: (final value) {
-                                    if (value == null ||
-                                        value.isEmpty ||
-                                        !companyRegex.hasMatch(value)) {
-                                      return 'Please enter some text';
-                                    }
-                                    return null;
-                                  },
+                                Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceEvenly,
+                                  children: [
+                                    Expanded(
+                                      child: TextFormField(
+                                        maxLength: 50,
+                                        controller: companyTextController,
+                                        decoration: const InputDecoration(
+                                            labelText: "Company name:",
+                                            suffixIcon: WarnIcon(
+                                                message:
+                                                    "You must enter a valid company name. Need include 'A.S., LTD. etc.'")),
+                                        validator: (final value) {
+                                          if (value == null ||
+                                              value.isEmpty ||
+                                              !companyRegex.hasMatch(value)) {
+                                            return 'Please enter some text';
+                                          }
+                                          return null;
+                                        },
+                                      ),
+                                    ),
+                                    Padding(
+                                      padding: const EdgeInsets.only(left: 15),
+                                      child: IconButton(onPressed: () {scaffoldKey.currentState!.openEndDrawer();}, icon: const Icon(Icons.search)),
+                                    )
+                                  ],
                                 ),
                                 TextFormField(
                                   maxLength: 50,
