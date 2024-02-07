@@ -90,7 +90,13 @@ class _InvoiceCaptureScreenState extends State<InvoiceCaptureScreen> {
             ),
             SliverToBoxAdapter(
               child: _isLoading
-                  ? const CircularProgressIndicator()
+                  ? Column(
+                    children: [
+                      const LinearProgressIndicator(),
+                      SizedBox(height: MediaQuery.of(context).size.height * 0.2),
+                      Image.asset("assets/loading/InvoiceReadLoading.gif"),
+                    ],
+                  )
                   : Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       mainAxisSize: MainAxisSize.min,
@@ -271,7 +277,7 @@ class _InvoiceCaptureScreenState extends State<InvoiceCaptureScreen> {
         amountTextController.text = i;
       }
     }
-    _isLoading = false;
+    //_isLoading = false;
   }
 
   Future<void> fieldFiller() async {
@@ -287,7 +293,7 @@ class _InvoiceCaptureScreenState extends State<InvoiceCaptureScreen> {
     dateTextController.text = dateFormat.format(item.date);
     amountTextController.text = item.amount.toString();
 
-    _isLoading = false;
+    //_isLoading = false;
   }
 
   Future<void> saveInvoice() async {
