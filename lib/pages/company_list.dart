@@ -108,8 +108,6 @@ class _CompanyPageState extends State<CompanyPage> {
   }
 }
 
-enum CompanyType { LTD, STI, all }
-
 // Return list of companies
 class CompanyList extends StatefulWidget {
   const CompanyList({super.key, this.onTap});
@@ -122,11 +120,10 @@ class CompanyList extends StatefulWidget {
 
 class _CompanyListState extends State<CompanyList> {
 
-  late CompanyType companyView;
+  Set<String> filters = <String>{};
 
   @override
   void initState() {
-    companyView = CompanyType.all;
     super.initState();
   }
 
@@ -153,19 +150,23 @@ class _CompanyListState extends State<CompanyList> {
                   final AsyncSnapshot<List<InvoiceData>> company) {
                 if (company.hasData) {
 
-                  switch (companyView) {
-                    case CompanyType.LTD:
-                      company.data!.removeWhere((final InvoiceData element) =>
-                          !element.companyName.toUpperCase().contains("LTD."));
-                      break;
-                    case CompanyType.STI:
-                      company.data!.removeWhere((final InvoiceData element) =>
-                          !element.companyName.toUpperCase().contains("ŞTİ."));
-                      break;
-                    default:
-                      break;
+                  final List<InvoiceData> companyList = List.from(company.data!);
+
+                  if (filters.length == 1) {
+                    companyList.removeWhere((final InvoiceData element) =>
+                    !filters.every((e) {
+                      return element.companyName.toUpperCase().contains(e.toUpperCase());
+                    })
+
+                    );
                   }
-                  final List<InvoiceData> companyList = company.data!;
+                  else if (filters.length > 1) {
+                    companyList.removeWhere((final InvoiceData element) =>
+                    !filters.any((e) {
+                      return element.companyName.toUpperCase().contains(e.toUpperCase());
+                    })
+                    );
+                  }
 
                   return Column(
                     children: [
@@ -176,25 +177,31 @@ class _CompanyListState extends State<CompanyList> {
                           child: Text(companyList.length.toString()),
                         ),
                       ),
-                      SegmentedButton(segments: const <ButtonSegment<CompanyType>>[
-                        ButtonSegment<CompanyType>(
-                            value: CompanyType.all,
-                            label: Text('All'),
-                            icon: Icon(Icons.all_inclusive)),
-                        ButtonSegment<CompanyType>(
-                            value: CompanyType.LTD,
-                            label: Text('LTD.'),
-                            icon: Icon(Icons.business_sharp)),
-                        ButtonSegment<CompanyType>(
-                            value: CompanyType.STI,
-                            label: Text('ŞTİ.'),
-                            icon: Icon(Icons.calendar_view_week)),
-                    ], selected: <CompanyType>{companyView},
-                onSelectionChanged: (final Set<CompanyType> newSelection) {
-                  setState(() {
-                    companyView = newSelection.first;
-                  });
-                },
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 20),
+                        child: SingleChildScrollView(
+                          scrollDirection: Axis.horizontal,
+                          child: Wrap(
+                            spacing: 10.0,
+                            children: CompanyType.values.map((final CompanyType types) {
+                              if (company.data!.any((final InvoiceData element) => element.companyName.toUpperCase().contains(types.name.toUpperCase())))
+                              {return FilterChip(
+                                label: Text(types.name),
+                                selected: filters.contains(types.name),
+                                onSelected: (final bool selected) {
+                                  setState(() {
+                                    if (selected) {
+                                      filters.add(types.name);
+                                    } else {
+                                      filters.remove(types.name);
+                                    }
+                                  });
+                                },
+                              );}
+                              else {return const SizedBox();}
+                            }).toList(),
+                          ),
+                        ),
                       ),
                       ListView.separated(
                           shrinkWrap: true,
@@ -239,3 +246,5 @@ class _CompanyListState extends State<CompanyList> {
         });
   }
 }
+
+
