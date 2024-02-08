@@ -6,6 +6,8 @@ import 'package:intl/intl.dart';
 import 'package:invoix/models/invoice_data.dart';
 import 'package:invoix/pages/invoice_edit.dart';
 
+import '../widgets/loading_animation.dart';
+
 class InvoiceCard extends StatelessWidget {
   const InvoiceCard({super.key, required this.invoiceData, required this.index});
 
@@ -80,15 +82,21 @@ class InvoiceCard extends StatelessWidget {
                           showModalBottomSheet<void>(
                             showDragHandle: true,
                             context: context,
-                            builder: (BuildContext context) {
+                            builder: (final BuildContext context) {
                               return const SizedBox(
                                 height: 200,
+                                width: double.infinity,
                                 child: Padding(
                                   padding: EdgeInsets.only(left: 24, bottom: 24, right: 24),
                                   child: Card(elevation: 16, child: SingleChildScrollView(
                                     child: Padding(
                                       padding: EdgeInsets.all(12.0),
-                                      child: Text('Analyze it with AI is very soon!'),
+                                      child: Column(
+                                        children: [
+                                          LoadingAnimation(),
+                                          Text('Analyze it with AI is very soon!'),
+                                        ],
+                                      ),
                                     ),
                                   )),
                                 ),
