@@ -54,23 +54,53 @@ class InvoiceCard extends StatelessWidget {
                   ],
                 ),
               ),
-              Hero(
-                tag: invoiceData.ImagePath,
-                child: Image.file(File(
-                    XFile(invoiceData.ImagePath).path),
-                width: 144,
-                frameBuilder: (final BuildContext context, final Widget child, final int? frame, final bool wasSynchronouslyLoaded) {
-                  if (wasSynchronouslyLoaded) {
-                    return child;
-                  }
-                  return AnimatedOpacity(
-                    opacity: frame == null ? 0 : 1,
-                    duration: const Duration(seconds: 1),
-                    curve: Curves.easeOut,
-                    child: child,
-                  );
-                },
-                ),
+              Stack(
+                children: [
+                  Hero(
+                    tag: invoiceData.ImagePath,
+                    child: Image.file(File(
+                        XFile(invoiceData.ImagePath).path),
+                    width: 144,
+                    frameBuilder: (final BuildContext context, final Widget child, final int? frame, final bool wasSynchronouslyLoaded) {
+                      if (wasSynchronouslyLoaded) {
+                        return child;
+                      }
+                      return AnimatedOpacity(
+                        opacity: frame == null ? 0 : 1,
+                        duration: const Duration(seconds: 1),
+                        curve: Curves.easeOut,
+                        child: child,
+                      );
+                    },
+                    ),
+                  ),
+                  Positioned(right: 0, bottom: 0,
+                      child: IconButton.outlined(
+                        onPressed: () {
+                          showModalBottomSheet<void>(
+                            showDragHandle: true,
+                            context: context,
+                            builder: (BuildContext context) {
+                              return const SizedBox(
+                                height: 200,
+                                child: Padding(
+                                  padding: EdgeInsets.only(left: 24, bottom: 24, right: 24),
+                                  child: Card(elevation: 16, child: SingleChildScrollView(
+                                    child: Padding(
+                                      padding: EdgeInsets.all(12.0),
+                                      child: Text('Analyze it with AI is very soon!'),
+                                    ),
+                                  )),
+                                ),
+                              );
+                            },
+                          );
+                        },
+                          icon: const Text("✨", style: TextStyle(fontSize: 17)),
+                        tooltip: 'Analyze it with AI',
+                      )
+                  )
+                ],
               ), // Adds a price to the bottom of the card
             ],
           ),
