@@ -8,6 +8,7 @@ import 'package:intl/intl.dart';
 import 'package:invoix/main.dart';
 import 'package:invoix/models/invoice_data.dart';
 import 'package:invoix/pages/company_list.dart';
+import 'package:invoix/widgets/loading_animation.dart';
 import 'package:string_similarity/string_similarity.dart';
 
 import '../utils/company_name_filter.dart';
@@ -88,13 +89,7 @@ class _InvoiceCaptureScreenState extends State<InvoiceCaptureScreen> {
             ),
             SliverToBoxAdapter(
               child: _isLoading
-                  ? Column(
-                    children: [
-                      const LinearProgressIndicator(),
-                      SizedBox(height: MediaQuery.of(context).size.height * 0.2),
-                      Image.asset("assets/loading/InvoiceReadLoading.gif"),
-                    ],
-                  )
+                  ? const LoadingAnimation()
                   : Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       mainAxisSize: MainAxisSize.min,
@@ -249,7 +244,7 @@ class _InvoiceCaptureScreenState extends State<InvoiceCaptureScreen> {
   }
 
   // The function that calculate which is company
-  void getInvoiceThing(final List listText) {
+  Future<void> getInvoiceThing(final List listText) async {
     companyTextController.text = listText[0];
 
     // For every each text in ListText
@@ -275,12 +270,18 @@ class _InvoiceCaptureScreenState extends State<InvoiceCaptureScreen> {
         amountTextController.text = i;
       }
     }
-    _isLoading = false;
+
+    await Future.delayed(const Duration(seconds: 2));
+
+    setState(() {
+      _isLoading = false;
+    });
+
   }
 
   Future<void> fieldFiller() async {
     await getRecognisedText(widget.imageFile);
-    getInvoiceThing(scannedText);
+    await getInvoiceThing(scannedText);
   }
 
   Future<void> fetchInvoiceData() async {
@@ -291,7 +292,12 @@ class _InvoiceCaptureScreenState extends State<InvoiceCaptureScreen> {
     dateTextController.text = dateFormat.format(item.date);
     amountTextController.text = item.amount.toString();
 
-    _isLoading = false;
+    await Future.delayed(const Duration(seconds: 1));
+
+    setState(() {
+      _isLoading = false;
+    });
+
   }
 
   Future<void> saveInvoice() async {
