@@ -80,14 +80,12 @@ class _CompanyPageState extends State<CompanyPage> {
         "${(DateTime.now().millisecondsSinceEpoch / 1000).round()}.jpeg");
 
     try {
+
       final bool success = await EdgeDetection.detectEdge(
         imagePath,
         canUseGallery: true,
         androidScanTitle: 'Scanning',
-        // use custom localizations for android
-        androidCropTitle: 'Crop',
-        androidCropBlackWhiteTitle: 'Black White',
-        androidCropReset: 'Reset',
+        androidCropTitle: 'Crop'
       );
 
       if (mounted && success) {
@@ -120,13 +118,13 @@ class CompanyList extends StatefulWidget {
 
 class _CompanyListState extends State<CompanyList> {
 
-  Set<String> filters = <String>{};
+  late Set<String> filters;
 
   @override
   void initState() {
+    filters = <String>{};
     super.initState();
   }
-
 
   @override
   Widget build(final BuildContext context) {
@@ -138,8 +136,8 @@ class _CompanyListState extends State<CompanyList> {
           if (invoiceDataBox.values.isEmpty) {
             return const Center(
               child: Text(
-                "No invoice added yet.",
-                style: TextStyle(fontSize: 25),
+                "No invoice added yet.", textAlign: TextAlign.center,
+                style: TextStyle(fontSize: 28),
               ),
             );
           } else {
@@ -154,7 +152,7 @@ class _CompanyListState extends State<CompanyList> {
 
                   if (filters.length == 1) {
                     companyList.removeWhere((final InvoiceData element) =>
-                    !filters.every((e) {
+                    !filters.every((final e) {
                       return element.companyName.toUpperCase().contains(e.toUpperCase());
                     })
 
@@ -162,7 +160,7 @@ class _CompanyListState extends State<CompanyList> {
                   }
                   else if (filters.length > 1) {
                     companyList.removeWhere((final InvoiceData element) =>
-                    !filters.any((e) {
+                    !filters.any((final e) {
                       return element.companyName.toUpperCase().contains(e.toUpperCase());
                     })
                     );
@@ -185,7 +183,8 @@ class _CompanyListState extends State<CompanyList> {
                             spacing: 10.0,
                             children: CompanyType.values.map((final CompanyType types) {
                               if (company.data!.any((final InvoiceData element) => element.companyName.toUpperCase().contains(types.name.toUpperCase())))
-                              {return FilterChip(
+                              {
+                                return FilterChip(
                                 label: Text(types.name),
                                 selected: filters.contains(types.name),
                                 onSelected: (final bool selected) {
