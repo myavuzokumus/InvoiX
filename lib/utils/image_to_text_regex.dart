@@ -11,6 +11,8 @@
 final RegExp companyRegex =
     RegExp(r"(?:LTD\.|ŞTİ\.|(A\.Ş\.|A\.S\.)|LLC|PLC|INC|GMBH)", caseSensitive: false);
 
+final RegExp invoiceNoRegex = RegExp(r'NO\s*:\s*(\S+)', caseSensitive: false);
+
 final RegExp dateRegex = RegExp(
     r"(0[1-9]|[12][0-9]|3[01])(\/|-|\.)(0[1-9]|1[1,2])(\/|-|\.)(19|20)\d{2}",
     caseSensitive: false);

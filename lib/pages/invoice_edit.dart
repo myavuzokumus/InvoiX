@@ -220,15 +220,7 @@ class _InvoiceCaptureScreenState extends State<InvoiceCaptureScreen> {
                                         labelText: "Invoice No:",
                                         suffixIcon: WarnIcon(
                                             message:
-                                            "You must enter a valid invoice no.\nNeed 16 or 9 character.")),
-                                    validator: (final value) {
-                                      if (value == null ||
-                                          value.isEmpty ||
-                                          value.length != 16) {
-                                        return "";
-                                      }
-                                      return null;
-                                    },
+                                            "You must enter a valid invoice no.")),
                                   ),
                                   TextFormField(
                                     maxLength: 50,
@@ -326,7 +318,6 @@ class _InvoiceCaptureScreenState extends State<InvoiceCaptureScreen> {
     companyTextController.text = listText[0];
 
     // For every each text in ListText
-    print("c");
     for (String i in listText) {
       // Text if match with CompanyRegex
       if (companyRegex.hasMatch(i)) {
@@ -339,6 +330,10 @@ class _InvoiceCaptureScreenState extends State<InvoiceCaptureScreen> {
       // Text if match with DateRegex
       else if (dateRegex.hasMatch(i)) {
         // Set text to DateTextController.text
+        i = i.replaceAll(" ", "");
+        if (i.contains(":")) {
+          i = i.split(":").last;
+        }
 
         late final DateTime parsedDate;
 
@@ -355,10 +350,14 @@ class _InvoiceCaptureScreenState extends State<InvoiceCaptureScreen> {
         dateTextController.text = dateFormat.format(parsedDate);
       }
       // If text length is 16
-      else if (i.length == 16 || i.length == 9) {
+      else if (invoiceNoRegex.hasMatch(i)) {
         // set text to InvoiceNoTextController.text
+        if (i.contains(":")) {
+          i = i.split(":").last;
+        }
 
         invoiceNoTextController.text = i;
+
       }
       // Text if match with AmountRegex
       else if (amountRegex.hasMatch(i)) {
