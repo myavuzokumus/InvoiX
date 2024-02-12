@@ -1,4 +1,4 @@
-import 'dart:ffi';
+import 'dart:async';
 import 'dart:io';
 
 import 'package:cross_file/cross_file.dart';
@@ -30,8 +30,7 @@ class InvoiceCaptureScreen extends StatefulWidget {
 }
 
 class _InvoiceCaptureScreenState extends State<InvoiceCaptureScreen> {
-
-  bool _saveButtonState = true;
+  late bool _saveButtonState;
 
   late final XFile imageFile;
   late final int? editIndex;
@@ -45,14 +44,11 @@ class _InvoiceCaptureScreenState extends State<InvoiceCaptureScreen> {
   late final GlobalKey<ScaffoldState> _scaffoldKey;
   late final GlobalKey<FormState> _formKey;
 
-  late final List<DateFormat> dateFormats;
-
-  late final Future<bool> _future;
-
-  //TODO: Invoice Type detection will be added.
+  late Future<dynamic> _future;
 
   @override
   void initState() {
+    _saveButtonState = true;
 
     editIndex = widget.editIndex;
     imageFile = widget.imageFile;
@@ -65,11 +61,22 @@ class _InvoiceCaptureScreenState extends State<InvoiceCaptureScreen> {
     _scaffoldKey = GlobalKey<ScaffoldState>();
     _formKey = GlobalKey<FormState>();
 
-    dateFormats = [DateFormat("MM-dd-yyyy"), DateFormat("MM/dd/yyyy"), DateFormat("MM.dd.yyyy"), DateFormat("dd-MM-yyyy"), DateFormat("dd/MM/yyyy"), DateFormat("dd.MM.yyyy")];
-
-    _future = editIndex == null ? populateFieldsFromScannedText() : fetchInvoiceData();
+    _future =
+        editIndex == null ? collectReadData() : fetchInvoiceData();
 
     super.initState();
+  }
+
+  @override
+  void dispose() {
+    companyTextController.dispose();
+    invoiceNoTextController.dispose();
+    dateTextController.dispose();
+    amountTextController.dispose();
+    _scaffoldKey.currentState?.dispose();
+    _formKey.currentState?.dispose();
+
+    super.dispose();
   }
 
   @override
@@ -79,20 +86,30 @@ class _InvoiceCaptureScreenState extends State<InvoiceCaptureScreen> {
       child: Scaffold(
         key: _scaffoldKey,
         endDrawerEnableOpenDragGesture: false,
-        endDrawer: NavigationDrawer(children: [CompanyList(onTap: (final item) {
-          _scaffoldKey.currentState!.closeEndDrawer();
-          setState(() {
-            companyTextController.text = item;
-          });
-        },)],),
+        endDrawer: NavigationDrawer(
+          children: [
+            CompanyList(
+              onTap: (final item) {
+                _scaffoldKey.currentState!.closeEndDrawer();
+                setState(() {
+                  companyTextController.text = item;
+                });
+              },
+            )
+          ],
+        ),
         body: GestureDetector(
           onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
           child: CustomScrollView(slivers: [
             SliverAppBar(
-              actions: const [Tooltip(triggerMode: TooltipTriggerMode.tap,
-                showDuration: Duration(seconds: 3),
-                message: "Zoom in and out to see the image details.",
-                child: Icon(Icons.zoom_out_map, size: 28),)],
+              actions: const [
+                Tooltip(
+                  triggerMode: TooltipTriggerMode.tap,
+                  showDuration: Duration(seconds: 3),
+                  message: "Zoom in and out to see the image details.",
+                  child: Icon(Icons.zoom_out_map, size: 28),
+                )
+              ],
               expandedHeight: 350,
               flexibleSpace: FlexibleSpaceBar(
                 background: InteractiveViewer(
@@ -111,11 +128,37 @@ class _InvoiceCaptureScreenState extends State<InvoiceCaptureScreen> {
             ),
             SliverToBoxAdapter(
               child: FutureBuilder(
-                    future: _future,
-                    builder: (final BuildContext context, final AsyncSnapshot<dynamic> snapshot) {
+                future: _future,
+                builder: (final BuildContext context,
+                    final AsyncSnapshot<dynamic> snapshot) {
 
-                      if (snapshot.hasData) {
-                        return Column(
+                  if (snapshot.connectionState == ConnectionState.done) {
+                    if (snapshot.hasError) {
+
+                      return Center(
+                        child: Column(
+                          children: [
+                            const Divider(),
+                            Text("Error:\n${snapshot.error}",
+                                textAlign: TextAlign.center,
+                                style: const TextStyle(fontSize: 18)),
+                            FilledButton.tonal(
+                              onPressed: () {
+                                setState(() {
+                                  _future = editIndex == null
+                                      ? collectReadData()
+                                      : fetchInvoiceData();
+                                });
+                              },
+                              child: const Text("Retry"),
+                            ),
+                          ],
+                        ),
+                      );
+                    }
+
+                    else {
+                      return Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         mainAxisSize: MainAxisSize.min,
                         children: [
@@ -123,21 +166,29 @@ class _InvoiceCaptureScreenState extends State<InvoiceCaptureScreen> {
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                             children: [
-                              IconButton.filledTonal(onPressed: () {_scaffoldKey.currentState!.openEndDrawer();}, icon: const Icon(Icons.search)),
+                              IconButton.filledTonal(
+                                  onPressed: () {
+                                    _scaffoldKey.currentState!.openEndDrawer();
+                                  },
+                                  icon: const Icon(Icons.search)),
                               DateFormatSegmented(onChange: (value) {
-
                                 if (value == DateFormatSegment.uk) {
-                                  dateTextController.text = DateFormat("MM-dd-yyyy").format(DateFormat("dd-MM-yyyy").parse(dateTextController.text));
-                                } else if (value == DateFormatSegment.us){
-                                  dateTextController.text = DateFormat("dd-MM-yyyy").format(DateFormat("MM-dd-yyyy").parse(dateTextController.text));
+                                  dateTextController.text =
+                                      DateFormat("MM-dd-yyyy").format(
+                                          DateFormat("dd-MM-yyyy")
+                                              .parse(dateTextController.text));
+                                } else if (value == DateFormatSegment.us) {
+                                  dateTextController.text =
+                                      DateFormat("dd-MM-yyyy").format(
+                                          DateFormat("MM-dd-yyyy")
+                                              .parse(dateTextController.text));
                                 }
-
                               }),
                             ],
-
                           ),
                           Form(
-                            autovalidateMode: AutovalidateMode.onUserInteraction,
+                            autovalidateMode:
+                            AutovalidateMode.onUserInteraction,
                             key: _formKey,
                             child: Padding(
                               padding: const EdgeInsets.only(
@@ -152,7 +203,7 @@ class _InvoiceCaptureScreenState extends State<InvoiceCaptureScreen> {
                                         labelText: "Company name:",
                                         suffixIcon: WarnIcon(
                                             message:
-                                            "You must enter a valid company name. Need include 'A.S., LTD. etc.'")),
+                                            "You must enter a valid company name.\nNeed include 'LTD., ŞTİ., A.Ş., LLC, PLC, INC, GMBH'")),
                                     validator: (final value) {
                                       if (value == null ||
                                           value.isEmpty ||
@@ -169,7 +220,7 @@ class _InvoiceCaptureScreenState extends State<InvoiceCaptureScreen> {
                                         labelText: "Invoice No:",
                                         suffixIcon: WarnIcon(
                                             message:
-                                            "You must enter a valid invoice no. Need 16 character.")),
+                                            "You must enter a valid invoice no.\nNeed 16 or 9 character.")),
                                     validator: (final value) {
                                       if (value == null ||
                                           value.isEmpty ||
@@ -202,7 +253,8 @@ class _InvoiceCaptureScreenState extends State<InvoiceCaptureScreen> {
 
                                       if (pickedDate != null) {
                                         final String formattedDate =
-                                        dateFormat.format(pickedDate); // format date in required form here we use yyyy-MM-dd that means time is removed
+                                        dateFormat.format(
+                                            pickedDate); // format date in required form here we use yyyy-MM-dd that means time is removed
 
                                         setState(() {
                                           dateTextController.text =
@@ -249,28 +301,12 @@ class _InvoiceCaptureScreenState extends State<InvoiceCaptureScreen> {
                           ),
                         ],
                       );
-                      }
-                      else if (snapshot.hasError) {
-
-                        print(snapshot.error);
-                        return Center(
-                          child: Padding(
-                            padding: const EdgeInsets.only(top: 50),
-                            child: ElevatedButton(
-                              onPressed: () {
-                                editIndex == null ? populateFieldsFromScannedText() : fetchInvoiceData();
-                              },
-                              child: const Text("Retry"),
-                            ),
-                          ),
-                        );
-                      }
-                      else {
-                        return const LoadingAnimation();
-                      }
-
-                    },
-                  ),
+                    }
+                  } else {
+                    return const LoadingAnimation();
+                  }
+                },
+              ),
             ),
           ]),
         ),
@@ -278,21 +314,26 @@ class _InvoiceCaptureScreenState extends State<InvoiceCaptureScreen> {
     );
   }
 
-  Future<bool> populateFieldsFromScannedText() async {
-    await getInvoiceData(await getScannedText(imageFile));
-    return true;
+  Future<void> collectReadData() async {
+    getInvoiceData(await getScannedText(imageFile));
+
+    await Future.delayed(const Duration(seconds: 2));
+
   }
 
   // Get Invoice Data from scanned text with Regex
-  Future<void> getInvoiceData(final List listText) async {
-
+  void getInvoiceData(final List listText) {
     companyTextController.text = listText[0];
 
     // For every each text in ListText
+    print("c");
     for (String i in listText) {
       // Text if match with CompanyRegex
       if (companyRegex.hasMatch(i)) {
         // Set text to CompanyTextController.text
+        if (i.contains("A.S.")) {
+          i = i.replaceAll("A.S.", "A.Ş.");
+        }
         companyTextController.text = i;
       }
       // Text if match with DateRegex
@@ -312,40 +353,30 @@ class _InvoiceCaptureScreenState extends State<InvoiceCaptureScreen> {
         }
 
         dateTextController.text = dateFormat.format(parsedDate);
-
       }
       // If text length is 16
       else if (i.length == 16 || i.length == 9) {
         // set text to InvoiceNoTextController.text
 
         invoiceNoTextController.text = i;
-
       }
       // Text if match with AmountRegex
       else if (amountRegex.hasMatch(i)) {
         // Set text to AmountTextController.text
-        i = i
-          ..replaceAll(RegExp(r'[^0-9.,]'), "")
-          ..replaceAll(",", "."); // Sayısal olmayan ve nokta, virgül olmayan karakterleri kaldır
+        i = i.replaceAll(RegExp(r'[^0-9.,]'), "").replaceAll(",", ".");
         amountTextController.text = double.parse(i).toString();
       }
     }
-
-    await Future.delayed(const Duration(seconds: 2));
-
   }
 
-  Future<bool> fetchInvoiceData() async {
+  Future<void> fetchInvoiceData() async {
+
     final InvoiceData item = invoiceDataBox.getAt(editIndex!);
 
     companyTextController.text = item.companyName;
     invoiceNoTextController.text = item.invoiceNo;
     dateTextController.text = dateFormat.format(item.date);
     amountTextController.text = item.amount.toString();
-
-    await Future.delayed(const Duration(seconds: 1));
-
-    return true;
 
   }
 
@@ -412,7 +443,6 @@ class _InvoiceCaptureScreenState extends State<InvoiceCaptureScreen> {
       }
 
       try {
-
         final data = InvoiceData(
             ImagePath: imageFile.path,
             companyName: companyTextController.text,
@@ -420,16 +450,15 @@ class _InvoiceCaptureScreenState extends State<InvoiceCaptureScreen> {
             date: dateFormat.parse(dateTextController.text),
             amount: double.parse(amountTextController.text));
 
-            editIndex == null
-                ? await invoiceDataBox.add(data)
-                : await invoiceDataBox.putAt(editIndex!, data);
+        editIndex == null
+            ? await invoiceDataBox.add(data)
+            : await invoiceDataBox.putAt(editIndex!, data);
 
-            if (mounted) {
-              showSnackBar(
-                  context, text: "Data Processed!", color: Colors.greenAccent);
-              Navigator.pop(context);
-            }
-
+        if (mounted) {
+          showSnackBar(context,
+              text: "Data Processed!", color: Colors.greenAccent);
+          Navigator.pop(context);
+        }
       } catch (e) {
         if (mounted) {
           showSnackBar(context,
@@ -437,14 +466,10 @@ class _InvoiceCaptureScreenState extends State<InvoiceCaptureScreen> {
                   "$e",
               color: Colors.redAccent);
         }
-
       } finally {
         setState(() {
           _saveButtonState = true;
         });
-
-
-
       }
     }
   }
