@@ -289,7 +289,7 @@ class _InvoiceCaptureScreenState extends State<InvoiceCaptureScreen> {
     companyTextController.text = listText[0];
 
     // For every each text in ListText
-    for (final i in listText) {
+    for (String i in listText) {
       // Text if match with CompanyRegex
       if (companyRegex.hasMatch(i)) {
         // Set text to CompanyTextController.text
@@ -324,8 +324,10 @@ class _InvoiceCaptureScreenState extends State<InvoiceCaptureScreen> {
       // Text if match with AmountRegex
       else if (amountRegex.hasMatch(i)) {
         // Set text to AmountTextController.text
-        print(50);
-        amountTextController.text = double.tryParse(i).toString();
+        i = i
+          ..replaceAll(RegExp(r'[^0-9.,]'), "")
+          ..replaceAll(",", "."); // Sayısal olmayan ve nokta, virgül olmayan karakterleri kaldır
+        amountTextController.text = double.parse(i).toString();
       }
     }
 
