@@ -63,6 +63,7 @@ class InvoiceCard extends StatelessWidget {
                     child: Image.file(File(
                         XFile(invoiceData.ImagePath).path),
                     width: 144,
+                    fit: BoxFit.cover,
                     frameBuilder: (final BuildContext context, final Widget child, final int? frame, final bool wasSynchronouslyLoaded) {
                       if (wasSynchronouslyLoaded) {
                         return child;
