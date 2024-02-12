@@ -16,16 +16,12 @@ void main() async {
   // Open user box
   await Hive.openBox('InvoiceData');
 
-  runApp(const MyApp());
+  runApp(const InvoixMain());
 }
 
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+class InvoixMain extends StatelessWidget {
+  const InvoixMain({super.key});
 
-  Color themeTextColor(final color) =>
-      color.computeLuminance() > 0.5 ? Colors.white : Colors.black;
-
-  // This widget is the root of your application.
   @override
   Widget build(final BuildContext context) {
 
