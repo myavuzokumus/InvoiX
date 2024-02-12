@@ -26,41 +26,47 @@ class CompanyPage extends StatefulWidget {
 }
 
 class _CompanyPageState extends State<CompanyPage> {
+
+  bool _isLoading = false;
+
   @override
   Widget build(final BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-          title: Hero(
-              tag: "InvoiX",
-              child: RichText(
-                  textAlign: TextAlign.center,
-                  text: const TextSpan(
-                      text: "InvoiX",
-                      style: TextStyle(
-                          fontSize: 28, fontWeight: FontWeight.bold)))),
-          centerTitle: true,
-          actions: <Widget>[
-            IconButton(
-              icon: const Icon(Icons.table_chart),
-              tooltip: "Export all data to Excel",
-              onPressed: () => showSnackBar(context,
-                  text: "Excel files are saved in " "Download" " file.",
-                  color: Colors.green),
-            ),
-          ]),
+    return AbsorbPointer(
+      absorbing: _isLoading,
+      child: Scaffold(
+        appBar: AppBar(
+            title: Hero(
+                tag: "InvoiX",
+                child: RichText(
+                    textAlign: TextAlign.center,
+                    text: const TextSpan(
+                        text: "InvoiX",
+                        style: TextStyle(
+                            fontSize: 28, fontWeight: FontWeight.bold)))),
+            centerTitle: true,
+            actions: <Widget>[
+              IconButton(
+                icon: const Icon(Icons.table_chart),
+                tooltip: "Export all data to Excel",
+                onPressed: () => showSnackBar(context,
+                    text: "Excel files are saved in " "Download" " file.",
+                    color: Colors.green),
+              ),
+            ]),
 
-      //CompanyList widget is added to the body of the scaffold
-      body: const CompanyList(),
+        //CompanyList widget is added to the body of the scaffold
+        body: Stack(children: [const CompanyList(), if (_isLoading) Container(height: double.infinity, width: double.infinity,color: Colors.black38 ,child: const Center(child: CircularProgressIndicator()))]),
 
-      //Invoice Capture button
-      floatingActionButton: Badge(
-        label: const Icon(Icons.add, color: Colors.white, size: 20),
-        largeSize: 28,
-        backgroundColor: Colors.red,
-        offset: const Offset(10, -10),
-        child: FloatingActionButton(
-            onPressed: getImageFromCamera,
-            child: const Icon(Icons.receipt_long, size: 46)),
+        //Invoice Capture button
+        floatingActionButton: Badge(
+          label: const Icon(Icons.add, color: Colors.white, size: 20),
+          largeSize: 28,
+          backgroundColor: Colors.red,
+          offset: const Offset(10, -10),
+          child: FloatingActionButton(
+              onPressed: getImageFromCamera,
+              child: const Icon(Icons.receipt_long, size: 46)),
+        ),
       ),
     );
   }
@@ -82,7 +88,9 @@ class _CompanyPageState extends State<CompanyPage> {
 
     try {
 
-
+      setState(() {
+        _isLoading = true;
+      });
 
       final bool success = await EdgeDetection.detectEdge(
         imagePath,
@@ -105,6 +113,10 @@ class _CompanyPageState extends State<CompanyPage> {
                 "$e",
             color: Colors.redAccent);
       }
+    } finally {
+      setState(() {
+        _isLoading = false;
+      });
     }
   }
 }
