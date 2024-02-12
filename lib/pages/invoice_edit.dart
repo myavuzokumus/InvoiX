@@ -317,8 +317,11 @@ class _InvoiceCaptureScreenState extends State<InvoiceCaptureScreen> {
   void getInvoiceData(final List listText) {
     companyTextController.text = listText[0];
 
+    String invoiceNo = "";
+
     // For every each text in ListText
     for (String i in listText) {
+
       // Text if match with CompanyRegex
       if (companyRegex.hasMatch(i)) {
         // Set text to CompanyTextController.text
@@ -352,6 +355,7 @@ class _InvoiceCaptureScreenState extends State<InvoiceCaptureScreen> {
       // If text length is 16
       else if (invoiceNoRegex.hasMatch(i)) {
         // set text to InvoiceNoTextController.text
+        i = i.replaceAll(" ", "");
         if (i.contains(":")) {
           i = i.split(":").last;
         }
@@ -365,6 +369,21 @@ class _InvoiceCaptureScreenState extends State<InvoiceCaptureScreen> {
         i = i.replaceAll(RegExp(r'[^0-9.,]'), "").replaceAll(",", ".");
         amountTextController.text = double.parse(i).toString();
       }
+
+      if (i.toUpperCase().contains("NO")) {
+        if (listText.length != listText.indexOf(i) + 1) {
+          i = listText.elementAt(listText.indexOf(i) + 1);
+          i = i.replaceAll(" ", "");
+          if (i.contains(":")) {
+            i = i.split(":").last;
+          }
+          invoiceNo = i;
+        }
+      }
+
+    }
+    if (invoiceNoTextController.text.isEmpty) {
+      invoiceNoTextController.text = invoiceNo;
     }
   }
 
