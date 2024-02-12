@@ -27,13 +27,13 @@ class _InvoicePageState extends State<InvoicePage> {
       appBar: AppBar(
           title: Hero(
             tag: "InvoiX",
-            child: RichText(text: TextSpan(
+            child: RichText(textAlign: TextAlign.center, text: TextSpan(
                 text: "InvoiX\n",
                 style: const TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
                 children: <TextSpan>[
                   TextSpan(
                       text: companyName,
-                      style: const TextStyle(fontSize: 20, fontWeight: FontWeight.normal))
+                      style: const TextStyle(fontSize: 16, fontWeight: FontWeight.normal)),
                 ])),
           ),
           centerTitle: true,

@@ -33,6 +33,7 @@ class _CompanyPageState extends State<CompanyPage> {
           title: Hero(
               tag: "InvoiX",
               child: RichText(
+                  textAlign: TextAlign.center,
                   text: const TextSpan(
                       text: "InvoiX",
                       style: TextStyle(
@@ -80,6 +81,8 @@ class _CompanyPageState extends State<CompanyPage> {
         "${(DateTime.now().millisecondsSinceEpoch / 1000).round()}.jpeg");
 
     try {
+
+
 
       final bool success = await EdgeDetection.detectEdge(
         imagePath,
