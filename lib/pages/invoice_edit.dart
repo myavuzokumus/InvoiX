@@ -1,13 +1,15 @@
+import 'dart:ffi';
 import 'dart:io';
 
 import 'package:cross_file/cross_file.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:google_mlkit_text_recognition/google_mlkit_text_recognition.dart';
 import 'package:intl/intl.dart';
 import 'package:invoix/main.dart';
 import 'package:invoix/models/invoice_data.dart';
 import 'package:invoix/pages/company_list.dart';
+import 'package:invoix/utils/text_extraction.dart';
+import 'package:invoix/widgets/date_format.dart';
 import 'package:invoix/widgets/loading_animation.dart';
 import 'package:string_similarity/string_similarity.dart';
 
@@ -28,40 +30,57 @@ class InvoiceCaptureScreen extends StatefulWidget {
 }
 
 class _InvoiceCaptureScreenState extends State<InvoiceCaptureScreen> {
-  late List<String> scannedText;
 
-  bool _isLoading = true;
   bool _saveButtonState = true;
 
-  late int? editIndex;
+  late final XFile imageFile;
+  late final int? editIndex;
 
   //TextLabelControllers
-  TextEditingController companyTextController = TextEditingController();
-  TextEditingController invoiceNoTextController = TextEditingController();
-  TextEditingController dateTextController = TextEditingController();
-  TextEditingController amountTextController = TextEditingController();
+  late final TextEditingController companyTextController;
+  late final TextEditingController invoiceNoTextController;
+  late final TextEditingController dateTextController;
+  late final TextEditingController amountTextController;
 
-  final GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
-  final _formKey = GlobalKey<FormState>();
-  final DateFormat dateFormat = DateFormat("dd-MM-yyyy");
+  late final GlobalKey<ScaffoldState> _scaffoldKey;
+  late final GlobalKey<FormState> _formKey;
+
+  late final List<DateFormat> dateFormats;
+
+  late final Future<bool> _future;
 
   //TODO: Invoice Type detection will be added.
 
   @override
   void initState() {
-    editIndex = widget.editIndex;
 
-    editIndex == null ? fieldFiller() : fetchInvoiceData();
+    editIndex = widget.editIndex;
+    imageFile = widget.imageFile;
+
+    companyTextController = TextEditingController();
+    invoiceNoTextController = TextEditingController();
+    dateTextController = TextEditingController();
+    amountTextController = TextEditingController();
+
+    _scaffoldKey = GlobalKey<ScaffoldState>();
+    _formKey = GlobalKey<FormState>();
+
+    dateFormats = [DateFormat("MM-dd-yyyy"), DateFormat("MM/dd/yyyy"), DateFormat("MM.dd.yyyy"), DateFormat("dd-MM-yyyy"), DateFormat("dd/MM/yyyy"), DateFormat("dd.MM.yyyy")];
+
+    _future = editIndex == null ? populateFieldsFromScannedText() : fetchInvoiceData();
+
     super.initState();
   }
 
   @override
   Widget build(final BuildContext context) {
+
     return SafeArea(
       child: Scaffold(
-        key: scaffoldKey,
+        key: _scaffoldKey,
+        endDrawerEnableOpenDragGesture: false,
         endDrawer: NavigationDrawer(children: [CompanyList(onTap: (final item) {
-          scaffoldKey.currentState!.closeEndDrawer();
+          _scaffoldKey.currentState!.closeEndDrawer();
           setState(() {
             companyTextController.text = item;
           });
@@ -70,16 +89,19 @@ class _InvoiceCaptureScreenState extends State<InvoiceCaptureScreen> {
           onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
           child: CustomScrollView(slivers: [
             SliverAppBar(
-              actions: const [SizedBox()],
-              expandedHeight: 375,
+              actions: const [Tooltip(triggerMode: TooltipTriggerMode.tap,
+                showDuration: Duration(seconds: 3),
+                message: "Zoom in and out to see the image details.",
+                child: Icon(Icons.zoom_out_map, size: 28),)],
+              expandedHeight: 350,
               flexibleSpace: FlexibleSpaceBar(
                 background: InteractiveViewer(
                   child: AspectRatio(
                       aspectRatio: 1,
                       child: Hero(
-                        tag: widget.imageFile.path,
+                        tag: imageFile.path,
                         child: Image.file(
-                          File(widget.imageFile.path),
+                          File(imageFile.path),
                           fit: BoxFit.fitHeight,
                           width: double.maxFinite,
                         ),
@@ -88,139 +110,167 @@ class _InvoiceCaptureScreenState extends State<InvoiceCaptureScreen> {
               ),
             ),
             SliverToBoxAdapter(
-              child: _isLoading
-                  ? const LoadingAnimation()
-                  : Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        const Divider(height: 20),
-                        Form(
-                          autovalidateMode: AutovalidateMode.onUserInteraction,
-                          key: _formKey,
-                          child: Padding(
-                            padding: const EdgeInsets.only(
-                                left: 20, right: 20, top: 10),
-                            child: Wrap(
-                              runSpacing: 16.0,
-                              children: [
-                                Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceEvenly,
-                                  children: [
-                                    Expanded(
-                                      child: TextFormField(
-                                        maxLength: 50,
-                                        controller: companyTextController,
-                                        decoration: const InputDecoration(
-                                            labelText: "Company name:",
-                                            suffixIcon: WarnIcon(
-                                                message:
-                                                    "You must enter a valid company name. Need include 'A.S., LTD. etc.'")),
-                                        validator: (final value) {
-                                          if (value == null ||
-                                              value.isEmpty ||
-                                              !companyRegex.hasMatch(value)) {
-                                            return 'Please enter some text';
-                                          }
-                                          return null;
-                                        },
-                                      ),
-                                    ),
-                                    Padding(
-                                      padding: const EdgeInsets.only(left: 15),
-                                      child: IconButton.filledTonal(onPressed: () {scaffoldKey.currentState!.openEndDrawer();}, icon: const Icon(Icons.search)),
-                                    )
-                                  ],
-                                ),
-                                TextFormField(
-                                  maxLength: 50,
-                                  controller: invoiceNoTextController,
-                                  decoration: const InputDecoration(
-                                      labelText: "Invoice No:",
-                                      suffixIcon: WarnIcon(
-                                          message:
-                                              "You must enter a valid invoice no. Need 16 character.")),
-                                  validator: (final value) {
-                                    if (value == null ||
-                                        value.isEmpty ||
-                                        value.length != 16) {
-                                      return "";
-                                    }
-                                    return null;
-                                  },
-                                ),
-                                TextFormField(
-                                  maxLength: 50,
-                                  controller: dateTextController,
-                                  readOnly: true,
-                                  decoration: const InputDecoration(
-                                      labelText: "Date:",
-                                      suffixIcon: WarnIcon(
-                                          message:
-                                              "You must enter a valid date.")),
-                                  onTap: () async {
-                                    final DateTime today = DateTime.now();
-                                    final DateTime? pickedDate =
-                                        await showDatePicker(
-                                            context: context,
-                                            initialDate: today,
-                                            //get today's date
-                                            firstDate: DateTime(1900),
-                                            //DateTime.now() - not to allow to choose before today.
-                                            lastDate: DateTime(today.year,
-                                                today.month, today.day));
+              child: FutureBuilder(
+                    future: _future,
+                    builder: (final BuildContext context, final AsyncSnapshot<dynamic> snapshot) {
 
-                                    if (pickedDate != null) {
-                                      final String formattedDate =
-                                          dateFormat.format(
-                                              pickedDate); // format date in required form here we use yyyy-MM-dd that means time is removed
+                      if (snapshot.hasData) {
+                        return Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          const Divider(height: 20),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                            children: [
+                              IconButton.filledTonal(onPressed: () {_scaffoldKey.currentState!.openEndDrawer();}, icon: const Icon(Icons.search)),
+                              DateFormatSegmented(onChange: (value) {
 
-                                      setState(() {
-                                        dateTextController.text =
-                                            formattedDate; //set formatted date to TextField value.
-                                      });
-                                    }
-                                  },
-                                  validator: (final value) {
-                                    if (value == null || value.isEmpty) {
-                                      return "";
-                                    }
-                                    return null;
-                                  },
-                                ),
-                                TextFormField(
-                                  maxLength: 50,
-                                  controller: amountTextController,
-                                  keyboardType: TextInputType.number,
-                                  inputFormatters: <TextInputFormatter>[
-                                    FilteringTextInputFormatter.digitsOnly
-                                  ],
-                                  // Only numbers can be entered
-                                  validator: (final value) {
-                                    if (value == null || value.isEmpty) {
-                                      return "";
-                                    }
-                                    return null;
-                                  },
-                                  decoration: const InputDecoration(
-                                      labelText: "Amount:",
-                                      suffixIcon: WarnIcon(
-                                          message:
-                                              "You must enter a valid amount.")),
-                                ),
-                              ],
+                                if (value == DateFormatSegment.uk) {
+                                  dateTextController.text = DateFormat("MM-dd-yyyy").format(DateFormat("dd-MM-yyyy").parse(dateTextController.text));
+                                } else if (value == DateFormatSegment.us){
+                                  dateTextController.text = DateFormat("dd-MM-yyyy").format(DateFormat("MM-dd-yyyy").parse(dateTextController.text));
+                                }
+
+                              }),
+                            ],
+
+                          ),
+                          Form(
+                            autovalidateMode: AutovalidateMode.onUserInteraction,
+                            key: _formKey,
+                            child: Padding(
+                              padding: const EdgeInsets.only(
+                                  left: 20, right: 20, top: 10),
+                              child: Wrap(
+                                runSpacing: 16.0,
+                                children: [
+                                  TextFormField(
+                                    maxLength: 50,
+                                    controller: companyTextController,
+                                    decoration: const InputDecoration(
+                                        labelText: "Company name:",
+                                        suffixIcon: WarnIcon(
+                                            message:
+                                            "You must enter a valid company name. Need include 'A.S., LTD. etc.'")),
+                                    validator: (final value) {
+                                      if (value == null ||
+                                          value.isEmpty ||
+                                          !companyRegex.hasMatch(value)) {
+                                        return 'Please enter some text';
+                                      }
+                                      return null;
+                                    },
+                                  ),
+                                  TextFormField(
+                                    maxLength: 50,
+                                    controller: invoiceNoTextController,
+                                    decoration: const InputDecoration(
+                                        labelText: "Invoice No:",
+                                        suffixIcon: WarnIcon(
+                                            message:
+                                            "You must enter a valid invoice no. Need 16 character.")),
+                                    validator: (final value) {
+                                      if (value == null ||
+                                          value.isEmpty ||
+                                          value.length != 16) {
+                                        return "";
+                                      }
+                                      return null;
+                                    },
+                                  ),
+                                  TextFormField(
+                                    maxLength: 50,
+                                    controller: dateTextController,
+                                    readOnly: true,
+                                    decoration: const InputDecoration(
+                                        labelText: "Date:",
+                                        suffixIcon: WarnIcon(
+                                            message:
+                                            "You must enter a valid date.")),
+                                    onTap: () async {
+                                      final DateTime today = DateTime.now();
+                                      final DateTime? pickedDate =
+                                      await showDatePicker(
+                                          context: context,
+                                          initialDate: today,
+                                          //get today's date
+                                          firstDate: DateTime(1900),
+                                          //DateTime.now() - not to allow to choose before today.
+                                          lastDate: DateTime(today.year,
+                                              today.month, today.day));
+
+                                      if (pickedDate != null) {
+                                        final String formattedDate =
+                                        dateFormat.format(pickedDate); // format date in required form here we use yyyy-MM-dd that means time is removed
+
+                                        setState(() {
+                                          dateTextController.text =
+                                              formattedDate; //set formatted date to TextField value.
+                                        });
+                                      }
+                                    },
+                                    validator: (final value) {
+                                      if (value == null || value.isEmpty) {
+                                        return "";
+                                      }
+                                      return null;
+                                    },
+                                  ),
+                                  TextFormField(
+                                    maxLength: 50,
+                                    controller: amountTextController,
+                                    keyboardType: TextInputType.number,
+                                    inputFormatters: <TextInputFormatter>[
+                                      FilteringTextInputFormatter.digitsOnly
+                                    ],
+                                    // Only numbers can be entered
+                                    validator: (final value) {
+                                      if (value == null || value.isEmpty) {
+                                        return "";
+                                      }
+                                      return null;
+                                    },
+                                    decoration: const InputDecoration(
+                                        labelText: "Amount:",
+                                        suffixIcon: WarnIcon(
+                                            message:
+                                            "You must enter a valid amount.")),
+                                  ),
+                                ],
+                              ),
                             ),
                           ),
-                        ),
-                        ElevatedButton(
-                          onPressed: _saveButtonState ? saveInvoice : null,
-                          child: _saveButtonState
-                              ? const Icon(Icons.save_as_rounded)
-                              : const CircularProgressIndicator(),
-                        ),
-                      ],
-                    ),
+                          ElevatedButton(
+                            onPressed: _saveButtonState ? saveInvoice : null,
+                            child: _saveButtonState
+                                ? const Icon(Icons.save_as_rounded)
+                                : const CircularProgressIndicator(),
+                          ),
+                        ],
+                      );
+                      }
+                      else if (snapshot.hasError) {
+
+                        print(snapshot.error);
+                        return Center(
+                          child: Padding(
+                            padding: const EdgeInsets.only(top: 50),
+                            child: ElevatedButton(
+                              onPressed: () {
+                                editIndex == null ? populateFieldsFromScannedText() : fetchInvoiceData();
+                              },
+                              child: const Text("Retry"),
+                            ),
+                          ),
+                        );
+                      }
+                      else {
+                        return const LoadingAnimation();
+                      }
+
+                    },
+                  ),
             ),
           ]),
         ),
@@ -228,23 +278,14 @@ class _InvoiceCaptureScreenState extends State<InvoiceCaptureScreen> {
     );
   }
 
-  //To get readed text
-  Future<void> getRecognisedText(final XFile image) async {
-    final inputImage = InputImage.fromFilePath(image.path);
-    final textRecognizer = TextRecognizer(script: TextRecognitionScript.latin);
-    final RecognizedText recognizedText =
-        await textRecognizer.processImage(inputImage);
-    await textRecognizer.close();
-    setState(() {
-      scannedText = recognizedText.text.split("\n");
-    });
-
-    //For test
-    print(scannedText);
+  Future<bool> populateFieldsFromScannedText() async {
+    await getInvoiceData(await getScannedText(imageFile));
+    return true;
   }
 
-  // The function that calculate which is company
-  Future<void> getInvoiceThing(final List listText) async {
+  // Get Invoice Data from scanned text with Regex
+  Future<void> getInvoiceData(final List listText) async {
+
     companyTextController.text = listText[0];
 
     // For every each text in ListText
@@ -257,34 +298,42 @@ class _InvoiceCaptureScreenState extends State<InvoiceCaptureScreen> {
       // Text if match with DateRegex
       else if (dateRegex.hasMatch(i)) {
         // Set text to DateTextController.text
-        dateTextController.text = dateFormat.format(dateFormat.parse(i));
+
+        late final DateTime parsedDate;
+
+        for (final DateFormat format in dateFormats) {
+          try {
+            parsedDate = format.parse(i);
+            print('Parsed Date with format $format: $parsedDate');
+            break;
+          } catch (e) {
+            print('Failed to parse date with format $format');
+          }
+        }
+
+        dateTextController.text = dateFormat.format(parsedDate);
+
       }
       // If text length is 16
-      else if (i.length == 16) {
+      else if (i.length == 16 || i.length == 9) {
         // set text to InvoiceNoTextController.text
+
         invoiceNoTextController.text = i;
+
       }
       // Text if match with AmountRegex
       else if (amountRegex.hasMatch(i)) {
         // Set text to AmountTextController.text
-        amountTextController.text = i;
+        print(50);
+        amountTextController.text = double.tryParse(i).toString();
       }
     }
 
     await Future.delayed(const Duration(seconds: 2));
 
-    setState(() {
-      _isLoading = false;
-    });
-
   }
 
-  Future<void> fieldFiller() async {
-    await getRecognisedText(widget.imageFile);
-    await getInvoiceThing(scannedText);
-  }
-
-  Future<void> fetchInvoiceData() async {
+  Future<bool> fetchInvoiceData() async {
     final InvoiceData item = invoiceDataBox.getAt(editIndex!);
 
     companyTextController.text = item.companyName;
@@ -294,9 +343,7 @@ class _InvoiceCaptureScreenState extends State<InvoiceCaptureScreen> {
 
     await Future.delayed(const Duration(seconds: 1));
 
-    setState(() {
-      _isLoading = false;
-    });
+    return true;
 
   }
 
@@ -362,37 +409,40 @@ class _InvoiceCaptureScreenState extends State<InvoiceCaptureScreen> {
             text: "Processing Data...", color: Colors.deepOrangeAccent);
       }
 
-      //For state management
-      //ref.read(InvoiceListProvider.notifier).add(
-      // InvoiceImage: Image.file(File(widget.imageFile.path)),
-      // CompanyName: CompanyTextController.text,
-      // InvoiceNo: InvoiceNoTextController.text,
-      // Date: DateFormat("dd-MM-yyyy").parse(DateTextController.text),
-      // Amount: double.parse(AmountTextController.text));
+      try {
 
-      final data = InvoiceData(
-          ImagePath: widget.imageFile.path,
-          companyName: companyTextController.text,
-          invoiceNo: invoiceNoTextController.text,
-          date: dateFormat.parse(dateTextController.text),
-          amount: double.parse(amountTextController.text));
+        final data = InvoiceData(
+            ImagePath: imageFile.path,
+            companyName: companyTextController.text,
+            invoiceNo: invoiceNoTextController.text,
+            date: dateFormat.parse(dateTextController.text),
+            amount: double.parse(amountTextController.text));
 
-      editIndex == null
-          ? await invoiceDataBox.add(data)
-          : await invoiceDataBox.putAt(editIndex!, data);
+            editIndex == null
+                ? await invoiceDataBox.add(data)
+                : await invoiceDataBox.putAt(editIndex!, data);
 
-      if (!mounted) {
-        return;
-      }
+            if (mounted) {
+              showSnackBar(
+                  context, text: "Data Processed!", color: Colors.greenAccent);
+              Navigator.pop(context);
+            }
 
-      showSnackBar(context, text: "Data Processed!", color: Colors.greenAccent);
+      } catch (e) {
+        if (mounted) {
+          showSnackBar(context,
+              text: "Something went wrong."
+                  "$e",
+              color: Colors.redAccent);
+        }
 
-      if (mounted) {
+      } finally {
         setState(() {
           _saveButtonState = true;
         });
 
-        Navigator.pop(context);
+
+
       }
     }
   }
