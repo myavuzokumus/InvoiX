@@ -30,14 +30,9 @@ Future<List<String>> getScannedText(final XFile image) async {
   final RecognizedText extractedText =
   await textRecognizer.processImage(inputImage);
   await textRecognizer.close();
-  print("c");
 
   //For test
   print(extractedText.text.split("\n"));
-
-  await Future.delayed(Duration(seconds: 5));
-
-  throw UnimplementedError();
 
   return extractedText.text.split("\n");
 
