@@ -4,6 +4,10 @@ import 'package:intl/intl.dart';
 enum DateFormatSegment { uk, us }
 
 DateFormatSegment dateFormatView = DateFormatSegment.uk;
+
+List<DateFormat> dateFormats = [DateFormat("dd-MM-yyyy"), DateFormat("dd/MM/yyyy"), DateFormat("dd.MM.yyyy")];
+//DateFormat("MM-dd-yyyy"), DateFormat("MM/dd/yyyy"), DateFormat("MM.dd.yyyy"),
+
 DateFormat dateFormat = DateFormat("dd-MM-yyyy");
 
 class DateFormatSegmented extends StatefulWidget {
