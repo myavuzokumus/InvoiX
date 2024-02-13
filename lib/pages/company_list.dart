@@ -7,7 +7,9 @@ import 'package:hive_flutter/hive_flutter.dart';
 import 'package:invoix/models/invoice_data.dart';
 import 'package:invoix/utils/company_name_filter.dart';
 import 'package:invoix/utils/export_to_excel.dart';
+import 'package:invoix/utils/image_to_text_regex.dart';
 import 'package:invoix/widgets/loading_animation.dart';
+import 'package:invoix/widgets/warn_icon.dart';
 import 'package:path/path.dart' as path;
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -172,12 +174,15 @@ class CompanyList extends StatefulWidget {
 }
 
 class _CompanyListState extends State<CompanyList> {
-
   late Set<String> filters;
+  late final TextEditingController companyNameTextController;
+  late final GlobalKey<FormState> _companyNameformKey;
 
   @override
   void initState() {
     filters = <String>{};
+    companyNameTextController = TextEditingController();
+    _companyNameformKey = GlobalKey<FormState>();
     super.initState();
   }
 
@@ -239,11 +244,10 @@ class _CompanyListState extends State<CompanyList> {
                         child: SingleChildScrollView(
                           scrollDirection: Axis.horizontal,
                           child: Wrap(
-                            spacing: 10.0,
-                            children: filterlist.length > 1
-                                            ? filterlist
-                                            : const [SizedBox()]
-                          ),
+                              spacing: 10.0,
+                              children: filterlist.length > 1
+                                  ? filterlist
+                                  : const [SizedBox()]),
                         ),
                       ),
                       ListView.separated(
@@ -263,8 +267,102 @@ class _CompanyListState extends State<CompanyList> {
                               title: Text(
                                 companyListName,
                               ),
+                              onLongPress: () {
+                                showDialog(
+                                    context: context,
+                                    builder: (final BuildContext context) {
 
-
+                                      return AlertDialog(
+                                        title: Text(companyListName),
+                                        content: Column(
+                                          mainAxisSize: MainAxisSize.min,
+                                          children: [
+                                            const Text(
+                                                "What would you like to change new company name?"),
+                                            const SizedBox(height: 12),
+                                            Form(
+                                              key: _companyNameformKey,
+                                              autovalidateMode: AutovalidateMode
+                                                  .onUserInteraction,
+                                              child: TextFormField(
+                                                maxLength: 50,
+                                                controller:
+                                                    companyNameTextController,
+                                                decoration: const InputDecoration(
+                                                    labelText:
+                                                        "New company name:",
+                                                    labelStyle:
+                                                        TextStyle(fontSize: 16),
+                                                    hintText:
+                                                        "Enter new company name",
+                                                    suffixIcon: WarnIcon(
+                                                        message:
+                                                            "You must enter a valid company name.\nNeed include 'LTD., ŞTİ., A.Ş., LLC, PLC, INC, GMBH'")),
+                                                validator: (final value) {
+                                                  if (value == null ||
+                                                      value.isEmpty ||
+                                                      !companyRegex
+                                                          .hasMatch(value)) {
+                                                    return 'Please enter some text';
+                                                  }
+                                                  return null;
+                                                },
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                        actions: <Widget>[
+                                          TextButton(
+                                            onPressed: () {
+                                              Navigator.pop(context);
+                                            },
+                                            child: const Text("Cancel"),
+                                          ),
+                                          TextButton(
+                                            onPressed: () {
+                                              if (_companyNameformKey
+                                                  .currentState!
+                                                  .validate()) {
+                                                invoiceDataBox.put(
+                                                    invoiceDataBox.values
+                                                        .cast<InvoiceData>()
+                                                        .toList()
+                                                        .indexOf(companyList
+                                                            .elementAt(index)),
+                                                    InvoiceData(
+                                                        companyName:
+                                                            companyNameTextController
+                                                                .text,
+                                                        invoiceNo: companyList
+                                                            .elementAt(index)
+                                                            .invoiceNo,
+                                                        date: companyList
+                                                            .elementAt(index)
+                                                            .date,
+                                                        amount: companyList
+                                                            .elementAt(index)
+                                                            .amount,
+                                                        ImagePath: companyList
+                                                            .elementAt(index)
+                                                            .ImagePath));
+                                                Navigator.pop(context);
+                                                showSnackBar(context,
+                                                    text:
+                                                        "Company name has been changed successfully.",
+                                                    color: Colors.greenAccent);
+                                              } else {
+                                                showSnackBar(context,
+                                                    text:
+                                                        "Please enter a valid company name.\nNeed include 'LTD., ŞTİ., A.Ş., LLC, PLC, INC, GMBH'",
+                                                    color: Colors.redAccent);
+                                              }
+                                            },
+                                            child: const Text("Change"),
+                                          ),
+                                        ],
+                                      );
+                                    });
+                              },
                               onTap: () {
                                 if (widget.onTap != null) {
                                   widget.onTap!(companyListName);

@@ -1,13 +1,13 @@
-# Invoix
+# InvoiX
 
-A Flutter application that allows you to quickly read the invoices at hand, get the necessary information and then output it as an .xls file.
+> I started this project when I first started learning Flutter in August 2023 when I participated in the SupaBase Hackathon. Of course, I postponed it because it wasn't finished and I was new to Flutter. Months later, I started the project again in January 2024 and after a 3-week process, I got it ready to showcase it. I thought maybe it would work in some way in the Solution Challenge.
 
-### TODO: 
-- Add Excel function to export data. (IN PROGRESS)
+A Flutter application that allows you to quickly read the invoices at hand, get the necessary information and then output it as an .xlsx file.
+
+### TODO:
 - Removing companies and invoices will be added.
-- Changing company names will be added. (IN PROGRESS)
 - VAT, Tax number, Products properties will be added.
-- Analyse invoices and take advice depending on invoices with AI. (Need more information to give AI to analyse invoices and advice.)
+- Analyse invoices and take advice depending on invoices with AI. (Need more information to give AI to analyse invoices and advice.) (IN PROGRESS)
 
 ## Installation
 
