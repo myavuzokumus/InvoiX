@@ -8,7 +8,7 @@ class LoadingAnimation extends StatelessWidget {
     return Column(
       children: [
         const LinearProgressIndicator(),
-        Image.asset("assets/loading/InvoiceReadLoading.gif"),
+        Expanded(child: Center(child: Image.asset("assets/loading/InvoiceReadLoading.gif"))),
       ],
     );
   }
