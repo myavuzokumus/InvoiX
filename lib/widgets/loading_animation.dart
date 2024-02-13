@@ -5,11 +5,14 @@ class LoadingAnimation extends StatelessWidget {
 
   @override
   Widget build(final BuildContext context) {
-    return Column(
+    return SizedBox(
+        height: double.maxFinite,
+        width: double.maxFinite,
+        child: Column(
       children: [
         const LinearProgressIndicator(),
         Expanded(child: Center(child: Image.asset("assets/loading/InvoiceReadLoading.gif"))),
       ],
-    );
+    ));
   }
 }
