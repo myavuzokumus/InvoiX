@@ -96,7 +96,10 @@ class InvoiceList extends StatelessWidget {
                       itemCount: invoiceList.length,
                       itemBuilder: (final BuildContext context, final int index) {
 
-                        return InvoiceCard(invoiceData: invoiceList.elementAt(index), index: index);
+                        return InvoiceCard(
+                            invoiceData: invoiceList.elementAt(index),
+                            index: invoiceDataBox.values.cast<InvoiceData>().toList().indexOf(invoiceList.elementAt(index))
+                        );
 
                       },
                     ),
