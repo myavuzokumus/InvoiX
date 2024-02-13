@@ -178,15 +178,18 @@ class _InvoiceCaptureScreenState extends State<InvoiceCaptureScreen> {
                                   },
                                   icon: const Icon(Icons.search)),
                               DateFormatSegmented(onChange: (final value) {
+
                                 if (value == DateFormatSegment.uk) {
-                                  dateTextController.text =
-                                      DateFormat("MM-dd-yyyy").format(
-                                          DateFormat("dd-MM-yyyy")
-                                              .parse(dateTextController.text));
-                                } else if (value == DateFormatSegment.us) {
+
                                   dateTextController.text =
                                       DateFormat("dd-MM-yyyy").format(
                                           DateFormat("MM-dd-yyyy")
+                                              .parse(dateTextController.text));
+                                } else if (value == DateFormatSegment.us) {
+
+                                  dateTextController.text =
+                                      DateFormat("MM-dd-yyyy").format(
+                                          DateFormat("dd-MM-yyyy")
                                               .parse(dateTextController.text));
                                 }
                               }),
@@ -421,6 +424,11 @@ class _InvoiceCaptureScreenState extends State<InvoiceCaptureScreen> {
       if (editIndex == null) {
         for (final element in companyList) {
           final companyName = element.companyName;
+
+          // If the company name is the same as the company name in the database, bypass to similarity check
+          if (companyTextController.text == companyName) {
+            break;
+          }
           final double similarity =
               (companyTextController.text).similarityTo(companyName);
 
