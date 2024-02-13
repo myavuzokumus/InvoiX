@@ -8,6 +8,7 @@ import 'package:intl/intl.dart';
 import 'package:invoix/main.dart';
 import 'package:invoix/models/invoice_data.dart';
 import 'package:invoix/pages/company_list.dart';
+import 'package:invoix/utils/image_filter.dart';
 import 'package:invoix/utils/text_extraction.dart';
 import 'package:invoix/widgets/date_format.dart';
 import 'package:invoix/widgets/loading_animation.dart';
@@ -30,6 +31,7 @@ class InvoiceCaptureScreen extends StatefulWidget {
 }
 
 class _InvoiceCaptureScreenState extends State<InvoiceCaptureScreen> {
+
   late bool _saveButtonState;
 
   late final XFile imageFile;
@@ -46,8 +48,11 @@ class _InvoiceCaptureScreenState extends State<InvoiceCaptureScreen> {
 
   late Future<dynamic> _future;
 
+
+
   @override
   void initState() {
+
     _saveButtonState = true;
 
     editIndex = widget.editIndex;
@@ -100,7 +105,8 @@ class _InvoiceCaptureScreenState extends State<InvoiceCaptureScreen> {
         ),
         body: GestureDetector(
           onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
-          child: CustomScrollView(slivers: [
+          child: CustomScrollView(
+              slivers: [
             SliverAppBar(
               actions: const [
                 Tooltip(
@@ -171,7 +177,7 @@ class _InvoiceCaptureScreenState extends State<InvoiceCaptureScreen> {
                                     _scaffoldKey.currentState!.openEndDrawer();
                                   },
                                   icon: const Icon(Icons.search)),
-                              DateFormatSegmented(onChange: (value) {
+                              DateFormatSegmented(onChange: (final value) {
                                 if (value == DateFormatSegment.uk) {
                                   dateTextController.text =
                                       DateFormat("MM-dd-yyyy").format(
@@ -295,7 +301,7 @@ class _InvoiceCaptureScreenState extends State<InvoiceCaptureScreen> {
                       );
                     }
                   } else {
-                    return const LoadingAnimation();
+                    return LoadingAnimation(customHeight: MediaQuery.of(context).size.height - 350);
                   }
                 },
               ),
@@ -307,6 +313,7 @@ class _InvoiceCaptureScreenState extends State<InvoiceCaptureScreen> {
   }
 
   Future<void> collectReadData() async {
+    await imageFilter(imageFile);
     getInvoiceData(await getScannedText(imageFile));
 
     await Future.delayed(const Duration(seconds: 2));
@@ -321,7 +328,6 @@ class _InvoiceCaptureScreenState extends State<InvoiceCaptureScreen> {
 
     // For every each text in ListText
     for (String i in listText) {
-
       // Text if match with CompanyRegex
       if (companyRegex.hasMatch(i)) {
         // Set text to CompanyTextController.text
@@ -331,14 +337,15 @@ class _InvoiceCaptureScreenState extends State<InvoiceCaptureScreen> {
         companyTextController.text = i;
       }
       // Text if match with DateRegex
+
       else if (dateRegex.hasMatch(i)) {
         // Set text to DateTextController.text
-        i = i.replaceAll(" ", "");
-        if (i.contains(":")) {
-          i = i.split(":").last;
+        final RegExpMatch? matchedDate = dateRegex.firstMatch(i);
+        if (matchedDate != null) {
+          i = i.substring(matchedDate.start, matchedDate.end);
         }
 
-        late final DateTime parsedDate;
+        late final DateTime? parsedDate;
 
         for (final DateFormat format in dateFormats) {
           try {
@@ -350,7 +357,7 @@ class _InvoiceCaptureScreenState extends State<InvoiceCaptureScreen> {
           }
         }
 
-        dateTextController.text = dateFormat.format(parsedDate);
+        dateTextController.text = parsedDate != null ? dateFormat.format(parsedDate) : "";
       }
       // If text length is 16
       else if (invoiceNoRegex.hasMatch(i)) {
@@ -457,7 +464,7 @@ class _InvoiceCaptureScreenState extends State<InvoiceCaptureScreen> {
 
       if (mounted) {
         showSnackBar(context,
-            text: "Processing Data...", color: Colors.deepOrangeAccent);
+            text: "Processing Data...", color: Colors.yellowAccent);
       }
 
       try {
