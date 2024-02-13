@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:invoix/models/invoice_data.dart';
+import 'package:invoix/utils/company_name_filter.dart';
+import 'package:invoix/utils/export_to_excel.dart';
 import 'package:invoix/widgets/invoice_card.dart';
+import 'package:invoix/widgets/loading_animation.dart';
 
 import '../main.dart';
-import '../utils/company_name_filter.dart';
 import '../widgets/toast.dart';
 
 class InvoicePage extends StatefulWidget {
@@ -18,10 +20,21 @@ class InvoicePage extends StatefulWidget {
 
 class _InvoicePageState extends State<InvoicePage> {
 
+  late bool _excelExporting;
+  late final String companyName;
+
+  @override
+  initState() {
+    _excelExporting = false;
+    companyName = widget.companyName;
+
+    getInvoiceDataList(ListType.invoice, invoiceDataBox.values.cast<InvoiceData>(), companyName);
+
+    super.initState();
+  }
+
   @override
   Widget build(final BuildContext context) {
-
-    final String companyName = widget.companyName;
 
     return Scaffold(
       appBar: AppBar(
@@ -39,11 +52,23 @@ class _InvoicePageState extends State<InvoicePage> {
           centerTitle: true,
           actions: <Widget>[
             IconButton(
-              icon: const Icon(Icons.table_chart),
+              icon: _excelExporting ? const CircularProgressIndicator() : const Icon(Icons.table_chart),
               tooltip: "Export all data to Excel",
-              onPressed: () => showSnackBar(context,
-                  text: "Excel files are saved in " "Download" " file.",
-                  color: Colors.green),
+              onPressed: _excelExporting ? null : () {
+                setState(() {
+                  _excelExporting = true;
+                });
+
+                exportToExcel(companyName: companyName, listType: ListType.invoice)
+                  ..catchError((final Object e) => showSnackBar(context,
+                      text: e.toString(), color: Colors.redAccent))
+                  ..then((final _) => showSnackBar(context,
+                      text: "$companyName's invoices excel output is saved in the ""Download"" file.",
+                      color: Colors.green))
+                  ..whenComplete(() => setState(() {
+                    _excelExporting = false;
+                  }));
+              },
             ),
           ]),
 
@@ -106,7 +131,7 @@ class InvoiceList extends StatelessWidget {
                   ],
                 );
               } else {
-                return const CircularProgressIndicator();
+                return const LoadingAnimation();
               }
             });
       },

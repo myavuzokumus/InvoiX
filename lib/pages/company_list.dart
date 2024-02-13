@@ -5,12 +5,14 @@ import 'package:edge_detection/edge_detection.dart';
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:invoix/models/invoice_data.dart';
+import 'package:invoix/utils/company_name_filter.dart';
+import 'package:invoix/utils/export_to_excel.dart';
+import 'package:invoix/widgets/loading_animation.dart';
 import 'package:path/path.dart' as path;
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
 
 import '../main.dart';
-import '../utils/company_name_filter.dart';
 import '../widgets/toast.dart';
 import 'invoice_edit.dart';
 import 'invoice_list.dart';
@@ -26,8 +28,16 @@ class CompanyPage extends StatefulWidget {
 }
 
 class _CompanyPageState extends State<CompanyPage> {
+  late bool _isLoading;
+  late bool _excelExporting;
 
-  bool _isLoading = false;
+  @override
+  void initState() {
+    // TODO: implement initState
+    _isLoading = false;
+    _excelExporting = false;
+    super.initState();
+  }
 
   @override
   Widget build(final BuildContext context) {
@@ -46,16 +56,42 @@ class _CompanyPageState extends State<CompanyPage> {
             centerTitle: true,
             actions: <Widget>[
               IconButton(
-                icon: const Icon(Icons.table_chart),
+                icon: _excelExporting
+                    ? const CircularProgressIndicator()
+                    : const Icon(Icons.table_chart),
                 tooltip: "Export all data to Excel",
-                onPressed: () => showSnackBar(context,
-                    text: "Excel files are saved in " "Download" " file.",
-                    color: Colors.green),
+                onPressed: _excelExporting
+                    ? null
+                    : () {
+                        setState(() {
+                          _excelExporting = true;
+                        });
+
+                        exportToExcel(listType: ListType.company)
+                          ..catchError((final Object e) => showSnackBar(context,
+                              text: e.toString(), color: Colors.redAccent))
+                          ..then((final _) => showSnackBar(context,
+                              text: "Excel output is saved in "
+                                  "Download"
+                                  " file.",
+                              color: Colors.green))
+                          ..whenComplete(() => setState(() {
+                                _excelExporting = false;
+                              }));
+                      },
               ),
             ]),
 
         //CompanyList widget is added to the body of the scaffold
-        body: Stack(children: [const CompanyList(), if (_isLoading) Container(height: double.infinity, width: double.infinity,color: Colors.black38 ,child: const Center(child: CircularProgressIndicator()))]),
+        body: Stack(children: [
+          const CompanyList(),
+          if (_isLoading)
+            Container(
+                height: double.infinity,
+                width: double.infinity,
+                color: Colors.black38,
+                child: const Center(child: LoadingAnimation()))
+        ]),
 
         //Invoice Capture button
         floatingActionButton: Badge(
@@ -73,12 +109,19 @@ class _CompanyPageState extends State<CompanyPage> {
 
   // Get image from camera
   Future<void> getImageFromCamera() async {
-    final bool isCameraGranted = await Permission.camera.request().isGranted;
+    final isCameraGranted = await Permission.camera.request();
 
-    if (mounted && !isCameraGranted) {
-      return showSnackBar(context,
-          text: "You need to give permission to use camera.",
-          color: Colors.redAccent);
+    if (mounted) {
+      if (isCameraGranted.isPermanentlyDenied) {
+        unawaited(openAppSettings());
+        return showSnackBar(context,
+            text: "You need to give permission to use camera.",
+            color: Colors.redAccent);
+      } else if (!isCameraGranted.isGranted) {
+        return showSnackBar(context,
+            text: "You need to give permission to use camera.",
+            color: Colors.redAccent);
+      }
     }
 
     // Generate filepath for saving
@@ -87,17 +130,14 @@ class _CompanyPageState extends State<CompanyPage> {
         "${(DateTime.now().millisecondsSinceEpoch / 1000).round()}.jpeg");
 
     try {
-
       setState(() {
         _isLoading = true;
       });
 
-      final bool success = await EdgeDetection.detectEdge(
-        imagePath,
-        canUseGallery: true,
-        androidScanTitle: 'Scanning',
-        androidCropTitle: 'Crop'
-      );
+      final bool success = await EdgeDetection.detectEdge(imagePath,
+          canUseGallery: true,
+          androidScanTitle: 'Scanning',
+          androidCropTitle: 'Crop');
 
       if (mounted && success) {
         unawaited(Navigator.push(
@@ -151,7 +191,8 @@ class _CompanyListState extends State<CompanyList> {
           if (invoiceDataBox.values.isEmpty) {
             return const Center(
               child: Text(
-                "No invoice added yet.", textAlign: TextAlign.center,
+                "No invoice added yet.",
+                textAlign: TextAlign.center,
                 style: TextStyle(fontSize: 28),
               ),
             );
@@ -162,24 +203,27 @@ class _CompanyListState extends State<CompanyList> {
               builder: (final BuildContext context,
                   final AsyncSnapshot<List<InvoiceData>> company) {
                 if (company.hasData) {
-
-                  final List<InvoiceData> companyList = List.from(company.data!);
+                  // Create a list of companies with copy of company data
+                  final List<InvoiceData> companyList =
+                      List.from(company.data!);
 
                   if (filters.length == 1) {
                     companyList.removeWhere((final InvoiceData element) =>
-                    !filters.every((final e) {
-                      return element.companyName.toUpperCase().contains(e.toUpperCase());
-                    })
+                        !filters.every((final e) {
+                          return element.companyName
+                              .toUpperCase()
+                              .contains(e.toUpperCase());
+                        }));
+                  } else if (filters.length > 1) {
+                    companyList.removeWhere(
+                        (final InvoiceData element) => !filters.any((final e) {
+                              return element.companyName
+                                  .toUpperCase()
+                                  .contains(e.toUpperCase());
+                            }));
+                  }
 
-                    );
-                  }
-                  else if (filters.length > 1) {
-                    companyList.removeWhere((final InvoiceData element) =>
-                    !filters.any((final e) {
-                      return element.companyName.toUpperCase().contains(e.toUpperCase());
-                    })
-                    );
-                  }
+                  final List<Widget> filterlist = filterList(company.data!);
 
                   return Column(
                     children: [
@@ -196,24 +240,9 @@ class _CompanyListState extends State<CompanyList> {
                           scrollDirection: Axis.horizontal,
                           child: Wrap(
                             spacing: 10.0,
-                            children: CompanyType.values.map((final CompanyType types) {
-                              if (company.data!.any((final InvoiceData element) => element.companyName.toUpperCase().contains(types.name.toUpperCase())))
-                              {
-                                return FilterChip(
-                                label: Text(types.name),
-                                selected: filters.contains(types.name),
-                                onSelected: (final bool selected) {
-                                  setState(() {
-                                    if (selected) {
-                                      filters.add(types.name);
-                                    } else {
-                                      filters.remove(types.name);
-                                    }
-                                  });
-                                },
-                              );}
-                              else {return const SizedBox();}
-                            }).toList(),
+                            children: filterlist.length > 1
+                                            ? filterlist
+                                            : const [SizedBox()]
                           ),
                         ),
                       ),
@@ -234,6 +263,8 @@ class _CompanyListState extends State<CompanyList> {
                               title: Text(
                                 companyListName,
                               ),
+
+
                               onTap: () {
                                 if (widget.onTap != null) {
                                   widget.onTap!(companyListName);
@@ -242,23 +273,43 @@ class _CompanyListState extends State<CompanyList> {
                                 Navigator.push(
                                     context,
                                     MaterialPageRoute(
-                                        builder: (final context) =>
-                                            InvoicePage(
-                                                companyName:
-                                                    companyListName)));
+                                        builder: (final context) => InvoicePage(
+                                            companyName: companyListName)));
                               },
                             );
                           }),
                     ],
                   );
                 } else {
-                  return const Center(child: CircularProgressIndicator());
+                  return const LoadingAnimation();
                 }
               },
             );
           }
         });
   }
+
+  List<Widget> filterList(final List<InvoiceData> company) {
+    return CompanyType.values.map((final CompanyType types) {
+      if (company.any((final InvoiceData element) => element.companyName
+          .toUpperCase()
+          .contains(types.name.toUpperCase()))) {
+        return FilterChip(
+          label: Text(types.name),
+          selected: filters.contains(types.name),
+          onSelected: (final bool selected) {
+            setState(() {
+              if (selected) {
+                filters.add(types.name);
+              } else {
+                filters.remove(types.name);
+              }
+            });
+          },
+        );
+      } else {
+        return const SizedBox();
+      }
+    }).toList();
+  }
 }
-
-
