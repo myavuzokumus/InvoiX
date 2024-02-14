@@ -330,6 +330,9 @@ class _CompanyListState extends State<CompanyList> {
                                                         .indexOf(companyList
                                                             .elementAt(index)),
                                                     InvoiceData(
+                                                        ImagePath: companyList
+                                                            .elementAt(index)
+                                                            .ImagePath,
                                                         companyName:
                                                             companyNameTextController
                                                                 .text,
@@ -339,12 +342,12 @@ class _CompanyListState extends State<CompanyList> {
                                                         date: companyList
                                                             .elementAt(index)
                                                             .date,
-                                                        amount: companyList
+                                                        totalAmount: companyList
                                                             .elementAt(index)
-                                                            .amount,
-                                                        ImagePath: companyList
+                                                            .totalAmount,
+                                                        taxAmount: companyList
                                                             .elementAt(index)
-                                                            .ImagePath));
+                                                            .taxAmount));
                                                 Navigator.pop(context);
                                                 showSnackBar(context,
                                                     text:

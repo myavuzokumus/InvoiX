@@ -127,7 +127,7 @@ Future<void> importInvoiceData(final Worksheet sheet, final String company, fina
       ..cellStyle = cellStyle;
 
     sheet.getRangeByName('C${i + 2}')
-      ..setNumber(invoices[i].amount)
+      ..setNumber(invoices[i].totalAmount)
       ..cellStyle = cellStyle;
 
     sheet.pictures.addStream(i + 2, 4, image)

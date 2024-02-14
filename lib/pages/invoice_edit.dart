@@ -41,7 +41,8 @@ class _InvoiceCaptureScreenState extends State<InvoiceCaptureScreen> {
   late final TextEditingController companyTextController;
   late final TextEditingController invoiceNoTextController;
   late final TextEditingController dateTextController;
-  late final TextEditingController amountTextController;
+  late final TextEditingController totalAmountTextController;
+  late final TextEditingController taxAmountTextController;
 
   late final GlobalKey<ScaffoldState> _scaffoldKey;
   late final GlobalKey<FormState> _formKey;
@@ -61,7 +62,8 @@ class _InvoiceCaptureScreenState extends State<InvoiceCaptureScreen> {
     companyTextController = TextEditingController();
     invoiceNoTextController = TextEditingController();
     dateTextController = TextEditingController();
-    amountTextController = TextEditingController();
+    totalAmountTextController = TextEditingController();
+    taxAmountTextController = TextEditingController();
 
     _scaffoldKey = GlobalKey<ScaffoldState>();
     _formKey = GlobalKey<FormState>();
@@ -77,7 +79,7 @@ class _InvoiceCaptureScreenState extends State<InvoiceCaptureScreen> {
     companyTextController.dispose();
     invoiceNoTextController.dispose();
     dateTextController.dispose();
-    amountTextController.dispose();
+    totalAmountTextController.dispose();
     _scaffoldKey.currentState?.dispose();
     _formKey.currentState?.dispose();
 
@@ -270,25 +272,60 @@ class _InvoiceCaptureScreenState extends State<InvoiceCaptureScreen> {
                                       return null;
                                     },
                                   ),
-                                  TextFormField(
-                                    maxLength: 50,
-                                    controller: amountTextController,
-                                    keyboardType: TextInputType.number,
-                                    inputFormatters: <TextInputFormatter>[
-                                      FilteringTextInputFormatter.digitsOnly
+                                  Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Flexible(
+                                        child: TextFormField(
+                                          maxLength: 50,
+                                          controller: totalAmountTextController,
+                                          keyboardType: TextInputType.number,
+                                          inputFormatters: <TextInputFormatter>[
+                                            FilteringTextInputFormatter.digitsOnly
+                                          ],
+                                          // Only numbers can be entered
+                                          validator: (final value) {
+                                            if (value == null || value.isEmpty) {
+                                              return "";
+                                            }
+                                            return null;
+                                          },
+                                          decoration: const InputDecoration(
+                                              labelText: "Total Amount:",
+                                              suffixIcon: WarnIcon(
+                                                  message:
+                                                  "You must enter a valid amount."),
+                                              labelStyle: TextStyle(
+                                                  fontSize: 15, fontWeight: FontWeight.bold)),
+                                        ),
+                                      ),
+                                      const SizedBox(width: 16),
+                                      Flexible(
+                                        child: TextFormField(
+                                          maxLength: 50,
+                                          controller: taxAmountTextController,
+                                          keyboardType: TextInputType.number,
+                                          inputFormatters: <TextInputFormatter>[
+                                            FilteringTextInputFormatter.digitsOnly
+                                          ],
+                                          // Only numbers can be entered
+                                          validator: (final value) {
+                                            if (value == null || value.isEmpty) {
+                                              return "";
+                                            }
+                                            return null;
+                                          },
+                                          decoration: const InputDecoration(
+                                              labelText: "Tax Amount:",
+                                              suffixIcon: WarnIcon(
+                                                  message:
+                                                  "You must enter a valid amount."),
+                                              labelStyle: TextStyle(
+                                                  fontSize: 15, fontWeight: FontWeight.bold)),
+                                        ),
+                                      ),
                                     ],
-                                    // Only numbers can be entered
-                                    validator: (final value) {
-                                      if (value == null || value.isEmpty) {
-                                        return "";
-                                      }
-                                      return null;
-                                    },
-                                    decoration: const InputDecoration(
-                                        labelText: "Amount:",
-                                        suffixIcon: WarnIcon(
-                                            message:
-                                            "You must enter a valid amount.")),
                                   ),
                                 ],
                               ),
@@ -377,7 +414,7 @@ class _InvoiceCaptureScreenState extends State<InvoiceCaptureScreen> {
       else if (amountRegex.hasMatch(i)) {
         // Set text to AmountTextController.text
         i = i.replaceAll(RegExp(r'[^0-9.,]'), "").replaceAll(",", ".");
-        amountTextController.text = double.parse(i).toString();
+        totalAmountTextController.text = double.parse(i).toString();
       }
 
       if (i.toUpperCase().contains("NO")) {
@@ -404,7 +441,7 @@ class _InvoiceCaptureScreenState extends State<InvoiceCaptureScreen> {
     companyTextController.text = item.companyName;
     invoiceNoTextController.text = item.invoiceNo;
     dateTextController.text = dateFormat.format(item.date);
-    amountTextController.text = item.amount.toString();
+    totalAmountTextController.text = item.totalAmount.toString();
 
   }
 
@@ -481,7 +518,8 @@ class _InvoiceCaptureScreenState extends State<InvoiceCaptureScreen> {
             companyName: companyTextController.text,
             invoiceNo: invoiceNoTextController.text,
             date: dateFormat.parse(dateTextController.text),
-            amount: double.parse(amountTextController.text));
+            totalAmount: double.parse(totalAmountTextController.text),
+            taxAmount: double.parse(taxAmountTextController.text));
 
         editIndex == null
             ? await invoiceDataBox.add(data)
