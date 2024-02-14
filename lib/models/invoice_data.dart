@@ -17,14 +17,17 @@ class InvoiceData extends HiveObject {
   @HiveField(4)
   final DateTime date;
   @HiveField(5)
-  final double amount;
+  final double totalAmount;
+  @HiveField(6, defaultValue: 0.0)
+  final double taxAmount;
 
   InvoiceData(
       {required this.ImagePath,
       required this.companyName,
       required this.invoiceNo,
       required this.date,
-      required this.amount});
+      required this.totalAmount,
+      required this.taxAmount});
 }
 
 //final Uint8List ImagePath;
