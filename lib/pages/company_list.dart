@@ -74,7 +74,7 @@ class _CompanyPageState extends State<CompanyPage> {
                               text: e.toString(), color: Colors.redAccent))
                           ..then((final _) => showSnackBar(context,
                               text: "Excel output is saved in "
-                                  "Download"
+                                  """Download"""
                                   " file.",
                               color: Colors.green))
                           ..whenComplete(() => setState(() {
@@ -82,6 +82,11 @@ class _CompanyPageState extends State<CompanyPage> {
                               }));
                       },
               ),
+            IconButton(onPressed: () {
+              showSnackBar(context,
+                  text: "Company deletion very soon!",
+                  color: Colors.redAccent);
+            }, icon: const Icon(Icons.restore_from_trash_outlined))
             ]),
 
         //CompanyList widget is added to the body of the scaffold
@@ -250,135 +255,136 @@ class _CompanyListState extends State<CompanyList> {
                                   : const [SizedBox()]),
                         ),
                       ),
-                      ListView.separated(
-                          shrinkWrap: true,
-                          padding: const EdgeInsets.only(
-                              left: 10, right: 10, top: 20),
-                          itemCount: companyList.length,
-                          separatorBuilder:
-                              (final BuildContext context, final int index) =>
-                                  const Divider(),
-                          itemBuilder:
-                              (final BuildContext context, final int index) {
-                            final companyListName =
-                                companyList.elementAt(index).companyName;
-
-                            return ListTile(
-                              title: Text(
-                                companyListName,
-                              ),
-                              onLongPress: () {
-                                showDialog(
-                                    context: context,
-                                    builder: (final BuildContext context) {
-
-                                      return AlertDialog(
-                                        title: Text(companyListName),
-                                        content: Column(
-                                          mainAxisSize: MainAxisSize.min,
-                                          children: [
-                                            const Text(
-                                                "What would you like to change new company name?"),
-                                            const SizedBox(height: 12),
-                                            Form(
-                                              key: _companyNameformKey,
-                                              autovalidateMode: AutovalidateMode
-                                                  .onUserInteraction,
-                                              child: TextFormField(
-                                                maxLength: 50,
-                                                controller:
-                                                    companyNameTextController,
-                                                decoration: const InputDecoration(
-                                                    labelText:
-                                                        "New company name:",
-                                                    labelStyle:
-                                                        TextStyle(fontSize: 16),
-                                                    hintText:
-                                                        "Enter new company name",
-                                                    suffixIcon: WarnIcon(
-                                                        message:
-                                                            "You must enter a valid company name.\nNeed include 'LTD., ŞTİ., A.Ş., LLC, PLC, INC, GMBH'")),
-                                                validator: (final value) {
-                                                  if (value == null ||
-                                                      value.isEmpty ||
-                                                      !companyRegex
-                                                          .hasMatch(value)) {
-                                                    return 'Please enter some text';
-                                                  }
-                                                  return null;
-                                                },
+                      Expanded(
+                        child: ListView.separated(
+                            padding: const EdgeInsets.only(
+                                left: 10, right: 10, top: 20),
+                            itemCount: companyList.length,
+                            separatorBuilder:
+                                (final BuildContext context, final int index) =>
+                                    const Divider(),
+                            itemBuilder:
+                                (final BuildContext context, final int index) {
+                              final companyListName =
+                                  companyList.elementAt(index).companyName;
+                        
+                              return ListTile(
+                                title: Text(
+                                  companyListName,
+                                ),
+                                onLongPress: () {
+                                  showDialog(
+                                      context: context,
+                                      builder: (final BuildContext context) {
+                        
+                                        return AlertDialog(
+                                          title: Text(companyListName),
+                                          content: Column(
+                                            mainAxisSize: MainAxisSize.min,
+                                            children: [
+                                              const Text(
+                                                  "What would you like to change new company name?"),
+                                              const SizedBox(height: 12),
+                                              Form(
+                                                key: _companyNameformKey,
+                                                autovalidateMode: AutovalidateMode
+                                                    .onUserInteraction,
+                                                child: TextFormField(
+                                                  maxLength: 50,
+                                                  controller:
+                                                      companyNameTextController,
+                                                  decoration: const InputDecoration(
+                                                      labelText:
+                                                          "New company name:",
+                                                      labelStyle:
+                                                          TextStyle(fontSize: 16),
+                                                      hintText:
+                                                          "Enter new company name",
+                                                      suffixIcon: WarnIcon(
+                                                          message:
+                                                              "You must enter a valid company name.\nNeed include 'LTD., ŞTİ., A.Ş., LLC, PLC, INC, GMBH'")),
+                                                  validator: (final value) {
+                                                    if (value == null ||
+                                                        value.isEmpty ||
+                                                        !companyRegex
+                                                            .hasMatch(value)) {
+                                                      return 'Please enter some text';
+                                                    }
+                                                    return null;
+                                                  },
+                                                ),
                                               ),
+                                            ],
+                                          ),
+                                          actions: <Widget>[
+                                            TextButton(
+                                              onPressed: () {
+                                                Navigator.pop(context);
+                                              },
+                                              child: const Text("Cancel"),
+                                            ),
+                                            TextButton(
+                                              onPressed: () {
+                                                if (_companyNameformKey
+                                                    .currentState!
+                                                    .validate()) {
+                                                  invoiceDataBox.put(
+                                                      invoiceDataBox.values
+                                                          .cast<InvoiceData>()
+                                                          .toList()
+                                                          .indexOf(companyList
+                                                              .elementAt(index)),
+                                                      InvoiceData(
+                                                          ImagePath: companyList
+                                                              .elementAt(index)
+                                                              .ImagePath,
+                                                          companyName:
+                                                              companyNameTextController
+                                                                  .text,
+                                                          invoiceNo: companyList
+                                                              .elementAt(index)
+                                                              .invoiceNo,
+                                                          date: companyList
+                                                              .elementAt(index)
+                                                              .date,
+                                                          totalAmount: companyList
+                                                              .elementAt(index)
+                                                              .totalAmount,
+                                                          taxAmount: companyList
+                                                              .elementAt(index)
+                                                              .taxAmount));
+                                                  Navigator.pop(context);
+                                                  showSnackBar(context,
+                                                      text:
+                                                          "Company name has been changed successfully.",
+                                                      color: Colors.greenAccent);
+                                                } else {
+                                                  showSnackBar(context,
+                                                      text:
+                                                          "Please enter a valid company name.\nNeed include 'LTD., ŞTİ., A.Ş., LLC, PLC, INC, GMBH'",
+                                                      color: Colors.redAccent);
+                                                }
+                                              },
+                                              child: const Text("Change"),
                                             ),
                                           ],
-                                        ),
-                                        actions: <Widget>[
-                                          TextButton(
-                                            onPressed: () {
-                                              Navigator.pop(context);
-                                            },
-                                            child: const Text("Cancel"),
-                                          ),
-                                          TextButton(
-                                            onPressed: () {
-                                              if (_companyNameformKey
-                                                  .currentState!
-                                                  .validate()) {
-                                                invoiceDataBox.put(
-                                                    invoiceDataBox.values
-                                                        .cast<InvoiceData>()
-                                                        .toList()
-                                                        .indexOf(companyList
-                                                            .elementAt(index)),
-                                                    InvoiceData(
-                                                        ImagePath: companyList
-                                                            .elementAt(index)
-                                                            .ImagePath,
-                                                        companyName:
-                                                            companyNameTextController
-                                                                .text,
-                                                        invoiceNo: companyList
-                                                            .elementAt(index)
-                                                            .invoiceNo,
-                                                        date: companyList
-                                                            .elementAt(index)
-                                                            .date,
-                                                        totalAmount: companyList
-                                                            .elementAt(index)
-                                                            .totalAmount,
-                                                        taxAmount: companyList
-                                                            .elementAt(index)
-                                                            .taxAmount));
-                                                Navigator.pop(context);
-                                                showSnackBar(context,
-                                                    text:
-                                                        "Company name has been changed successfully.",
-                                                    color: Colors.greenAccent);
-                                              } else {
-                                                showSnackBar(context,
-                                                    text:
-                                                        "Please enter a valid company name.\nNeed include 'LTD., ŞTİ., A.Ş., LLC, PLC, INC, GMBH'",
-                                                    color: Colors.redAccent);
-                                              }
-                                            },
-                                            child: const Text("Change"),
-                                          ),
-                                        ],
-                                      );
-                                    });
-                              },
-                              onTap: () {
-                                if (widget.onTap != null) {
-                                  widget.onTap!(companyListName);
-                                  return;
-                                }
-                                Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                        builder: (final context) => InvoicePage(
-                                            companyName: companyListName)));
-                              },
-                            );
-                          }),
+                                        );
+                                      });
+                                },
+                                onTap: () {
+                                  if (widget.onTap != null) {
+                                    widget.onTap!(companyListName);
+                                    return;
+                                  }
+                                  Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                          builder: (final context) => InvoicePage(
+                                              companyName: companyListName)));
+                                },
+                              );
+                            }),
+                      ),
                     ],
                   );
                 } else {

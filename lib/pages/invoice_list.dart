@@ -70,6 +70,11 @@ class _InvoicePageState extends State<InvoicePage> {
                   }));
               },
             ),
+            IconButton(onPressed: () {
+              showSnackBar(context,
+                  text: "Company deletion very soon!",
+                  color: Colors.redAccent);
+            }, icon: const Icon(Icons.restore_from_trash_outlined))
           ]),
 
 
@@ -108,25 +113,27 @@ class InvoiceList extends StatelessWidget {
                         child: Text(invoiceList.length.toString()),
                       ),
                     ),
-                    GridView.builder(
-                      shrinkWrap: true,
-                      padding: const EdgeInsets.only(left: 20, right: 20),
-                      gridDelegate:
-                      const SliverGridDelegateWithFixedCrossAxisCount(
-                        crossAxisCount: 1,
-                        mainAxisSpacing: 15,
-                        crossAxisSpacing: 15,
-                        childAspectRatio: 2.60,
+                    Expanded(
+                      child: GridView.builder(
+                        shrinkWrap: true,
+                        padding: const EdgeInsets.only(left: 20, right: 20),
+                        gridDelegate:
+                        SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: MediaQuery.of(context).orientation == Orientation.landscape ? 2 : 1,
+                          mainAxisSpacing: 15,
+                          crossAxisSpacing: 15,
+                          childAspectRatio: 2.60,
+                        ),
+                        itemCount: invoiceList.length,
+                        itemBuilder: (final BuildContext context, final int index) {
+                      
+                          return InvoiceCard(
+                              invoiceData: invoiceList.elementAt(index),
+                              index: invoiceDataBox.values.cast<InvoiceData>().toList().indexOf(invoiceList.elementAt(index))
+                          );
+                      
+                        },
                       ),
-                      itemCount: invoiceList.length,
-                      itemBuilder: (final BuildContext context, final int index) {
-
-                        return InvoiceCard(
-                            invoiceData: invoiceList.elementAt(index),
-                            index: invoiceDataBox.values.cast<InvoiceData>().toList().indexOf(invoiceList.elementAt(index))
-                        );
-
-                      },
                     ),
                   ],
                 );
