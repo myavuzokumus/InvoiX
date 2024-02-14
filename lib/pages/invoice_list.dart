@@ -115,7 +115,6 @@ class InvoiceList extends StatelessWidget {
                     ),
                     Expanded(
                       child: GridView.builder(
-                        shrinkWrap: true,
                         padding: const EdgeInsets.only(left: 20, right: 20),
                         gridDelegate:
                         SliverGridDelegateWithFixedCrossAxisCount(
