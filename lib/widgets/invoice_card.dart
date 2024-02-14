@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:invoix/models/invoice_data.dart';
 import 'package:invoix/pages/invoice_edit.dart';
+import 'package:invoix/widgets/ai_button.dart';
 
 import '../widgets/loading_animation.dart';
 
@@ -52,7 +53,13 @@ class InvoiceCard extends StatelessWidget {
                     const Divider(height: 2),
                     Text("Date\n${DateFormat("dd-MM-yyyy").format(invoiceData.date)}"),
                     const Divider(height: 2),
-                    Text("Amount\n${invoiceData.amount}"),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text("Total Amount\n${invoiceData.totalAmount}"),
+                        Text("Tax Amount\n${invoiceData.taxAmount}"),
+                      ],
+                    ),
                   ],
                 ),
               ),
@@ -77,45 +84,8 @@ class InvoiceCard extends StatelessWidget {
                     },
                     ),
                   ),
-                  Positioned(right: 0, bottom: 0,
-                      child: IconButton.outlined(
-                        style: OutlinedButton.styleFrom(
-                          backgroundColor: Colors.black.withOpacity(0.35),
-                          side: const BorderSide(width: 1.5, color: Colors.orangeAccent),
-                        ),
-                        onPressed: () {
-                          showModalBottomSheet<void>(
-                            showDragHandle: true,
-                            context: context,
-                            builder: (final BuildContext context) {
-                              return SizedBox(
-                                height: 200,
-                                width: double.infinity,
-                                child: Padding(
-                                  padding: const EdgeInsets.only(left: 24, bottom: 24, right: 24),
-                                  child: LayoutBuilder(
-                                    builder: (final BuildContext context, final BoxConstraints constraints) {
-                                      return Card(elevation: 16, child: SingleChildScrollView(
-                                        child: Padding(
-                                          padding: const EdgeInsets.all(12.0),
-                                          child: Column(
-                                            children: [
-                                              LoadingAnimation(customHeight: constraints.maxHeight - 72),
-                                              const Text('Very soon, it will be possible to analyze invoices using AI.', textAlign: TextAlign.center),
-                                            ],
-                                          ),
-                                        ),
-                                      ));
-                                    },
-                                  ),
-                                ),
-                              );
-                            },
-                          );
-                        },
-                          icon: const Text("✨", style: TextStyle(fontSize: 17)),
-                        tooltip: 'Analyze it with AI',
-                      )
+                  const Positioned(right: 0, bottom: 0,
+                      child: AIButton()
                   )
                 ],
               ), // Adds a price to the bottom of the card
