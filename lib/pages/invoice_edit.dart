@@ -280,9 +280,9 @@ class _InvoiceCaptureScreenState extends State<InvoiceCaptureScreen> {
                                         child: TextFormField(
                                           maxLength: 50,
                                           controller: totalAmountTextController,
-                                          keyboardType: TextInputType.number,
+                                          keyboardType: const TextInputType.numberWithOptions(decimal: true),
                                           inputFormatters: <TextInputFormatter>[
-                                            FilteringTextInputFormatter.digitsOnly
+                                            FilteringTextInputFormatter.allow(RegExp(r'[0-9.]')),
                                           ],
                                           // Only numbers can be entered
                                           validator: (final value) {
@@ -305,9 +305,9 @@ class _InvoiceCaptureScreenState extends State<InvoiceCaptureScreen> {
                                         child: TextFormField(
                                           maxLength: 50,
                                           controller: taxAmountTextController,
-                                          keyboardType: TextInputType.number,
+                                          keyboardType: const TextInputType.numberWithOptions(decimal: true),
                                           inputFormatters: <TextInputFormatter>[
-                                            FilteringTextInputFormatter.digitsOnly
+                                            FilteringTextInputFormatter.allow(RegExp(r'[0-9.]')),
                                           ],
                                           // Only numbers can be entered
                                           validator: (final value) {
@@ -442,6 +442,7 @@ class _InvoiceCaptureScreenState extends State<InvoiceCaptureScreen> {
     invoiceNoTextController.text = item.invoiceNo;
     dateTextController.text = dateFormat.format(item.date);
     totalAmountTextController.text = item.totalAmount.toString();
+    taxAmountTextController.text = item.taxAmount.toString();
 
   }
 
@@ -533,8 +534,8 @@ class _InvoiceCaptureScreenState extends State<InvoiceCaptureScreen> {
       } catch (e) {
         if (mounted) {
           showSnackBar(context,
-              text: "Something went wrong."
-                  "$e",
+              text: "Something went wrong.\n"
+                  "${e}",
               color: Colors.redAccent);
         }
       } finally {
