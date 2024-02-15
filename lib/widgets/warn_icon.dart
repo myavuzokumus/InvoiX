@@ -9,7 +9,7 @@ class WarnIcon extends StatelessWidget {
   Widget build(final BuildContext context) {
     return Tooltip(
         triggerMode: TooltipTriggerMode.tap,
-        showDuration: const Duration(seconds: 3),
+        showDuration: const Duration(seconds: 5),
         message: message,
         child: const Icon(
           Icons.info_outline,
