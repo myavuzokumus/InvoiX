@@ -225,6 +225,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.1.5"
+  dio:
+    dependency: transitive
+    description:
+      name: dio
+      sha256: "797e1e341c3dd2f69f2dad42564a6feff3bfb87187d05abb93b9609e6f1645c3"
+      url: "https://pub.dev"
+    source: hosted
+    version: "5.4.0"
   downloadsfolder:
     dependency: "direct main"
     description:
@@ -278,6 +286,22 @@ packages:
     description: flutter
     source: sdk
     version: "0.0.0"
+  flutter_dotenv:
+    dependency: "direct main"
+    description:
+      name: flutter_dotenv
+      sha256: "9357883bdd153ab78cbf9ffa07656e336b8bbb2b5a3ca596b0b27e119f7c7d77"
+      url: "https://pub.dev"
+    source: hosted
+    version: "5.1.0"
+  flutter_gemini:
+    dependency: "direct main"
+    description:
+      name: flutter_gemini
+      sha256: e901f5d237b3ed7b75129a54c00a1b817d15895f147ab701a54c31d6e3bf89a9
+      url: "https://pub.dev"
+    source: hosted
+    version: "2.0.1"
   flutter_lints:
     dependency: "direct dev"
     description:
@@ -296,6 +320,14 @@ packages:
     description: flutter
     source: sdk
     version: "0.0.0"
+  freezed_annotation:
+    dependency: transitive
+    description:
+      name: freezed_annotation
+      sha256: c3fd9336eb55a38cc1bbd79ab17573113a8deccd0ecbbf926cca3c62803b5c2d
+      url: "https://pub.dev"
+    source: hosted
+    version: "2.4.1"
   frontend_server_client:
     dependency: transitive
     description:
@@ -548,10 +580,10 @@ packages:
     dependency: transitive
     description:
       name: permission_handler_android
-      sha256: a5ebaa420cee8fd880ef10dedd42c6b3f493e7dbe27d7e0a7e1798669373082a
+      sha256: "1acac6bae58144b442f11e66621c062aead9c99841093c38f5bcdcc24c1c3474"
       url: "https://pub.dev"
     source: hosted
-    version: "12.0.4"
+    version: "12.0.5"
   permission_handler_apple:
     dependency: transitive
     description:
@@ -640,6 +672,62 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.2.3"
+  shared_preferences:
+    dependency: "direct main"
+    description:
+      name: shared_preferences
+      sha256: "81429e4481e1ccfb51ede496e916348668fd0921627779233bd24cc3ff6abd02"
+      url: "https://pub.dev"
+    source: hosted
+    version: "2.2.2"
+  shared_preferences_android:
+    dependency: transitive
+    description:
+      name: shared_preferences_android
+      sha256: "8568a389334b6e83415b6aae55378e158fbc2314e074983362d20c562780fb06"
+      url: "https://pub.dev"
+    source: hosted
+    version: "2.2.1"
+  shared_preferences_foundation:
+    dependency: transitive
+    description:
+      name: shared_preferences_foundation
+      sha256: "7708d83064f38060c7b39db12aefe449cb8cdc031d6062280087bc4cdb988f5c"
+      url: "https://pub.dev"
+    source: hosted
+    version: "2.3.5"
+  shared_preferences_linux:
+    dependency: transitive
+    description:
+      name: shared_preferences_linux
+      sha256: "9f2cbcf46d4270ea8be39fa156d86379077c8a5228d9dfdb1164ae0bb93f1faa"
+      url: "https://pub.dev"
+    source: hosted
+    version: "2.3.2"
+  shared_preferences_platform_interface:
+    dependency: transitive
+    description:
+      name: shared_preferences_platform_interface
+      sha256: "22e2ecac9419b4246d7c22bfbbda589e3acf5c0351137d87dd2939d984d37c3b"
+      url: "https://pub.dev"
+    source: hosted
+    version: "2.3.2"
+  shared_preferences_web:
+    dependency: transitive
+    description:
+      name: shared_preferences_web
+      sha256: "7b15ffb9387ea3e237bb7a66b8a23d2147663d391cafc5c8f37b2e7b4bde5d21"
+      url: "https://pub.dev"
+    source: hosted
+    version: "2.2.2"
+  shared_preferences_windows:
+    dependency: transitive
+    description:
+      name: shared_preferences_windows
+      sha256: "841ad54f3c8381c480d0c9b508b89a34036f512482c407e6df7a9c4aa2ef8f59"
+      url: "https://pub.dev"
+    source: hosted
+    version: "2.3.2"
   shelf:
     dependency: transitive
     description:
@@ -737,26 +825,26 @@ packages:
     dependency: transitive
     description:
       name: syncfusion_flutter_core
-      sha256: e8580e201c7197feac830b501889e877796a9fabbe20dcdbe90a981603939101
+      sha256: "4eed0d3ae50c16b5e8e4957f3c1917e9bd0315a08dfb49a104ca8fc10244bef3"
       url: "https://pub.dev"
     source: hosted
-    version: "24.2.4"
+    version: "24.2.6"
   syncfusion_flutter_xlsio:
     dependency: "direct main"
     description:
       name: syncfusion_flutter_xlsio
-      sha256: "0d06e279ab4f9ac45c554621ed29953f6411815eff2acfd62d8fac2af2f5ad0d"
+      sha256: "8f448d5b4a79bbf5046aecce5835d48e50c2ca76d1a1eb92df1e87327db72691"
       url: "https://pub.dev"
     source: hosted
-    version: "24.2.4"
+    version: "24.2.6"
   syncfusion_officecore:
     dependency: transitive
     description:
       name: syncfusion_officecore
-      sha256: "034ce937ef6a74aa9f6a5a2bb5a625607172ef6311b03cdf361bdad8c1d178d4"
+      sha256: c34de9975c342a6237c70731765352c3a5dcbf6871064242195d2be38bad475c
       url: "https://pub.dev"
     source: hosted
-    version: "24.2.4"
+    version: "24.2.6"
   term_glyph:
     dependency: transitive
     description:
@@ -809,10 +897,10 @@ packages:
     dependency: transitive
     description:
       name: url_launcher_android
-      sha256: "507dc655b1d9cb5ebc756032eb785f114e415f91557b73bf60b7e201dfedeb2f"
+      sha256: d4ed0711849dd8e33eb2dd69c25db0d0d3fdc37e0a62e629fe32f57a22db2745
       url: "https://pub.dev"
     source: hosted
-    version: "6.2.2"
+    version: "6.3.0"
   url_launcher_ios:
     dependency: transitive
     description:
@@ -841,10 +929,10 @@ packages:
     dependency: transitive
     description:
       name: url_launcher_platform_interface
-      sha256: a932c3a8082e118f80a475ce692fde89dc20fddb24c57360b96bc56f7035de1f
+      sha256: "552f8a1e663569be95a8190206a38187b531910283c3e982193e4f2733f01029"
       url: "https://pub.dev"
     source: hosted
-    version: "2.3.1"
+    version: "2.3.2"
   url_launcher_web:
     dependency: transitive
     description:
