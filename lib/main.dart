@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:flutter_gemini/flutter_gemini.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:invoix/models/invoice_data.dart';
 
@@ -15,6 +17,9 @@ void main() async {
   Hive.registerAdapter(InvoiceDataAdapter());
   // Open user box
   await Hive.openBox('InvoiceData');
+
+  await dotenv.load(fileName: ".env");
+  Gemini.init(apiKey: dotenv.env['GEMINI_API_KEY']!);
 
   runApp(const InvoixMain());
 }
@@ -41,7 +46,12 @@ class InvoixMain extends StatelessWidget {
             vertical: BorderSide(color: Colors.white, width: 2.5),
           ),
           titleTextStyle: TextStyle(fontSize: 24),
-        )
+        ),
+        expansionTileTheme: const ExpansionTileThemeData(
+          shape: Border.symmetric(
+            vertical: BorderSide.none,
+          ),
+        ),
       ),
       home: const CompanyPage(),
     );
