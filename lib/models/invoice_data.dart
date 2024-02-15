@@ -30,12 +30,12 @@ class InvoiceData extends HiveObject {
       required this.taxAmount});
 
   InvoiceData.fromJson(final Map<String, dynamic> json)
-      : ImagePath = json['ImagePath'],
-        companyName = json['companyName'],
-        invoiceNo = json['invoiceNo'],
-        date = json['date'],
-        totalAmount = json['totalAmount'],
-        taxAmount = json['taxAmount'];
+      : ImagePath = json['ImagePath'] ?? "",
+        companyName = json['companyName'] ?? "",
+        invoiceNo = json['invoiceNo'] ?? "",
+        date = json['date'] ?? "",
+        totalAmount = json['totalAmount'] ?? "",
+        taxAmount = json['taxAmount'] ?? "";
 
 }
 

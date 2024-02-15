@@ -92,7 +92,7 @@ class AIButton extends StatelessWidget {
                                             constraints.maxHeight - 72),
                                     const Text(
                                         'Your invoice is being analyzed...',
-                                        textAlign: TextAlign.center),
+                                        textAlign: TextAlign.center, style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
                                   ],
                                 );
                               },
@@ -107,7 +107,7 @@ class AIButton extends StatelessWidget {
         } else {
           toast(context,
               text:
-                  "Please wait ${30 - remainingTime} seconds before opening the sheet again.");
+                  "Please wait ${30 - remainingTime} seconds before analyze the invoice again.");
         }
       },
       icon: const Text("✨", style: TextStyle(fontSize: 17)),
