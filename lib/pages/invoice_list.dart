@@ -25,10 +25,9 @@ class _InvoicePageState extends State<InvoicePage> {
 
   @override
   initState() {
+
     _excelExporting = false;
     companyName = widget.companyName;
-
-    getInvoiceDataList(ListType.invoice, invoiceDataBox.values.cast<InvoiceData>(), companyName);
 
     super.initState();
   }
@@ -60,9 +59,9 @@ class _InvoicePageState extends State<InvoicePage> {
                 });
 
                 exportToExcel(companyName: companyName, listType: ListType.invoice)
-                  ..catchError((final Object e) => showSnackBar(context,
+                  ..catchError((final Object e) => toast(context,
                       text: e.toString(), color: Colors.redAccent))
-                  ..then((final _) => showSnackBar(context,
+                  ..then((final _) => toast(context,
                       text: "$companyName's invoices excel output is saved in the ""Download"" file.",
                       color: Colors.green))
                   ..whenComplete(() => setState(() {
@@ -71,7 +70,7 @@ class _InvoicePageState extends State<InvoicePage> {
               },
             ),
             IconButton(onPressed: () {
-              showSnackBar(context,
+              toast(context,
                   text: "Company deletion very soon!",
                   color: Colors.redAccent);
             }, icon: const Icon(Icons.restore_from_trash_outlined))
@@ -125,12 +124,13 @@ class InvoiceList extends StatelessWidget {
                         ),
                         itemCount: invoiceList.length,
                         itemBuilder: (final BuildContext context, final int index) {
-                      
+
+                          final invoiceData = invoiceList.elementAt(index);
+
                           return InvoiceCard(
-                              invoiceData: invoiceList.elementAt(index),
-                              index: invoiceDataBox.values.cast<InvoiceData>().toList().indexOf(invoiceList.elementAt(index))
+                              invoiceData: invoiceData,
+                              index: invoiceDataBox.values.cast<InvoiceData>().toList().indexOf(invoiceData)
                           );
-                      
                         },
                       ),
                     ),
