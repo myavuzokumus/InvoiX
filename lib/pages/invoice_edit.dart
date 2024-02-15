@@ -368,7 +368,9 @@ class _InvoiceCaptureScreenState extends State<InvoiceCaptureScreen> {
     }
     else if ( widget.readMode == ReadMode.ai) {
       try {
-        final String? aioutput = await GeminiAPI().describeImage(imgFile: File(imageFile.path), prompt: identifyInvoicePrompt);
+        final String aioutput = await GeminiAPI().describeImage(imgFile: File(imageFile.path), prompt: identifyInvoicePrompt);
+        print(aioutput);
+
         await fetchInvoiceData(aioutput);
       } catch (e) {
         if (await isInternetConnected()) {
