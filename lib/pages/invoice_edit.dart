@@ -445,8 +445,13 @@ class _InvoiceCaptureScreenState extends State<InvoiceCaptureScreen> {
       // Text if match with AmountRegex
       else if (amountRegex.hasMatch(i)) {
         // Set text to AmountTextController.text
-        i = i.replaceAll(RegExp(r'[^0-9.,]'), "").replaceAll(",", ".");
+        String tax = listText.elementAt(listText.indexOf(i) - 1);
+
+        i = i.replaceAll(" ", "").replaceAll(RegExp(r'[^0-9.,]'), "").replaceAll(",", ".");
+        tax = tax.replaceAll(" ", "").replaceAll(RegExp(r'[^0-9.,]'), "").replaceAll(",", ".");
+
         totalAmountTextController.text = double.parse(i).toString();
+        taxAmountTextController.text = double.parse(tax).toString();
       }
 
       if (i.toUpperCase().contains("NO")) {
