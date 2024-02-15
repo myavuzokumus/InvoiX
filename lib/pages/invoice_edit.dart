@@ -1,28 +1,34 @@
 import 'dart:async';
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:cross_file/cross_file.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
+
 import 'package:invoix/main.dart';
 import 'package:invoix/models/invoice_data.dart';
-import 'package:invoix/pages/company_list.dart';
+import 'package:invoix/utils/ai/geminiAPI.dart';
+import 'package:invoix/utils/ai/prompts.dart';
 import 'package:invoix/utils/image_filter.dart';
 import 'package:invoix/utils/text_extraction.dart';
 import 'package:invoix/widgets/date_format.dart';
 import 'package:invoix/widgets/loading_animation.dart';
 import 'package:string_similarity/string_similarity.dart';
 
+import '../pages/company_list.dart';
 import '../utils/company_name_filter.dart';
 import '../utils/image_to_text_regex.dart';
 import '../widgets/toast.dart';
 import '../widgets/warn_icon.dart';
 
 class InvoiceCaptureScreen extends StatefulWidget {
-  const InvoiceCaptureScreen(
-      {this.editIndex, required this.imageFile, super.key});
 
+  const InvoiceCaptureScreen(
+      {this.editIndex, required this.imageFile, required this.readMode, super.key});
+
+  final ReadMode readMode;
   final XFile imageFile;
   final int? editIndex;
 
@@ -353,10 +359,15 @@ class _InvoiceCaptureScreenState extends State<InvoiceCaptureScreen> {
   }
 
   Future<void> collectReadData() async {
-    await imageFilter(imageFile);
-    getInvoiceData(await getScannedText(imageFile));
 
-    await Future.delayed(const Duration(seconds: 2));
+    if( widget.readMode == ReadMode.legacy) {
+      await imageFilter(imageFile);
+      getInvoiceData(await getScannedText(imageFile));
+      await Future.delayed(const Duration(seconds: 2));
+    }
+    else if ( widget.readMode == ReadMode.ai) {
+      await GeminiAPI().describeImage(imgFile: File(imageFile.path), prompt: identifyInvoicePrompt);
+    }
 
   }
 
@@ -434,9 +445,16 @@ class _InvoiceCaptureScreenState extends State<InvoiceCaptureScreen> {
     }
   }
 
-  Future<void> fetchInvoiceData() async {
+  Future<void> fetchInvoiceData([final String? aioutput]) async {
 
-    final InvoiceData item = invoiceDataBox.getAt(editIndex!);
+    final InvoiceData item;
+
+    if (editIndex != null) {
+      item = invoiceDataBox.getAt(editIndex!);
+    }
+    else {
+      item = InvoiceData.fromJson(jsonDecode(aioutput!));
+    }
 
     companyTextController.text = item.companyName;
     invoiceNoTextController.text = item.invoiceNo;
@@ -509,7 +527,7 @@ class _InvoiceCaptureScreenState extends State<InvoiceCaptureScreen> {
       }
 
       if (mounted) {
-        showSnackBar(context,
+        toast(context,
             text: "Processing Data...", color: Colors.yellowAccent);
       }
 
@@ -527,13 +545,13 @@ class _InvoiceCaptureScreenState extends State<InvoiceCaptureScreen> {
             : await invoiceDataBox.putAt(editIndex!, data);
 
         if (mounted) {
-          showSnackBar(context,
+          toast(context,
               text: "Data Processed!", color: Colors.greenAccent);
           Navigator.pop(context);
         }
       } catch (e) {
         if (mounted) {
-          showSnackBar(context,
+          toast(context,
               text: "Something went wrong.\n"
                   "${e}",
               color: Colors.redAccent);

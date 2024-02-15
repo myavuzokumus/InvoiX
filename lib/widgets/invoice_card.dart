@@ -4,6 +4,7 @@ import 'package:cross_file/cross_file.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:invoix/models/invoice_data.dart';
+import 'package:invoix/pages/company_list.dart';
 import 'package:invoix/pages/invoice_edit.dart';
 import 'package:invoix/widgets/ai_button.dart';
 
@@ -38,6 +39,7 @@ class InvoiceCard extends StatelessWidget {
                         InvoiceCaptureScreen(
                           editIndex: index,
                           imageFile: XFile(invoiceData.ImagePath),
+                          readMode: ReadMode.legacy,
                         )));
           },
           splashColor: Colors.blue,
@@ -89,8 +91,8 @@ class InvoiceCard extends StatelessWidget {
                       ),
                     ),
                   ),
-                  const Positioned(right: 0, bottom: 0,
-                      child: AIButton()
+                  Positioned(right: 0, bottom: 0,
+                      child: AIButton(invoiceImage: File(invoiceData.ImagePath))
                   )
                 ],
               ),

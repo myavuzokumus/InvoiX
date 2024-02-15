@@ -8,6 +8,7 @@ import 'package:invoix/models/invoice_data.dart';
 import 'package:invoix/utils/company_name_filter.dart';
 import 'package:invoix/utils/export_to_excel.dart';
 import 'package:invoix/utils/image_to_text_regex.dart';
+import 'package:invoix/utils/network_check.dart';
 import 'package:invoix/widgets/loading_animation.dart';
 import 'package:invoix/widgets/warn_icon.dart';
 import 'package:path/path.dart' as path;
@@ -19,8 +20,9 @@ import '../widgets/toast.dart';
 import 'invoice_edit.dart';
 import 'invoice_list.dart';
 
-//TODO: Add Excel function to save data
 //TODO: Removing companies and invoices will be added.
+
+enum ReadMode { legacy, ai }
 
 class CompanyPage extends StatefulWidget {
   const CompanyPage({super.key});
@@ -33,11 +35,13 @@ class _CompanyPageState extends State<CompanyPage> {
   late bool _isLoading;
   late bool _excelExporting;
 
+  ReadMode? _character;
+
   @override
   void initState() {
-    // TODO: implement initState
     _isLoading = false;
     _excelExporting = false;
+    _character = ReadMode.legacy;
     super.initState();
   }
 
@@ -70,9 +74,9 @@ class _CompanyPageState extends State<CompanyPage> {
                         });
 
                         exportToExcel(listType: ListType.company)
-                          ..catchError((final Object e) => showSnackBar(context,
+                          ..catchError((final Object e) => toast(context,
                               text: e.toString(), color: Colors.redAccent))
-                          ..then((final _) => showSnackBar(context,
+                          ..then((final _) => toast(context,
                               text: "Excel output is saved in "
                                   """Download"""
                                   " file.",
@@ -82,11 +86,13 @@ class _CompanyPageState extends State<CompanyPage> {
                               }));
                       },
               ),
-            IconButton(onPressed: () {
-              showSnackBar(context,
-                  text: "Company deletion very soon!",
-                  color: Colors.redAccent);
-            }, icon: const Icon(Icons.restore_from_trash_outlined))
+              IconButton(
+                  onPressed: () {
+                    toast(context,
+                        text: "Company deletion very soon!",
+                        color: Colors.redAccent);
+                  },
+                  icon: const Icon(Icons.restore_from_trash_outlined))
             ]),
 
         //CompanyList widget is added to the body of the scaffold
@@ -101,14 +107,103 @@ class _CompanyPageState extends State<CompanyPage> {
         ]),
 
         //Invoice Capture button
-        floatingActionButton: Badge(
-          label: const Icon(Icons.add, color: Colors.white, size: 20),
-          largeSize: 28,
-          backgroundColor: Colors.red,
-          offset: const Offset(10, -10),
-          child: FloatingActionButton(
-              onPressed: getImageFromCamera,
-              child: const Icon(Icons.receipt_long, size: 46)),
+        floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
+        floatingActionButton: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Flexible(
+              child: Container(
+                decoration: const BoxDecoration(
+                  color: Color(0xff723523),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black,
+                      blurRadius: 10.0,
+                      spreadRadius: 0.5,
+                      offset: Offset(0, 0),
+                    ),
+                  ],
+                  borderRadius: BorderRadius.only(
+                    topRight: Radius.circular(20),
+                    bottomRight: Radius.circular(20),
+                  ),
+                ),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
+                    SizedBox(
+                      width: 192,
+                      child: ListTile(
+                        contentPadding: const EdgeInsets.all(0),
+                        visualDensity: const VisualDensity(vertical: -4),
+                        shape: const Border.symmetric(
+                          vertical: BorderSide.none,
+                        ),
+                        horizontalTitleGap: 0,
+                        title: const Text("Legacy Mode"),
+                        titleTextStyle: const TextStyle(fontSize: 18),
+                        leading: Radio<ReadMode>(
+                          value: ReadMode.legacy,
+                          groupValue: _character,
+                          onChanged: (final ReadMode? value) {
+                            setState(() {
+                              _character = value;
+                            });
+                          },
+                        ),
+                      ),
+                    ),
+                    SizedBox(
+                      width: 192,
+                      child: ListTile(
+                        trailing: const WarnIcon(
+                            message: "Internet connection needed."),
+                        contentPadding: const EdgeInsets.only(right: 10),
+                        visualDensity: const VisualDensity(vertical: -4),
+                        shape: const Border.symmetric(
+                          vertical: BorderSide.none,
+                        ),
+                        horizontalTitleGap: 0,
+                        title: const Text("AI Mode ✨"),
+                        titleTextStyle: const TextStyle(fontSize: 18),
+                        leading: Radio<ReadMode>(
+                          value: ReadMode.ai,
+                          groupValue: _character,
+                          onChanged: (final ReadMode? value) async {
+                            if (await isInternetConnected()) {
+                              setState(() {
+                                _character = value;
+                              });
+                            } else {
+                              toast(context,
+                                  text:
+                                  "You need to connect to the internet to use AI mode.",
+                                  color: Colors.redAccent);
+                            }
+                          },
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.only(right: 16.0),
+              child: Badge(
+                label: const Icon(Icons.add, color: Colors.white, size: 20),
+                largeSize: 28,
+                backgroundColor: Colors.red,
+                offset: const Offset(10, -10),
+                child: FloatingActionButton(
+                    onPressed: getImageFromCamera,
+                    child: const Icon(Icons.receipt_long, size: 46)),
+              ),
+            ),
+          ],
         ),
       ),
     );
@@ -121,11 +216,11 @@ class _CompanyPageState extends State<CompanyPage> {
     if (mounted) {
       if (isCameraGranted.isPermanentlyDenied) {
         unawaited(openAppSettings());
-        return showSnackBar(context,
+        return toast(context,
             text: "You need to give permission to use camera.",
             color: Colors.redAccent);
       } else if (!isCameraGranted.isGranted) {
-        return showSnackBar(context,
+        return toast(context,
             text: "You need to give permission to use camera.",
             color: Colors.redAccent);
       }
@@ -150,12 +245,12 @@ class _CompanyPageState extends State<CompanyPage> {
         unawaited(Navigator.push(
             context,
             MaterialPageRoute(
-                builder: (final context) =>
-                    InvoiceCaptureScreen(imageFile: XFile(imagePath)))));
+                builder: (final context) => InvoiceCaptureScreen(
+                    imageFile: XFile(imagePath), readMode: ReadMode.legacy))));
       }
     } catch (e) {
       if (mounted) {
-        showSnackBar(context,
+        toast(context,
             text: "Something went wrong."
                 "$e",
             color: Colors.redAccent);
@@ -267,7 +362,7 @@ class _CompanyListState extends State<CompanyList> {
                                 (final BuildContext context, final int index) {
                               final companyListName =
                                   companyList.elementAt(index).companyName;
-                        
+
                               return ListTile(
                                 title: Text(
                                   companyListName,
@@ -276,7 +371,6 @@ class _CompanyListState extends State<CompanyList> {
                                   showDialog(
                                       context: context,
                                       builder: (final BuildContext context) {
-                        
                                         return AlertDialog(
                                           title: Text(companyListName),
                                           content: Column(
@@ -287,8 +381,9 @@ class _CompanyListState extends State<CompanyList> {
                                               const SizedBox(height: 12),
                                               Form(
                                                 key: _companyNameformKey,
-                                                autovalidateMode: AutovalidateMode
-                                                    .onUserInteraction,
+                                                autovalidateMode:
+                                                    AutovalidateMode
+                                                        .onUserInteraction,
                                                 child: TextFormField(
                                                   maxLength: 50,
                                                   controller:
@@ -296,8 +391,8 @@ class _CompanyListState extends State<CompanyList> {
                                                   decoration: const InputDecoration(
                                                       labelText:
                                                           "New company name:",
-                                                      labelStyle:
-                                                          TextStyle(fontSize: 16),
+                                                      labelStyle: TextStyle(
+                                                          fontSize: 16),
                                                       hintText:
                                                           "Enter new company name",
                                                       suffixIcon: WarnIcon(
@@ -333,7 +428,8 @@ class _CompanyListState extends State<CompanyList> {
                                                           .cast<InvoiceData>()
                                                           .toList()
                                                           .indexOf(companyList
-                                                              .elementAt(index)),
+                                                              .elementAt(
+                                                                  index)),
                                                       InvoiceData(
                                                           ImagePath: companyList
                                                               .elementAt(index)
@@ -347,19 +443,22 @@ class _CompanyListState extends State<CompanyList> {
                                                           date: companyList
                                                               .elementAt(index)
                                                               .date,
-                                                          totalAmount: companyList
-                                                              .elementAt(index)
-                                                              .totalAmount,
+                                                          totalAmount:
+                                                              companyList
+                                                                  .elementAt(
+                                                                      index)
+                                                                  .totalAmount,
                                                           taxAmount: companyList
                                                               .elementAt(index)
                                                               .taxAmount));
                                                   Navigator.pop(context);
-                                                  showSnackBar(context,
+                                                  toast(context,
                                                       text:
                                                           "Company name has been changed successfully.",
-                                                      color: Colors.greenAccent);
+                                                      color:
+                                                          Colors.greenAccent);
                                                 } else {
-                                                  showSnackBar(context,
+                                                  toast(context,
                                                       text:
                                                           "Please enter a valid company name.\nNeed include 'LTD., ŞTİ., A.Ş., LLC, PLC, INC, GMBH'",
                                                       color: Colors.redAccent);
@@ -379,8 +478,10 @@ class _CompanyListState extends State<CompanyList> {
                                   Navigator.push(
                                       context,
                                       MaterialPageRoute(
-                                          builder: (final context) => InvoicePage(
-                                              companyName: companyListName)));
+                                          builder: (final context) =>
+                                              InvoicePage(
+                                                  companyName:
+                                                      companyListName)));
                                 },
                               );
                             }),
