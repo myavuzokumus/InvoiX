@@ -12,6 +12,7 @@ import 'package:invoix/models/invoice_data.dart';
 import 'package:invoix/utils/ai/geminiAPI.dart';
 import 'package:invoix/utils/ai/prompts.dart';
 import 'package:invoix/utils/image_filter.dart';
+import 'package:invoix/utils/network_check.dart';
 import 'package:invoix/utils/text_extraction.dart';
 import 'package:invoix/widgets/date_format.dart';
 import 'package:invoix/widgets/loading_animation.dart';
@@ -366,7 +367,27 @@ class _InvoiceCaptureScreenState extends State<InvoiceCaptureScreen> {
       await Future.delayed(const Duration(seconds: 2));
     }
     else if ( widget.readMode == ReadMode.ai) {
-      await GeminiAPI().describeImage(imgFile: File(imageFile.path), prompt: identifyInvoicePrompt);
+      try {
+        final String? aioutput = await GeminiAPI().describeImage(imgFile: File(imageFile.path), prompt: identifyInvoicePrompt);
+        await fetchInvoiceData(aioutput);
+      } catch (e) {
+        if (await isInternetConnected()) {
+            toast(context,
+                text: "Something went wrong.\n"
+                    "${e}\n"
+                    "Switching to Legacy Mode...",
+                color: Colors.redAccent);
+          } else {
+            toast(context,
+                text: "No Internet Connection\n"
+                    "Switching to Legacy Mode...",
+                color: Colors.redAccent);
+          }
+
+        await imageFilter(imageFile);
+        getInvoiceData(await getScannedText(imageFile));
+        await Future.delayed(const Duration(seconds: 2));
+      }
     }
 
   }
