@@ -6,8 +6,6 @@ A Flutter application that allows you to quickly read the invoices at hand, get 
 
 ### TODO:
 - Removing companies and invoices will be added.
-- VAT, Tax number, Products properties will be added.
-- Analyse invoices and take advice depending on invoices with AI. (Need more information to give AI to analyse invoices and advice.) (IN PROGRESS)
 
 ## Installation
 
@@ -18,7 +16,7 @@ flutter create invoix
 
 2. Clone the repository:
 ```
-git clone https://github.com/myavuzokumus/Invoix.git
+git clone https://github.com/myavuzokumus/InvoiX.git
 ```
 
 3. Test your changes by running the app on a physical device:
@@ -26,9 +24,14 @@ git clone https://github.com/myavuzokumus/Invoix.git
 flutter run
 ```
 
+> [!IMPORTANT]
+> You need to create `.env` file in root directory. And add that following things:
+> - GEMINI_API_KEY= ""
+
 ## Packages
 
 - [hive](https://pub.dev/packages/hive) - To save for the user’s invoices data in device’s storage.
 - [syncfusion_flutter_xlsio](https://pub.dev/packages/syncfusion_flutter_xlsio) - To export invoices data with image to .xls file.
 - [google_mlkit_text_recognition](https://pub.dev/packages/google_mlkit_text_recognition) - To read texts in image.
 - opencv - It reads the corners of the invoice and ensures that it is trimmed.
+- [shared_preferences](https://pub.dev/packages/shared_preferences) - To save the user’s settings in device’s storage. (Read Mode, AI usage cooldown time, etc.)
