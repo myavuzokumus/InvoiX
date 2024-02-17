@@ -49,9 +49,9 @@ dependencies:
   cross_file: ^0.3.3+8
   image: ^4.1.7
   downloadsfolder: ^0.1.1
-  flutter_gemini: ^2.0.1
+  google_generative_ai: ^0.2.0
   flutter_dotenv: ^5.1.0
-  shared_preferences: ^2.2.2
+  #shared_preferences: ^2.2.2
 
 dev_dependencies:
   flutter_test:
