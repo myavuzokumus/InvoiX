@@ -4,8 +4,6 @@ import 'package:invoix/models/invoice_data.dart';
 import 'package:invoix/utils/invoice_data_service.dart';
 import 'package:invoix/widgets/toast.dart';
 
-//TODO: Removing companies and invoices will be added.
-
 class GeneralPage extends StatefulWidget {
   final String title;
   final String companyName;
