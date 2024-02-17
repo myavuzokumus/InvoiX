@@ -3,13 +3,13 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:hive/hive.dart';
 import 'package:invoix/models/invoice_analysis.dart';
-import 'package:invoix/utils/ai/geminiAPI.dart';
+import 'package:invoix/utils/ai/gemini_api.dart';
 import 'package:invoix/utils/ai/prompts.dart';
 import 'package:invoix/widgets/loading_animation.dart';
 import 'package:invoix/widgets/toast.dart';
 import 'package:invoix/widgets/warn_icon.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 class AIButton extends StatelessWidget {
   const AIButton({super.key, required this.invoiceImage});
@@ -24,8 +24,8 @@ class AIButton extends StatelessWidget {
         side: const BorderSide(width: 1.5, color: Colors.orangeAccent),
       ),
       onPressed: () async {
-        final SharedPreferences prefs = await SharedPreferences.getInstance();
-        int remainingTime = prefs.getInt(invoiceImage.path) ?? 0;
+        final Box<int> box = await Hive.openBox<int>('remainingTimeBox');
+        int remainingTime = box.get(invoiceImage.path) ?? 0;
 
         if (remainingTime == 0) {
           Timer.periodic(const Duration(seconds: 1), (final t) async {
@@ -35,7 +35,7 @@ class AIButton extends StatelessWidget {
               remainingTime = 0;
               t.cancel();
             }
-            await prefs.setInt(invoiceImage.path, remainingTime);
+            await box.put(invoiceImage.path, remainingTime);
           });
 
           await showModalBottomSheet<void>(
@@ -105,9 +105,7 @@ class AIButton extends StatelessWidget {
             },
           );
         } else {
-          toast(context,
-              text:
-                  "Please wait ${30 - remainingTime} seconds before analyze the invoice again.");
+          Toast(text: "Please wait ${30 - remainingTime} seconds before analyze the invoice again.");
         }
       },
       icon: const Text("✨", style: TextStyle(fontSize: 17)),
