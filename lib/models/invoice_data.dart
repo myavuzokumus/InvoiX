@@ -1,6 +1,5 @@
 import 'package:hive_flutter/hive_flutter.dart';
-import 'package:intl/intl.dart';
-import 'package:invoix/widgets/date_format.dart';
+import 'package:invoix/utils/date_parser.dart';
 import 'package:uuid/uuid.dart';
 
 part 'invoice_data.g.dart';
@@ -34,17 +33,26 @@ class InvoiceData extends HiveObject {
       : ImagePath = json["ImagePath"] ?? "",
         companyName = json["companyName"] ?? "",
         invoiceNo = json["invoiceNo"] ?? "",
+        date = DateParser(json["date"]),
         totalAmount = double.parse(json["totalAmount"]),
-        taxAmount = double.parse(json["taxAmount"]) {
-    for (final DateFormat format in dateFormats) {
-      try {
-        date = format.parse(json['date']);
-        print('Parsed Date with format $format: $date');
-        break;
-      } catch (e) {
-        print('Failed to parse date with format $format');
-      }
-    }
+        taxAmount = double.parse(json["taxAmount"]);
+
+  InvoiceData copyWith({
+    final String? ImagePath,
+    final String? companyName,
+    final String? invoiceNo,
+    final DateTime? date,
+    final double? totalAmount,
+    final double? taxAmount,
+  }) {
+    return InvoiceData(
+      ImagePath: ImagePath ?? this.ImagePath,
+      companyName: companyName ?? this.companyName,
+      invoiceNo: invoiceNo ?? this.invoiceNo,
+      date: date ?? this.date,
+      totalAmount: totalAmount ?? this.totalAmount,
+      taxAmount: taxAmount ?? this.taxAmount,
+    );
   }
 
 }
