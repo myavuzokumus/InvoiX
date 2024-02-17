@@ -1,27 +1,41 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:flutter_gemini/flutter_gemini.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:invoix/models/invoice_data.dart';
+import 'package:invoix/pages/CompaniesPage/company_main.dart';
 
-import 'pages/company_list.dart';
 import 'theme.dart';
 
 final invoiceDataBox = Hive.box('InvoiceData');
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Hive.initFlutter();
 
-  // Register for invoice class adapter
+  await Hive.initFlutter();
   Hive.registerAdapter(InvoiceDataAdapter());
-  // Open user box
   await Hive.openBox('InvoiceData');
 
   await dotenv.load(fileName: ".env");
-  Gemini.init(apiKey: dotenv.env['GEMINI_API_KEY']!);
 
   runApp(const InvoixMain());
+
+  final Box<int> box = await Hive.openBox<int>('remainingTimeBox');
+  box.keys.forEach((key) {
+    int remainingTime = box.get(key) ?? 0;
+    if (remainingTime > 0) {
+      Timer.periodic(const Duration(seconds: 1), (final t) async {
+        remainingTime -= 1;
+
+        if (remainingTime <= 0) {
+          remainingTime = 0;
+          t.cancel();
+        }
+        await box.put(key, remainingTime);
+      });
+    }
+  });
 }
 
 class InvoixMain extends StatelessWidget {
