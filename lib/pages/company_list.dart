@@ -5,9 +5,9 @@ import 'package:edge_detection/edge_detection.dart';
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:invoix/models/invoice_data.dart';
-import 'package:invoix/utils/company_name_filter.dart';
 import 'package:invoix/utils/export_to_excel.dart';
 import 'package:invoix/utils/image_to_text_regex.dart';
+import 'package:invoix/utils/invoice_data_service.dart';
 import 'package:invoix/utils/network_check.dart';
 import 'package:invoix/widgets/loading_animation.dart';
 import 'package:invoix/widgets/warn_icon.dart';
@@ -302,27 +302,26 @@ class _CompanyListState extends State<CompanyList> {
               ),
             );
           } else {
-            return FutureBuilder<List<InvoiceData>>(
-              future: getInvoiceDataList(
-                  ListType.company, invoiceDataBox.values.cast<InvoiceData>()),
+            return FutureBuilder<List<String>>(
+              future: InvoiceDataService.getCompanyList(),
               builder: (final BuildContext context,
-                  final AsyncSnapshot<List<InvoiceData>> company) {
+                  final AsyncSnapshot<List<String>> company) {
                 if (company.hasData) {
                   // Create a list of companies with copy of company data
-                  final List<InvoiceData> companyList =
+                  final List<String> companyList =
                       List.from(company.data!);
 
                   if (filters.length == 1) {
-                    companyList.removeWhere((final InvoiceData element) =>
+                    companyList.removeWhere((final String element) =>
                         !filters.every((final e) {
-                          return element.companyName
+                          return element
                               .toUpperCase()
                               .contains(e.toUpperCase());
                         }));
                   } else if (filters.length > 1) {
                     companyList.removeWhere(
-                        (final InvoiceData element) => !filters.any((final e) {
-                              return element.companyName
+                        (final String element) => !filters.any((final e) {
+                              return element
                                   .toUpperCase()
                                   .contains(e.toUpperCase());
                             }));
@@ -363,7 +362,7 @@ class _CompanyListState extends State<CompanyList> {
                               itemBuilder:
                                   (final BuildContext context, final int index) {
                                 final companyListName =
-                                    companyList.elementAt(index).companyName;
+                                    companyList.elementAt(index);
 
                                 return ListTile(
                                   title: Text(
@@ -421,38 +420,20 @@ class _CompanyListState extends State<CompanyList> {
                                                 child: const Text("Cancel"),
                                               ),
                                               TextButton(
-                                                onPressed: () {
+                                                onPressed: () async {
                                                   if (_companyNameformKey
                                                       .currentState!
                                                       .validate()) {
-                                                    invoiceDataBox.put(
-                                                        invoiceDataBox.values
-                                                            .cast<InvoiceData>()
-                                                            .toList()
-                                                            .indexOf(companyList
-                                                                .elementAt(
-                                                                    index)),
-                                                        InvoiceData(
-                                                            ImagePath: companyList
-                                                                .elementAt(index)
-                                                                .ImagePath,
-                                                            companyName:
-                                                                companyNameTextController
-                                                                    .text,
-                                                            invoiceNo: companyList
-                                                                .elementAt(index)
-                                                                .invoiceNo,
-                                                            date: companyList
-                                                                .elementAt(index)
-                                                                .date,
-                                                            totalAmount:
-                                                                companyList
-                                                                    .elementAt(
-                                                                        index)
-                                                                    .totalAmount,
-                                                            taxAmount: companyList
-                                                                .elementAt(index)
-                                                                .taxAmount));
+
+                                                    for (final InvoiceData element in await InvoiceDataService.getInvoiceList(companyListName)) {
+                                                      await InvoiceDataService.saveInvoiceData(
+                                                          element.copyWith(
+                                                              companyName:
+                                                                  companyNameTextController
+                                                                      .text));
+
+                                                    }
+
                                                     Navigator.pop(context);
                                                     toast(context,
                                                         text:
@@ -500,9 +481,9 @@ class _CompanyListState extends State<CompanyList> {
         });
   }
 
-  List<Widget> filterList(final List<InvoiceData> company) {
+  List<Widget> filterList(final List<String> company) {
     return CompanyType.values.map((final CompanyType types) {
-      if (company.any((final InvoiceData element) => element.companyName
+      if (company.any((final String element) => element
           .toUpperCase()
           .contains(types.name.toUpperCase()))) {
         return FilterChip(
