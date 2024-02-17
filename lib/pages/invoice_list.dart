@@ -127,8 +127,7 @@ class InvoiceList extends StatelessWidget {
                           final invoiceData = invoiceList.elementAt(index);
 
                           return InvoiceCard(
-                              invoiceData: invoiceData,
-                              index: invoiceDataBox.values.cast<InvoiceData>().toList().indexOf(invoiceData)
+                              invoiceData: invoiceData
                           );
                         },
                       ),

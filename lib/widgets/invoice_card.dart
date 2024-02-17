@@ -9,11 +9,9 @@ import 'package:invoix/pages/invoice_edit.dart';
 import 'package:invoix/widgets/ai_button.dart';
 
 class InvoiceCard extends StatelessWidget {
-  InvoiceCard({super.key, required this.invoiceData, required this.index});
+  InvoiceCard({super.key, required this.invoiceData});
 
   final InvoiceData invoiceData;
-  final int index;
-
   final BorderRadius borderRadiusValue = BorderRadius.circular(16);
 
   @override
@@ -37,7 +35,6 @@ class InvoiceCard extends StatelessWidget {
                 MaterialPageRoute(
                     builder: (final context) =>
                         InvoiceCaptureScreen(
-                          editIndex: index,
                           imageFile: XFile(invoiceData.ImagePath),
                           readMode: ReadMode.legacy,
                         )));

@@ -6,7 +6,6 @@ import 'package:cross_file/cross_file.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
-
 import 'package:invoix/main.dart';
 import 'package:invoix/models/invoice_data.dart';
 import 'package:invoix/utils/ai/geminiAPI.dart';
@@ -20,19 +19,19 @@ import 'package:invoix/widgets/loading_animation.dart';
 import 'package:string_similarity/string_similarity.dart';
 
 import '../pages/company_list.dart';
-import '../utils/invoice_data_service.dart';
 import '../utils/image_to_text_regex.dart';
+import '../utils/invoice_data_service.dart';
 import '../widgets/toast.dart';
 import '../widgets/warn_icon.dart';
 
 class InvoiceCaptureScreen extends StatefulWidget {
 
   const InvoiceCaptureScreen(
-      {this.editIndex, required this.imageFile, required this.readMode, super.key});
+      {super.key, required this.imageFile, this.readMode, this.invoiceData});
 
-  final ReadMode readMode;
+  final ReadMode? readMode;
   final XFile imageFile;
-  final int? editIndex;
+  final InvoiceData? invoiceData;
 
   @override
   State<InvoiceCaptureScreen> createState() => _InvoiceCaptureScreenState();
@@ -43,7 +42,7 @@ class _InvoiceCaptureScreenState extends State<InvoiceCaptureScreen> {
   late bool _saveButtonState;
 
   late final XFile imageFile;
-  late final int? editIndex;
+  late final ReadMode? readMode;
 
   //TextLabelControllers
   late final TextEditingController companyTextController;
@@ -64,7 +63,6 @@ class _InvoiceCaptureScreenState extends State<InvoiceCaptureScreen> {
 
     _saveButtonState = true;
 
-    editIndex = widget.editIndex;
     imageFile = widget.imageFile;
 
     companyTextController = TextEditingController();
@@ -77,7 +75,7 @@ class _InvoiceCaptureScreenState extends State<InvoiceCaptureScreen> {
     _formKey = GlobalKey<FormState>();
 
     _future =
-        editIndex == null ? collectReadData() : fetchInvoiceData();
+      readMode == null ? collectReadData() : fetchInvoiceData();
 
     super.initState();
   }
@@ -161,7 +159,7 @@ class _InvoiceCaptureScreenState extends State<InvoiceCaptureScreen> {
                             FilledButton.tonal(
                               onPressed: () {
                                 setState(() {
-                                  _future = editIndex == null
+                                  _future = readMode == null
                                       ? collectReadData()
                                       : fetchInvoiceData();
                                 });
@@ -470,8 +468,8 @@ class _InvoiceCaptureScreenState extends State<InvoiceCaptureScreen> {
 
     final InvoiceData item;
 
-    if (editIndex != null) {
-      item = invoiceDataBox.getAt(editIndex!);
+    if (readMode != null) {
+      item = invoiceDataBox.get(widget.invoiceData!.id)!;
     }
     else {
       item = InvoiceData.fromJson(jsonDecode(aioutput!));
@@ -497,7 +495,7 @@ class _InvoiceCaptureScreenState extends State<InvoiceCaptureScreen> {
 
       final List<String> companyList = await InvoiceDataService.getCompanyList();
 
-      if (editIndex == null) {
+      if (readMode == null) {
         for (final companyName in companyList) {
 
           // If the company name is the same as the company name in the database, bypass to similarity check
