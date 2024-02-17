@@ -20,8 +20,8 @@ import 'package:invoix/utils/text_extraction.dart';
 import 'package:invoix/widgets/loading_animation.dart';
 import 'package:string_similarity/string_similarity.dart';
 
-import '../../utils/text_to_invoicedata_regex.dart';
 import '../../utils/invoice_data_service.dart';
+import '../../utils/text_to_invoicedata_regex.dart';
 import '../../widgets/toast.dart';
 import '../../widgets/warn_icon.dart';
 

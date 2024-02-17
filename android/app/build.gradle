@@ -26,6 +26,7 @@ android {
     namespace "games.sc_riber.invoix"
     compileSdkVersion flutter.compileSdkVersion
     ndkVersion flutter.ndkVersion
+    minSdkVersion flutter.minSdkVersion
 
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
@@ -49,6 +50,7 @@ android {
         targetSdkVersion flutter.targetSdkVersion
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName
+        manifestPlaceholders = [applicationName: "android.app.Application"]
     }
 
     buildTypes {

@@ -22,7 +22,7 @@ void main() async {
   runApp(const InvoixMain());
 
   final Box<int> box = await Hive.openBox<int>('remainingTimeBox');
-  box.keys.forEach((key) {
+  for (final key in box.keys) {
     int remainingTime = box.get(key) ?? 0;
     if (remainingTime > 0) {
       Timer.periodic(const Duration(seconds: 1), (final t) async {
@@ -35,7 +35,7 @@ void main() async {
         await box.put(key, remainingTime);
       });
     }
-  });
+  }
 }
 
 class InvoixMain extends StatelessWidget {

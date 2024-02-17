@@ -33,7 +33,7 @@ class _GeneralPageState extends State<GeneralPage> {
   List<InvoiceData> _selectedInvoices = [];
   bool _selectAll = false;
   int _listLength = 0;
-  List<String> _selectedCompanies = [];
+  final List<String> _selectedCompanies = [];
 
   late bool _excelExporting;
 
@@ -92,7 +92,7 @@ class _GeneralPageState extends State<GeneralPage> {
   void _setListLength(final int length) {
     setState(() {
       _listLength = length;
-      _selected = List<bool>.generate(_listLength, (_) => false);
+      _selected = List<bool>.generate(_listLength, (final _) => false);
     });
   }
 
@@ -132,7 +132,7 @@ class _GeneralPageState extends State<GeneralPage> {
               setState(() {
                 isSelectionMode = false;
               });
-              _selected = List<bool>.generate(_listLength, (_) => false);
+              _selected = List<bool>.generate(_listLength, (final _) => false);
             },
           )
               : const SizedBox(),

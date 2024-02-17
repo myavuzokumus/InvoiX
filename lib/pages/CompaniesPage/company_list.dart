@@ -141,7 +141,7 @@ class _CompanyListState extends State<CompanyList> {
                                       ],
                                     ),
                                   ),
-                                  confirmDismiss: (direction) async {
+                                  confirmDismiss: (final direction) async {
                                     unawaited(showDialog(
                                         context: context,
                                         builder: (final BuildContext context) {
