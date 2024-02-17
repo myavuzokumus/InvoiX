@@ -1,3 +1,4 @@
+import 'package:hive/hive.dart';
 import 'package:invoix/main.dart';
 import 'package:invoix/models/invoice_data.dart';
 
@@ -33,7 +34,10 @@ mixin InvoiceDataService {
   }
 
   static Future<void> deleteInvoiceData(final InvoiceData invoiceData) async {
+    final Box box = await Hive.openBox('invoiceDataBox');
+    await box.delete(invoiceData.ImagePath);
     await invoiceDataBox.delete(invoiceData.id);
+
   }
 
   static Future<List<InvoiceData>> getInvoiceList(final String companyName) async {

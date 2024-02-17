@@ -8,25 +8,26 @@ import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import 'package:invoix/main.dart';
 import 'package:invoix/models/invoice_data.dart';
-import 'package:invoix/utils/ai/geminiAPI.dart';
+import 'package:invoix/pages/CompaniesPage/company_list.dart';
+import 'package:invoix/pages/CompaniesPage/mode_selection.dart';
+import 'package:invoix/pages/InvoiceEditPage/date_format.dart';
+import 'package:invoix/utils/ai/gemini_api.dart';
 import 'package:invoix/utils/ai/prompts.dart';
 import 'package:invoix/utils/date_parser.dart';
 import 'package:invoix/utils/image_filter.dart';
 import 'package:invoix/utils/network_check.dart';
 import 'package:invoix/utils/text_extraction.dart';
-import 'package:invoix/widgets/date_format.dart';
 import 'package:invoix/widgets/loading_animation.dart';
 import 'package:string_similarity/string_similarity.dart';
 
-import '../pages/company_list.dart';
-import '../utils/image_to_text_regex.dart';
-import '../utils/invoice_data_service.dart';
-import '../widgets/toast.dart';
-import '../widgets/warn_icon.dart';
+import '../../utils/text_to_invoicedata_regex.dart';
+import '../../utils/invoice_data_service.dart';
+import '../../widgets/toast.dart';
+import '../../widgets/warn_icon.dart';
 
-class InvoiceCaptureScreen extends StatefulWidget {
+class InvoiceEditPage extends StatefulWidget {
 
-  const InvoiceCaptureScreen(
+  const InvoiceEditPage(
       {super.key, required this.imageFile, this.readMode, this.invoiceData});
 
   final ReadMode? readMode;
@@ -34,10 +35,10 @@ class InvoiceCaptureScreen extends StatefulWidget {
   final InvoiceData? invoiceData;
 
   @override
-  State<InvoiceCaptureScreen> createState() => _InvoiceCaptureScreenState();
+  State<InvoiceEditPage> createState() => _InvoiceEditPageState();
 }
 
-class _InvoiceCaptureScreenState extends State<InvoiceCaptureScreen> {
+class _InvoiceEditPageState extends State<InvoiceEditPage> {
 
   late bool _saveButtonState;
 
@@ -55,8 +56,6 @@ class _InvoiceCaptureScreenState extends State<InvoiceCaptureScreen> {
   late final GlobalKey<FormState> _formKey;
 
   late Future<dynamic> _future;
-
-
 
   @override
   void initState() {
@@ -369,17 +368,16 @@ class _InvoiceCaptureScreenState extends State<InvoiceCaptureScreen> {
       try {
         final String aioutput = await GeminiAPI().describeImage(imgFile: File(imageFile.path), prompt: identifyInvoicePrompt);
         print(aioutput);
-
         await fetchInvoiceData(aioutput);
       } catch (e) {
         if (await isInternetConnected()) {
-            toast(context,
+            Toast(
                 text: "Something went wrong.\n"
                     "$e\n"
                     "Switching to Legacy Mode...",
                 color: Colors.redAccent);
           } else {
-            toast(context,
+            Toast(
                 text: "No Internet Connection\n"
                     "Switching to Legacy Mode...",
                 color: Colors.redAccent);
@@ -544,8 +542,9 @@ class _InvoiceCaptureScreenState extends State<InvoiceCaptureScreen> {
       }
 
       if (mounted) {
-        toast(context,
-            text: "Processing Data...", color: Colors.yellowAccent);
+        Toast(
+            text: "Processing Data...",
+            color: Colors.yellowAccent);
       }
 
       try {
@@ -560,17 +559,17 @@ class _InvoiceCaptureScreenState extends State<InvoiceCaptureScreen> {
         await InvoiceDataService.saveInvoiceData(data);
 
         if (mounted) {
-          toast(context,
-              text: "Data Processed!", color: Colors.greenAccent);
+          Toast(
+              text: "Data Processed!",
+              color: Colors.greenAccent
+          );
           Navigator.pop(context);
         }
       } catch (e) {
-        if (mounted) {
-          toast(context,
-              text: "Something went wrong.\n"
-                  "$e",
+        if (mounted) return;
+          Toast(
+              text: "Something went wrong.\n$e",
               color: Colors.redAccent);
-        }
       } finally {
         setState(() {
           _saveButtonState = true;
