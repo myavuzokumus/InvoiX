@@ -1,14 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:invoix/utils/date_parser.dart';
 
 enum DateFormatSegment { uk, us }
-
 DateFormatSegment dateFormatView = DateFormatSegment.uk;
-
-List<DateFormat> dateFormats = [DateFormat("dd-MM-yyyy"), DateFormat("dd/MM/yyyy"), DateFormat("dd.MM.yyyy")];
-//DateFormat("MM-dd-yyyy"), DateFormat("MM/dd/yyyy"), DateFormat("MM.dd.yyyy"),
-
-DateFormat dateFormat = DateFormat("dd-MM-yyyy");
 
 class DateFormatSegmented extends StatefulWidget {
   const DateFormatSegmented({super.key, this.onChange});
