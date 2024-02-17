@@ -5,7 +5,7 @@ import 'package:downloadsfolder/downloadsfolder.dart';
 import 'package:flutter/foundation.dart';
 import 'package:invoix/main.dart';
 import 'package:invoix/models/invoice_data.dart';
-import 'package:invoix/utils/company_name_filter.dart';
+import 'package:invoix/utils/invoice_data_service.dart';
 import 'package:syncfusion_flutter_xlsio/xlsio.dart';
 
 Future<void> exportToExcel({required final ListType listType, final String? companyName}) async {
@@ -49,24 +49,21 @@ Future<void> exportToExcel({required final ListType listType, final String? comp
 
   if (listType == ListType.company) {
     // Get all companies from Hive box
-    final companies = await getInvoiceDataList(
-        ListType.company, invoiceDataBox.values.cast<InvoiceData>());
+    final companies = await InvoiceDataService.getCompanyList();
 
-    for (dynamic company in companies) {
+    for (final String companyName in companies) {
       final Worksheet sheet;
 
-      if (companies.elementAt(0) == company) {
+      if (companies.elementAt(0) == companyName) {
         sheet = workbook.worksheets[0];
-        sheet.name = company.companyName;
-        company = company.companyName;
+        sheet.name = companyName;
       }
       else {
         // Create a new worksheet for each company
-        company = company.companyName;
-        sheet = workbook.worksheets.addWithName(company);
+        sheet = workbook.worksheets.addWithName(companyName);
       }
 
-      await importInvoiceData(sheet, company, titleStyle, cellStyle);
+      await importInvoiceData(sheet, companyName, titleStyle, cellStyle);
     }
   } else if (listType == ListType.invoice) {
 
@@ -101,12 +98,11 @@ Future<void> exportToExcel({required final ListType listType, final String? comp
 
 }
 
-Future<void> importInvoiceData(final Worksheet sheet, final String company, final titleStyle, final cellStyle) async {
+Future<void> importInvoiceData(final Worksheet sheet, final String companyName, final titleStyle, final cellStyle) async {
   sheet.getRangeByName('A1:D1').cellStyle = titleStyle;
 
   // Get all invoices for the current company
-  final invoices = await getInvoiceDataList(ListType.invoice,
-      invoiceDataBox.values.cast<InvoiceData>(), company);
+  final invoices = await InvoiceDataService.getInvoiceList(companyName);
 
   // Create Excel headers
   sheet.getRangeByName('A1').setText('Invoice Number');

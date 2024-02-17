@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:invoix/models/invoice_data.dart';
-import 'package:invoix/utils/company_name_filter.dart';
+import 'package:invoix/utils/invoice_data_service.dart';
 import 'package:invoix/utils/export_to_excel.dart';
 import 'package:invoix/widgets/invoice_card.dart';
 import 'package:invoix/widgets/loading_animation.dart';
@@ -94,8 +94,7 @@ class InvoiceList extends StatelessWidget {
       builder: (final BuildContext context, final Box<dynamic> value,
           final Widget? child) {
         return FutureBuilder<List<InvoiceData>>(
-            future: getInvoiceDataList(ListType.invoice,
-                invoiceDataBox.values.cast<InvoiceData>(), companyName),
+            future: InvoiceDataService.getInvoiceList(companyName),
             builder: (final BuildContext context,
                 final AsyncSnapshot<List<InvoiceData>> invoice) {
 

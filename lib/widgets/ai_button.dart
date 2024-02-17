@@ -38,7 +38,7 @@ class AIButton extends StatelessWidget {
             await prefs.setInt(invoiceImage.path, remainingTime);
           });
 
-          showModalBottomSheet<void>(
+          await showModalBottomSheet<void>(
             showDragHandle: true,
             context: context,
             builder: (final BuildContext context) {

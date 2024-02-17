@@ -11,6 +11,7 @@ import 'package:invoix/main.dart';
 import 'package:invoix/models/invoice_data.dart';
 import 'package:invoix/utils/ai/geminiAPI.dart';
 import 'package:invoix/utils/ai/prompts.dart';
+import 'package:invoix/utils/date_parser.dart';
 import 'package:invoix/utils/image_filter.dart';
 import 'package:invoix/utils/network_check.dart';
 import 'package:invoix/utils/text_extraction.dart';
@@ -19,7 +20,7 @@ import 'package:invoix/widgets/loading_animation.dart';
 import 'package:string_similarity/string_similarity.dart';
 
 import '../pages/company_list.dart';
-import '../utils/company_name_filter.dart';
+import '../utils/invoice_data_service.dart';
 import '../utils/image_to_text_regex.dart';
 import '../widgets/toast.dart';
 import '../widgets/warn_icon.dart';
@@ -376,7 +377,7 @@ class _InvoiceCaptureScreenState extends State<InvoiceCaptureScreen> {
         if (await isInternetConnected()) {
             toast(context,
                 text: "Something went wrong.\n"
-                    "${e}\n"
+                    "$e\n"
                     "Switching to Legacy Mode...",
                 color: Colors.redAccent);
           } else {
@@ -421,17 +422,9 @@ class _InvoiceCaptureScreenState extends State<InvoiceCaptureScreen> {
 
         late final DateTime? parsedDate;
 
-        for (final DateFormat format in dateFormats) {
-          try {
-            parsedDate = format.parse(i);
-            print('Parsed Date with format $format: $parsedDate');
-            break;
-          } catch (e) {
-            print('Failed to parse date with format $format');
-          }
-        }
+        parsedDate = DateParser(i);
 
-        dateTextController.text = parsedDate != null ? dateFormat.format(parsedDate) : "";
+        dateTextController.text = dateFormat.format(parsedDate);
       }
       // If text length is 16
       else if (invoiceNoRegex.hasMatch(i)) {
@@ -502,12 +495,10 @@ class _InvoiceCaptureScreenState extends State<InvoiceCaptureScreen> {
       // If the form is valid, display a snack bar. In the real world,
       // you'd often call a server or save the information in a database.
 
-      final List<InvoiceData> companyList = await getInvoiceDataList(
-          ListType.company, invoiceDataBox.values.cast<InvoiceData>());
+      final List<String> companyList = await InvoiceDataService.getCompanyList();
 
       if (editIndex == null) {
-        for (final element in companyList) {
-          final companyName = element.companyName;
+        for (final companyName in companyList) {
 
           // If the company name is the same as the company name in the database, bypass to similarity check
           if (companyTextController.text == companyName) {
@@ -568,9 +559,7 @@ class _InvoiceCaptureScreenState extends State<InvoiceCaptureScreen> {
             totalAmount: double.parse(totalAmountTextController.text),
             taxAmount: double.parse(taxAmountTextController.text));
 
-        editIndex == null
-            ? await invoiceDataBox.add(data)
-            : await invoiceDataBox.putAt(editIndex!, data);
+        await InvoiceDataService.saveInvoiceData(data);
 
         if (mounted) {
           toast(context,
@@ -581,7 +570,7 @@ class _InvoiceCaptureScreenState extends State<InvoiceCaptureScreen> {
         if (mounted) {
           toast(context,
               text: "Something went wrong.\n"
-                  "${e}",
+                  "$e",
               color: Colors.redAccent);
         }
       } finally {

@@ -57,30 +57,3 @@ class InvoixMain extends StatelessWidget {
     );
   }
 }
-
-
-//        inputDecorationTheme: const InputDecorationTheme(
-//           labelStyle: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
-//           border: OutlineInputBorder(),
-//           isDense: true,
-//           counterStyle: TextStyle(fontSize: 0),
-//           errorStyle: TextStyle(fontSize: 0),
-//         ),
-//         textTheme: Theme.of(context).textTheme.apply(
-//               bodyColor: Colors.white,
-//               displayColor: Colors.white,
-//               decorationColor: Colors.white,
-//             ),
-//         primaryTextTheme: Theme.of(context).textTheme.apply(
-//               bodyColor: Colors.white,
-//               displayColor: Colors.white,
-//               decorationColor: Colors.white,
-//             ),
-//         appBarTheme: const AppBarTheme(
-//             titleTextStyle: TextStyle(
-//               color: Colors.white,
-//               fontSize: 28,
-//             ),
-//             iconTheme: IconThemeData(color: Colors.white)
-//         ),
-//         scaffoldBackgroundColor: Colors.black87,

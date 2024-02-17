@@ -17,10 +17,10 @@ class InvoiceAnalysis {
 
   factory InvoiceAnalysis.fromJson(final Map<String, dynamic> json) {
     return InvoiceAnalysis(
-      whichItemsBought: (json['which_items_bought'] as List?)?.map((i) => Item.fromJson(i)).toList() ?? [],
+      whichItemsBought: (json['which_items_bought'] as List?)?.map((final i) => Item.fromJson(i)).toList() ?? [],
       anyHealthProblem: json['any_health_problem'] ?? '',
       anyHabitatProblem: json['any_habitat problem'] ?? '',
-      alternatives: (json['alternatives'] as List?)?.map((i) => Alternative.fromJson(i)).toList() ?? [],
+      alternatives: (json['alternatives'] as List?)?.map((final i) => Alternative.fromJson(i)).toList() ?? [],
       consciousConsumption: json['conscious_consumption'] ?? '',
       marketResearch: json['market_research'] ?? '',
     );
