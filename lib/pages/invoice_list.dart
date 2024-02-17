@@ -6,7 +6,6 @@ import 'package:invoix/utils/export_to_excel.dart';
 import 'package:invoix/widgets/invoice_card.dart';
 import 'package:invoix/widgets/loading_animation.dart';
 
-import '../main.dart';
 import '../widgets/toast.dart';
 
 class InvoicePage extends StatefulWidget {
@@ -38,11 +37,11 @@ class _InvoicePageState extends State<InvoicePage> {
     return Scaffold(
       appBar: AppBar(
           title: Hero(
-            tag: "InvoiX",
+            tag: companyName,
             child: RichText(textAlign: TextAlign.center, text: TextSpan(
                 text: "InvoiX\n",
                 style: const TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
-                children: <TextSpan>[
+                children: [
                   TextSpan(
                       text: companyName,
                       style: const TextStyle(fontSize: 16, fontWeight: FontWeight.normal)),

@@ -51,14 +51,12 @@ class _CompanyPageState extends State<CompanyPage> {
       absorbing: _isLoading,
       child: Scaffold(
         appBar: AppBar(
-            title: Hero(
-                tag: "InvoiX",
-                child: RichText(
-                    textAlign: TextAlign.center,
-                    text: const TextSpan(
-                        text: "InvoiX",
-                        style: TextStyle(
-                            fontSize: 28, fontWeight: FontWeight.bold)))),
+            title: RichText(
+                textAlign: TextAlign.center,
+                text: const TextSpan(
+                    text: "InvoiX",
+                    style: TextStyle(
+                        fontSize: 28, fontWeight: FontWeight.bold))),
             centerTitle: true,
             actions: <Widget>[
               IconButton(
@@ -180,7 +178,7 @@ class _CompanyPageState extends State<CompanyPage> {
                             } else {
                               toast(context,
                                   text:
-                                  "You need to connect to the internet to use AI mode.",
+                                      "You need to connect to the internet to use AI mode.",
                                   color: Colors.redAccent);
                             }
                           },
@@ -308,16 +306,15 @@ class _CompanyListState extends State<CompanyList> {
                   final AsyncSnapshot<List<String>> company) {
                 if (company.hasData) {
                   // Create a list of companies with copy of company data
-                  final List<String> companyList =
-                      List.from(company.data!);
+                  final List<String> companyList = List.from(company.data!);
 
                   if (filters.length == 1) {
-                    companyList.removeWhere((final String element) =>
-                        !filters.every((final e) {
-                          return element
-                              .toUpperCase()
-                              .contains(e.toUpperCase());
-                        }));
+                    companyList.removeWhere(
+                        (final String element) => !filters.every((final e) {
+                              return element
+                                  .toUpperCase()
+                                  .contains(e.toUpperCase());
+                            }));
                   } else if (filters.length > 1) {
                     companyList.removeWhere(
                         (final String element) => !filters.any((final e) {
@@ -352,123 +349,47 @@ class _CompanyListState extends State<CompanyList> {
                           ),
                         ),
                         Flexible(
-                          child: ListView.separated(
-                              padding: const EdgeInsets.only(
-                                  left: 10, right: 10, top: 20),
-                              itemCount: companyList.length,
-                              separatorBuilder:
-                                  (final BuildContext context, final int index) =>
-                                      const Divider(),
-                              itemBuilder:
-                                  (final BuildContext context, final int index) {
-                                final companyListName =
-                                    companyList.elementAt(index);
+                            child: ListView.separated(
+                          padding: const EdgeInsets.only(
+                              left: 10, right: 10, top: 20),
+                          itemCount: companyList.length,
+                          separatorBuilder:
+                              (final BuildContext context, final int index) =>
+                                  const Divider(),
+                          itemBuilder:
+                              (final BuildContext context, final int index) {
+                            final companyListName =
+                                companyList.elementAt(index);
 
-                                return ListTile(
-                                  title: Text(
-                                    companyListName,
-                                  ),
-                                  onLongPress: () {
-                                    showDialog(
-                                        context: context,
-                                        builder: (final BuildContext context) {
-                                          return AlertDialog(
-                                            title: Text(companyListName),
-                                            content: Column(
-                                              mainAxisSize: MainAxisSize.min,
-                                              children: [
-                                                const Text(
-                                                    "What would you like to change new company name?"),
-                                                const SizedBox(height: 12),
-                                                Form(
-                                                  key: _companyNameformKey,
-                                                  autovalidateMode:
-                                                      AutovalidateMode
-                                                          .onUserInteraction,
-                                                  child: TextFormField(
-                                                    maxLength: 50,
-                                                    controller:
-                                                        companyNameTextController,
-                                                    decoration: const InputDecoration(
-                                                        labelText:
-                                                            "New company name:",
-                                                        labelStyle: TextStyle(
-                                                            fontSize: 16),
-                                                        hintText:
-                                                            "Enter new company name",
-                                                        suffixIcon: WarnIcon(
-                                                            message:
-                                                                "You must enter a valid company name.\nNeed include 'LTD., ŞTİ., A.Ş., LLC, PLC, INC, GMBH'")),
-                                                    validator: (final value) {
-                                                      if (value == null ||
-                                                          value.isEmpty ||
-                                                          !companyRegex
-                                                              .hasMatch(value)) {
-                                                        return 'Please enter some text';
-                                                      }
-                                                      return null;
-                                                    },
-                                                  ),
-                                                ),
-                                              ],
-                                            ),
-                                            actions: <Widget>[
-                                              TextButton(
-                                                onPressed: () {
-                                                  Navigator.pop(context);
-                                                },
-                                                child: const Text("Cancel"),
-                                              ),
-                                              TextButton(
-                                                onPressed: () async {
-                                                  if (_companyNameformKey
-                                                      .currentState!
-                                                      .validate()) {
-
-                                                    for (final InvoiceData element in await InvoiceDataService.getInvoiceList(companyListName)) {
-                                                      await InvoiceDataService.saveInvoiceData(
-                                                          element.copyWith(
-                                                              companyName:
-                                                                  companyNameTextController
-                                                                      .text));
-
-                                                    }
-
-                                                    Navigator.pop(context);
-                                                    toast(context,
-                                                        text:
-                                                            "Company name has been changed successfully.",
-                                                        color:
-                                                            Colors.greenAccent);
-                                                  } else {
-                                                    toast(context,
-                                                        text:
-                                                            "Please enter a valid company name.\nNeed include 'LTD., ŞTİ., A.Ş., LLC, PLC, INC, GMBH'",
-                                                        color: Colors.redAccent);
-                                                  }
-                                                },
-                                                child: const Text("Change"),
-                                              ),
-                                            ],
-                                          );
-                                        });
-                                  },
-                                  onTap: () {
-                                    if (widget.onTap != null) {
-                                      widget.onTap!(companyListName);
-                                      return;
-                                    }
-                                    Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                            builder: (final context) =>
-                                                InvoicePage(
-                                                    companyName:
-                                                        companyListName)));
-                                  },
-                                );
-                              }),
-                        ),
+                            return ListTile(
+                              title: Hero(
+                                tag: companyListName,
+                                child: Text(
+                                  companyListName,
+                                ),
+                              ),
+                              onLongPress: () {
+                                showDialog(
+                                    context: context,
+                                    builder: (final BuildContext context) {
+                                      return changeCompanyNameDialog(
+                                          companyListName);
+                                    });
+                              },
+                              onTap: () {
+                                if (widget.onTap != null) {
+                                  widget.onTap!(companyListName);
+                                  return;
+                                }
+                                Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (final context) => InvoicePage(
+                                            companyName: companyListName)));
+                              },
+                            );
+                          },
+                        )),
                       ],
                     ),
                   );
@@ -483,9 +404,8 @@ class _CompanyListState extends State<CompanyList> {
 
   List<Widget> filterList(final List<String> company) {
     return CompanyType.values.map((final CompanyType types) {
-      if (company.any((final String element) => element
-          .toUpperCase()
-          .contains(types.name.toUpperCase()))) {
+      if (company.any((final String element) =>
+          element.toUpperCase().contains(types.name.toUpperCase()))) {
         return FilterChip(
           label: Text(types.name),
           selected: filters.contains(types.name),
@@ -503,5 +423,71 @@ class _CompanyListState extends State<CompanyList> {
         return const SizedBox();
       }
     }).toList();
+  }
+
+  AlertDialog changeCompanyNameDialog(final String companyListName) {
+    return AlertDialog(
+      title: Text(companyListName),
+      content: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          const Text("What would you like to change new company name?"),
+          const SizedBox(height: 12),
+          Form(
+            key: _companyNameformKey,
+            autovalidateMode: AutovalidateMode.onUserInteraction,
+            child: TextFormField(
+              maxLength: 50,
+              controller: companyNameTextController,
+              decoration: const InputDecoration(
+                  labelText: "New company name:",
+                  labelStyle: TextStyle(fontSize: 16),
+                  hintText: "Enter new company name",
+                  suffixIcon: WarnIcon(
+                      message:
+                          "You must enter a valid company name.\nNeed include 'LTD., ŞTİ., A.Ş., LLC, PLC, INC, GMBH'")),
+              validator: (final value) {
+                if (value == null ||
+                    value.isEmpty ||
+                    !companyRegex.hasMatch(value)) {
+                  return 'Please enter some text';
+                }
+                return null;
+              },
+            ),
+          ),
+        ],
+      ),
+      actions: <Widget>[
+        TextButton(
+          onPressed: () {
+            Navigator.pop(context);
+          },
+          child: const Text("Cancel"),
+        ),
+        TextButton(
+          onPressed: () async {
+            if (_companyNameformKey.currentState!.validate()) {
+              for (final InvoiceData element
+                  in await InvoiceDataService.getInvoiceList(companyListName)) {
+                await InvoiceDataService.saveInvoiceData(element.copyWith(
+                    companyName: companyNameTextController.text));
+              }
+
+              Navigator.pop(context);
+              toast(context,
+                  text: "Company name has been changed successfully.",
+                  color: Colors.greenAccent);
+            } else {
+              toast(context,
+                  text:
+                      "Please enter a valid company name.\nNeed include 'LTD., ŞTİ., A.Ş., LLC, PLC, INC, GMBH'",
+                  color: Colors.redAccent);
+            }
+          },
+          child: const Text("Change"),
+        ),
+      ],
+    );
   }
 }
