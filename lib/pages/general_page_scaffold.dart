@@ -10,7 +10,7 @@ class GeneralPage extends StatefulWidget {
   final Widget body;
   final Function onExcelExport;
   final Function onDelete;
-  final FloatingActionButton? floatingActionButton;
+  final Widget? floatingActionButton;
 
   const GeneralPage({
     required this.title,
@@ -166,9 +166,11 @@ class _GeneralPageState extends State<GeneralPage> {
                 });
 
                 widget.onExcelExport()
-                  ..catchError((final Object e) => Toast(
-                      text: e.toString(), color: Colors.redAccent))
-                  ..then((final _) => Toast(
+                  ..catchError((final Object e) {
+                    return Toast(context,
+                      text: e.toString(), color: Colors.redAccent);
+                  })
+                  ..then((final _) => Toast(context,
                       text: "${widget.companyName}'s invoices excel output is saved in the ""Download"" file.",
                       color: Colors.green))
                   ..whenComplete(() => setState(() {
@@ -181,6 +183,7 @@ class _GeneralPageState extends State<GeneralPage> {
         ),
         body: widget.body,
         floatingActionButton: widget.floatingActionButton,
+        floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       ),
     );
   }

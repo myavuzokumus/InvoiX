@@ -279,11 +279,11 @@ class _CompanyListState extends State<CompanyList> {
               }
               if (!mounted) return;
               Navigator.pop(context);
-              Toast(
+              Toast(context,
                   text: "Company name has been changed successfully.",
                   color: Colors.greenAccent);
             } else {
-              Toast(
+              Toast(context,
                   text: "Please enter a valid company name.\nNeed include 'LTD., ŞTİ., A.Ş., LLC, PLC, INC, GMBH'",
                   color: Colors.redAccent
               );

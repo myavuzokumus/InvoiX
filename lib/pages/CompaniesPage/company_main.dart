@@ -49,12 +49,12 @@ class _CompanyPageState extends State<CompanyPage> {
       for (final InvoiceData invoiceData in selectedItems) {
         InvoiceDataService.deleteInvoiceData(invoiceData);
       }
-      Toast(
+      Toast(context,
         text: "${selectionData.selectedCompanies.length.toString()} company deleted successfully!",
         color: Colors.green,
       );
     } else {
-      Toast(
+      Toast(context,
         text: "No company selected for deletion!",
         color: Colors.redAccent,
       );
@@ -79,6 +79,25 @@ class _CompanyPageState extends State<CompanyPage> {
       ),
       onExcelExport: () => exportToExcel(listType: ListType.company),
       onDelete: () => onDelete(context),
+      floatingActionButton: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          ModeSelection(onModeChanged: handleModeChange),
+          Padding(
+            padding: const EdgeInsets.only(right: 16.0),
+            child: Badge(
+              label: const Icon(Icons.add, color: Colors.white, size: 20),
+              largeSize: 28,
+              backgroundColor: Colors.red,
+              offset: const Offset(10, -10),
+              child: FloatingActionButton(
+                  onPressed: getImageFromCamera,
+                  child: const Icon(Icons.receipt_long, size: 46)),
+            ),
+          ),
+        ],
+      ),
     );
   }
 
@@ -90,11 +109,11 @@ class _CompanyPageState extends State<CompanyPage> {
 
     if (isCameraGranted.isPermanentlyDenied) {
       unawaited(openAppSettings());
-      Toast(
+      Toast(context,
           text: "You need to give permission to use camera.",
           color: Colors.redAccent);
     } else if (!isCameraGranted.isGranted) {
-      Toast(
+      Toast(context,
           text: "You need to give permission to use camera.",
           color: Colors.redAccent);
     } else {
@@ -122,7 +141,7 @@ class _CompanyPageState extends State<CompanyPage> {
         }
       } catch (e) {
         if (mounted) {
-          Toast(
+          Toast(context,
               text: "Something went wrong."
                   "$e",
               color: Colors.redAccent);

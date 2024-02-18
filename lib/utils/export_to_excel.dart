@@ -49,6 +49,10 @@ Future<void> exportToExcel({required final ListType listType, final String? comp
     // Get all companies from Hive box
     final companies = await InvoiceDataService.getCompanyList();
 
+    if (companies.isEmpty) {
+      throw Exception('No companies found.');
+    }
+
     for (final String companyName in companies) {
       final Worksheet sheet;
 

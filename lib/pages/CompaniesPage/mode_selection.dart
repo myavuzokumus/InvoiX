@@ -34,7 +34,8 @@ class _ModeSelectionState extends State<ModeSelection> {
       });
       await box.put('isAI', _character == ReadMode.ai);
     } else {
-      Toast(text: "You need to connect to the internet to use AI mode.",
+      Toast(context,
+          text: "You need to connect to the internet to use AI mode.",
           color: Colors.redAccent);
     }
     widget.onModeChanged(_character);

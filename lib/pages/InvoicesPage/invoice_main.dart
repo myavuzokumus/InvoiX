@@ -22,12 +22,12 @@ class InvoicePage extends StatelessWidget {
       for (final InvoiceData invoiceData in selectedItems) {
         InvoiceDataService.deleteInvoiceData(invoiceData);
       }
-      Toast(
+      Toast(context,
         text: "${selectedItems.length} invoice(s) deleted successfully!",
         color: Colors.green,
       );
     } else {
-      Toast(
+      Toast(context,
         text: "No invoices selected for deletion!",
         color: Colors.redAccent,
       );

@@ -105,7 +105,8 @@ class AIButton extends StatelessWidget {
             },
           );
         } else {
-          Toast(text: "Please wait ${30 - remainingTime} seconds before analyze the invoice again.");
+          Toast(context,
+              text: "Please wait ${30 - remainingTime} seconds before analyze the invoice again.");
         }
       },
       icon: const Text("✨", style: TextStyle(fontSize: 17)),

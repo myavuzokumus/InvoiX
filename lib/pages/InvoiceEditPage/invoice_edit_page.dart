@@ -371,13 +371,13 @@ class _InvoiceEditPageState extends State<InvoiceEditPage> {
         await fetchInvoiceData(aioutput);
       } catch (e) {
         if (await isInternetConnected()) {
-            Toast(
+            Toast(context,
                 text: "Something went wrong.\n"
                     "$e\n"
                     "Switching to Legacy Mode...",
                 color: Colors.redAccent);
           } else {
-            Toast(
+            Toast(context,
                 text: "No Internet Connection\n"
                     "Switching to Legacy Mode...",
                 color: Colors.redAccent);
@@ -542,7 +542,7 @@ class _InvoiceEditPageState extends State<InvoiceEditPage> {
       }
 
       if (mounted) {
-        Toast(
+        Toast(context,
             text: "Processing Data...",
             color: Colors.yellowAccent);
       }
@@ -559,7 +559,7 @@ class _InvoiceEditPageState extends State<InvoiceEditPage> {
         await InvoiceDataService.saveInvoiceData(data);
 
         if (mounted) {
-          Toast(
+          Toast(context,
               text: "Data Processed!",
               color: Colors.greenAccent
           );
@@ -567,7 +567,7 @@ class _InvoiceEditPageState extends State<InvoiceEditPage> {
         }
       } catch (e) {
         if (mounted) return;
-          Toast(
+          Toast(context,
               text: "Something went wrong.\n$e",
               color: Colors.redAccent);
       } finally {
