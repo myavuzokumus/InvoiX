@@ -47,11 +47,20 @@ class _GeneralPageState extends State<GeneralPage> {
     if (isSelectionMode) {
       setState(() {
         _selected[index] = !_selected[index];
-        if (company != null) {
-          _selectedCompanies.add(company);
-        }
-        if (invoiceData != null) {
-          _selectedInvoices.add(invoiceData);
+        if (_selected[index]) {
+          if (company != null) {
+            _selectedCompanies.add(company);
+          }
+          if (invoiceData != null) {
+            _selectedInvoices.add(invoiceData);
+          }
+        } else {
+          if (company != null) {
+            _selectedCompanies.remove(company);
+          }
+          if (invoiceData != null) {
+            _selectedInvoices.remove(invoiceData);
+          }
         }
       });
     }
