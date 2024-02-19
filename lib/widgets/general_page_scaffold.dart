@@ -13,7 +13,7 @@ class GeneralPage extends ConsumerStatefulWidget {
   final Function onExcelExport;
   final Function onDelete;
 
-  final StateNotifierProvider<SelectionNotifier, SelectionState> selectionProvider;
+  final AutoDisposeStateNotifierProvider<SelectionNotifier, SelectionState> selectionProvider;
 
   const GeneralPage({super.key, required this.title, required this.companyName, required this.body, this.floatingActionButton, required this.onExcelExport, required this.onDelete, required this.selectionProvider});
 
@@ -54,19 +54,14 @@ class _GeneralPageState extends ConsumerState<GeneralPage> {
           ),
         ),
         centerTitle: true,
-        leading: selectionState.isSelectionMode
-            ? IconButton(
-                icon: const Icon(Icons.close),
-                onPressed: () => ref.read(widget.selectionProvider.notifier).toggleSelectionMode())
-            : const SizedBox(),
         actions: <Widget>[
           if (selectionState.isSelectionMode) ...[
             IconButton(
-              onPressed: widget.onDelete(),
+              onPressed: () {widget.onDelete();},
               icon: const Icon(Icons.restore_from_trash_outlined),
             ),
             Checkbox(
-              value: !selectionState.selectAll,
+              value: selectionState.selectAll,
               onChanged: (final bool? x) => ref.read(widget.selectionProvider.notifier).toggleSelectAll(),
             )
           ]
@@ -82,7 +77,6 @@ class _GeneralPageState extends ConsumerState<GeneralPage> {
                       setState(() {
                         _excelExporting = true;
                       });
-
                       widget.onExcelExport()
                         ..catchError((final Object e) {
                           return Toast(context,

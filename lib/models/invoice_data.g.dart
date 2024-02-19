@@ -11,7 +11,7 @@ class InvoiceDataAdapter extends TypeAdapter<InvoiceData> {
   final int typeId = 0;
 
   @override
-  InvoiceData read(final BinaryReader reader) {
+  InvoiceData read(BinaryReader reader) {
     final numOfFields = reader.readByte();
     final fields = <int, dynamic>{
       for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
@@ -27,7 +27,7 @@ class InvoiceDataAdapter extends TypeAdapter<InvoiceData> {
   }
 
   @override
-  void write(final BinaryWriter writer, final InvoiceData obj) {
+  void write(BinaryWriter writer, InvoiceData obj) {
     writer
       ..writeByte(7)
       ..writeByte(0)
@@ -50,7 +50,7 @@ class InvoiceDataAdapter extends TypeAdapter<InvoiceData> {
   int get hashCode => typeId.hashCode;
 
   @override
-  bool operator ==(final Object other) =>
+  bool operator ==(Object other) =>
       identical(this, other) ||
       other is InvoiceDataAdapter &&
           runtimeType == other.runtimeType &&

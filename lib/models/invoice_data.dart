@@ -9,7 +9,7 @@ class InvoiceData extends HiveObject {
   @HiveField(0)
   final String ImagePath;
   @HiveField(1)
-  final String id = const Uuid().toString();
+  final String id = const Uuid().v4();
   @HiveField(2)
   final String companyName;
   @HiveField(3)

@@ -27,14 +27,17 @@ class CompanyPage extends ConsumerStatefulWidget {
 }
 
 class _CompanyPageState extends ConsumerState<CompanyPage> {
+
   late bool _isLoading;
   late ReadMode readMode;
 
   @override
   void initState() {
-    super.initState();
+
     _isLoading = false;
     initializeModeData();
+
+    super.initState();
   }
 
   Future<void> initializeModeData() async {
@@ -53,6 +56,8 @@ class _CompanyPageState extends ConsumerState<CompanyPage> {
     final selectionState = ref.read(companySelectionProvider);
 
     final selectedItems = selectionState.selectedInvoices;
+
+    print(selectedItems);
 
     if (selectedItems.isNotEmpty) {
       for (final InvoiceData invoiceData in selectedItems) {
@@ -73,41 +78,51 @@ class _CompanyPageState extends ConsumerState<CompanyPage> {
   @override
   Widget build(final BuildContext context) {
 
-    return GeneralPage(
-      selectionProvider: companySelectionProvider,
-      title: "InvoiX",
-      companyName: "",
-      body: Stack(
-        children: [
-          CompanyList(),
-          if (_isLoading)
-            Container(
-                height: double.infinity,
-                width: double.infinity,
-                color: Colors.black38,
-                child: const Center(child: LoadingAnimation()))
-        ],
-      ),
-      onExcelExport: () => exportToExcel(listType: ListType.company),
-      onDelete: () => onDelete(context),
-      floatingActionButton: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          ModeSelection(onModeChanged: handleModeChange),
-          Padding(
-            padding: const EdgeInsets.only(right: 16.0),
-            child: Badge(
-              label: const Icon(Icons.add, color: Colors.white, size: 20),
-              largeSize: 28,
-              backgroundColor: Colors.red,
-              offset: const Offset(10, -10),
-              child: FloatingActionButton(
-                  onPressed: getImageFromCamera,
-                  child: const Icon(Icons.receipt_long, size: 46)),
+    final selectionState = ref.watch(companySelectionProvider);
+
+    return PopScope(
+      canPop: !selectionState.isSelectionMode,
+      onPopInvoked: (final bool bool) {
+        if (selectionState.isSelectionMode) {
+          ref.read(companySelectionProvider.notifier).toggleSelectionMode();
+        }
+      },
+      child: GeneralPage(
+        selectionProvider: companySelectionProvider,
+        title: "InvoiX",
+        companyName: "",
+        body: Stack(
+          children: [
+            const CompanyList(),
+            if (_isLoading)
+              Container(
+                  height: double.infinity,
+                  width: double.infinity,
+                  color: Colors.black38,
+                  child: const Center(child: LoadingAnimation()))
+          ],
+        ),
+        onExcelExport: () => exportToExcel(listType: ListType.company),
+        onDelete: () => onDelete(context),
+        floatingActionButton: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            ModeSelection(onModeChanged: handleModeChange),
+            Padding(
+              padding: const EdgeInsets.only(right: 16.0),
+              child: Badge(
+                label: const Icon(Icons.add, color: Colors.white, size: 20),
+                largeSize: 28,
+                backgroundColor: Colors.red,
+                offset: const Offset(10, -10),
+                child: FloatingActionButton(
+                    onPressed: getImageFromCamera,
+                    child: const Icon(Icons.receipt_long, size: 46)),
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -143,7 +158,6 @@ class _CompanyPageState extends ConsumerState<CompanyPage> {
             androidScanTitle: 'Scanning',
             androidCropTitle: 'Crop');
 
-        print(readMode);
         if (mounted && success) {
           unawaited(Navigator.push(
               context,

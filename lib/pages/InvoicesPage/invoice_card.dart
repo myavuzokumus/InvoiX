@@ -5,7 +5,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:invoix/models/invoice_data.dart';
-import 'package:invoix/pages/CompaniesPage/mode_selection.dart';
 import 'package:invoix/pages/InvoiceEditPage/invoice_edit_page.dart';
 import 'package:invoix/pages/InvoicesPage/ai_button.dart';
 import 'package:invoix/pages/SelectionState.dart';
@@ -49,15 +48,13 @@ class _InvoiceCardState extends ConsumerState<InvoiceCard> {
         child: InkWell(
           onLongPress: () {
             if (!selectionState.isSelectionMode) {
-              setState(() {
-                ref.read(invoiceSelectionProvider).selectedItems[index] = true;
-              });
               ref.read(invoiceSelectionProvider.notifier).toggleSelectionMode();
+              ref.read(invoiceSelectionProvider.notifier).toggleItemSelection(index: index, invoiceData: widget.invoiceData);
             }
           },
           onTap: () {
             selectionState.isSelectionMode
-                ? ref.read(invoiceSelectionProvider.notifier).selectionItemToggle(index: index, invoiceData: widget.invoiceData)
+                ? ref.read(invoiceSelectionProvider.notifier).toggleItemSelection(index: index, invoiceData: widget.invoiceData)
                     :
             Navigator.push(
                 context,
@@ -125,7 +122,7 @@ class _InvoiceCardState extends ConsumerState<InvoiceCard> {
                       right: 0,
                       top: 0,
                       child: Checkbox(
-                          onChanged: (final bool? x) => ref.read(invoiceSelectionProvider.notifier).selectionItemToggle(index: index, invoiceData: widget.invoiceData),
+                          onChanged: (final bool? x) => ref.read(invoiceSelectionProvider.notifier).toggleItemSelection(index: index, invoiceData: widget.invoiceData),
                           value: selectionState.selectedItems[index])
                     )
                 ],

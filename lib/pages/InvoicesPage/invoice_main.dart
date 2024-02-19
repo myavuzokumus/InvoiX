@@ -45,7 +45,7 @@ class InvoicePage extends ConsumerWidget {
       companyName: companyName,
       body: InvoiceList(companyName: companyName),
       onExcelExport: () => exportToExcel(companyName: companyName, listType: ListType.invoice),
-      onDelete: () => onDelete(context, selectionData),
+      onDelete: () {},
     );
   }
 }

@@ -27,7 +27,7 @@ class InvoiceList extends ConsumerWidget {
               if (invoice.hasData) {
 
                 final List<InvoiceData> invoiceList = List.from(invoice.data!);
-                ref.read(invoiceSelectionProvider.notifier).setListLength(invoiceList.length);
+                ref.read(invoiceSelectionProvider).listLength = invoiceList.length;
 
                 return Column(
                   children: [

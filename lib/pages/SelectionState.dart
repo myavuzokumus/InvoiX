@@ -23,15 +23,18 @@ class SelectionState {
 class SelectionNotifier extends StateNotifier<SelectionState> {
   SelectionNotifier() : super(SelectionState(false, false, 0, [], [], []));
 
-  void selectionItemToggle({
+  void toggleItemSelection({
     required final int index,
     final String? company,
     final InvoiceData? invoiceData,
   }) {
     if (state.isSelectionMode) {
+
       state.selectedItems[index] = !state.selectedItems[index];
+
       if (state.selectedItems[index]) {
         if (company != null) {
+          print("eeee");
           state.selectedCompanies.add(company);
         }
         if (invoiceData != null) {
@@ -46,25 +49,61 @@ class SelectionNotifier extends StateNotifier<SelectionState> {
         }
       }
     }
+
+    if (state.selectedItems.every((final element) => element == true)) {
+      state.selectAll = true;
+    }
+    else {
+      state.selectAll = false;
+    }
+
+    // Update the state with the new list
+    state = SelectionState(
+      state.isSelectionMode,
+      state.selectAll,
+      state.listLength,
+      state.selectedItems,
+      state.selectedInvoices,
+      state.selectedCompanies,
+    );
+
   }
 
+
+  //You must set the list length before calling this function
   void toggleSelectionMode() {
+
     state.isSelectionMode = !state.isSelectionMode;
+
     if (!state.isSelectionMode) {
       state.selectedInvoices.clear();
       state.selectedCompanies.clear();
       state.selectedItems.clear();
     }
+    else {
+      state.selectedItems = List<bool>.filled(state.listLength, false, growable: true);
+    }
+
+    state = SelectionState(
+      state.isSelectionMode,
+      state.selectAll,
+      state.listLength,
+      state.selectedItems,
+      state.selectedInvoices,
+      state.selectedCompanies,
+    );
+
   }
 
   Future<void> toggleSelectAll() async {
+
     state.selectAll = !state.selectAll;
 
     if (state.selectAll) {
       if (state.selectedCompanies.length == 1) {
-        state.selectedInvoices =
-        await InvoiceDataService.getInvoiceList(state.selectedCompanies[0]);
+        state.selectedInvoices = await InvoiceDataService.getInvoiceList(state.selectedCompanies[0]);
       } else {
+        state.selectedInvoices.clear();
         for (final String company in state.selectedCompanies) {
           state.selectedInvoices = [
             ...state.selectedInvoices,
@@ -75,15 +114,20 @@ class SelectionNotifier extends StateNotifier<SelectionState> {
     } else {
       state.selectedInvoices = [];
     }
-    state.selectedItems = List<bool>.filled(state.listLength, state.selectAll);
+    state.selectedItems = List<bool>.filled(state.listLength, state.selectAll, growable: true);
+
+    state = SelectionState(
+      state.isSelectionMode,
+      state.selectAll,
+      state.listLength,
+      state.selectedItems,
+      state.selectedInvoices,
+      state.selectedCompanies,
+    );
   }
 
-  void setListLength(final int length) {
-    state.listLength = length;
-    state.selectedItems = List<bool>.generate(state.listLength, (final _) => false);
-  }
 }
 
-final companySelectionProvider = StateNotifierProvider<SelectionNotifier, SelectionState>((ref) => SelectionNotifier());
+final companySelectionProvider = StateNotifierProvider.autoDispose<SelectionNotifier, SelectionState>((final ref) => SelectionNotifier());
 
-final invoiceSelectionProvider = StateNotifierProvider<SelectionNotifier, SelectionState>((ref) => SelectionNotifier());
+final invoiceSelectionProvider = StateNotifierProvider.autoDispose<SelectionNotifier, SelectionState>((final ref) => SelectionNotifier());

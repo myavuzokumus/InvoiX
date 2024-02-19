@@ -46,6 +46,7 @@ class _CompanyListState extends ConsumerState<CompanyList> {
   Widget build(final BuildContext context) {
 
     final selectionState = ref.watch(companySelectionProvider);
+
     return ValueListenableBuilder<Box>(
         valueListenable: Hive.box('InvoiceData').listenable(),
         builder: (final BuildContext context, final Box<dynamic> value,
@@ -67,7 +68,7 @@ class _CompanyListState extends ConsumerState<CompanyList> {
                 if (company.hasData) {
                   // Create a list of companies with copy of company data
                   final List<String> companyList = List.from(company.data!);
-                  ref.read(companySelectionProvider.notifier).setListLength(companyList.length);
+                  ref.read(companySelectionProvider).listLength = companyList.length;
 
                   if (filters.length == 1) {
                     companyList.removeWhere(
@@ -156,10 +157,8 @@ class _CompanyListState extends ConsumerState<CompanyList> {
                                     ),
                                     onLongPress: () {
                                       if (!selectionState.isSelectionMode) {
-                                        setState(() {
-                                          ref.read(companySelectionProvider).selectedItems[index] = true;
-                                        });
                                         ref.read(companySelectionProvider.notifier).toggleSelectionMode();
+                                        ref.read(companySelectionProvider.notifier).toggleItemSelection(index: index, company: companyListName);
                                       }
                                     },
                                     onTap: () {
@@ -168,7 +167,7 @@ class _CompanyListState extends ConsumerState<CompanyList> {
                                         return;
                                       }
                                       else if (selectionState.isSelectionMode) {
-                                        ref.read(companySelectionProvider.notifier).selectionItemToggle(index: index, company: companyListName);
+                                        ref.read(companySelectionProvider.notifier).toggleItemSelection(index: index, company: companyListName);
                                         ref.read(companySelectionProvider).selectedCompanies.add(companyListName);
                                       }
                                       else {
@@ -181,7 +180,7 @@ class _CompanyListState extends ConsumerState<CompanyList> {
                                     },
                                     trailing: selectionState.isSelectionMode
                                         ? Checkbox(
-                                        onChanged: (final bool? x) => ref.read(companySelectionProvider.notifier).selectionItemToggle(index: index, company: companyListName),
+                                        onChanged: (final bool? x) => ref.read(companySelectionProvider.notifier).toggleItemSelection(index: index, company: companyListName),
                                         value: selectionState.selectedItems[index])
                                         : const SizedBox.shrink(),
                                   ),
