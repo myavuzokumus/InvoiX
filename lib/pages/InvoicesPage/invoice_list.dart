@@ -1,40 +1,33 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:invoix/models/invoice_data.dart';
 import 'package:invoix/pages/InvoicesPage/invoice_card.dart';
-import 'package:invoix/pages/general_page_scaffold.dart';
+import 'package:invoix/pages/SelectionState.dart';
 import 'package:invoix/utils/invoice_data_service.dart';
 import 'package:invoix/widgets/loading_animation.dart';
 
-class InvoiceList extends StatefulWidget {
+class InvoiceList extends ConsumerWidget {
   const InvoiceList({super.key, required this.companyName});
 
   final String companyName;
 
   @override
-  State<InvoiceList> createState() => _InvoiceListState();
-}
-
-class _InvoiceListState extends State<InvoiceList> {
-
-  @override
-  Widget build(final BuildContext context) {
-
-    final selectionData = SelectionData.of(context);
+  Widget build(final BuildContext context, final WidgetRef ref) {
 
     return ValueListenableBuilder<Box>(
       valueListenable: Hive.box('InvoiceData').listenable(),
       builder: (final BuildContext context, final Box<dynamic> value,
           final Widget? child) {
         return FutureBuilder<List<InvoiceData>>(
-            future: InvoiceDataService.getInvoiceList(widget.companyName),
+            future: InvoiceDataService.getInvoiceList(companyName),
             builder: (final BuildContext context,
                 final AsyncSnapshot<List<InvoiceData>> invoice) {
 
               if (invoice.hasData) {
 
                 final List<InvoiceData> invoiceList = List.from(invoice.data!);
-                selectionData.setListLength(invoiceList.length);
+                ref.read(invoiceSelectionProvider.notifier).setListLength(invoiceList.length);
 
                 return Column(
                   children: [

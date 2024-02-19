@@ -1,11 +1,12 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:invoix/main.dart';
 import 'package:invoix/models/invoice_data.dart';
 import 'package:invoix/pages/InvoicesPage/invoice_main.dart';
-import 'package:invoix/pages/general_page_scaffold.dart';
+import 'package:invoix/pages/SelectionState.dart';
 import 'package:invoix/utils/invoice_data_service.dart';
 import 'package:invoix/utils/text_to_invoicedata_regex.dart';
 import 'package:invoix/widgets/loading_animation.dart';
@@ -13,16 +14,16 @@ import 'package:invoix/widgets/toast.dart';
 import 'package:invoix/widgets/warn_icon.dart';
 
 // Return list of companies
-class CompanyList extends StatefulWidget {
+class CompanyList extends ConsumerStatefulWidget {
   const CompanyList({super.key, this.onTap});
 
   final Function(String)? onTap;
 
   @override
-  State<CompanyList> createState() => _CompanyListState();
+  ConsumerState<CompanyList> createState() => _CompanyListState();
 }
 
-class _CompanyListState extends State<CompanyList> {
+class _CompanyListState extends ConsumerState<CompanyList> {
   late Set<String> filters;
   late final TextEditingController companyNameTextController;
   late final GlobalKey<FormState> _companyNameformKey;
@@ -44,8 +45,7 @@ class _CompanyListState extends State<CompanyList> {
   @override
   Widget build(final BuildContext context) {
 
-    final selectionData = SelectionData.of(context);
-
+    final selectionState = ref.watch(companySelectionProvider);
     return ValueListenableBuilder<Box>(
         valueListenable: Hive.box('InvoiceData').listenable(),
         builder: (final BuildContext context, final Box<dynamic> value,
@@ -67,7 +67,7 @@ class _CompanyListState extends State<CompanyList> {
                 if (company.hasData) {
                   // Create a list of companies with copy of company data
                   final List<String> companyList = List.from(company.data!);
-                  selectionData.setListLength(companyList.length);
+                  ref.read(companySelectionProvider.notifier).setListLength(companyList.length);
 
                   if (filters.length == 1) {
                     companyList.removeWhere(
@@ -158,11 +158,11 @@ class _CompanyListState extends State<CompanyList> {
                                       ),
                                     ),
                                     onLongPress: () {
-                                      if (!selectionData.isSelectionMode) {
+                                      if (!selectionState.isSelectionMode) {
                                         setState(() {
-                                          selectionData.selectedList[index] = true;
+                                          ref.read(companySelectionProvider).selectedItems[index] = true;
                                         });
-                                        selectionData.onSelectionChange(true);
+                                        ref.read(companySelectionProvider.notifier).toggleSelectionMode();
                                       }
                                     },
                                     onTap: () {
@@ -170,9 +170,9 @@ class _CompanyListState extends State<CompanyList> {
                                         widget.onTap!(companyListName);
                                         return;
                                       }
-                                      else if (selectionData.isSelectionMode) {
-                                        selectionData.selectionToggle(index: index, company: companyListName);
-                                        selectionData.selectedCompanies.add(companyListName);
+                                      else if (selectionState.isSelectionMode) {
+                                        ref.read(companySelectionProvider.notifier).selectionItemToggle(index: index, company: companyListName);
+                                        ref.read(companySelectionProvider).selectedCompanies.add(companyListName);
                                       }
                                       else {
                                         Navigator.push(
@@ -182,13 +182,10 @@ class _CompanyListState extends State<CompanyList> {
                                                     companyName: companyListName)));
                                       }
                                     },
-                                    trailing: selectionData.isSelectionMode
+                                    trailing: selectionState.isSelectionMode
                                         ? Checkbox(
-                                        onChanged: (final bool? x) {
-                                          selectionData.selectionToggle(index: index, company: companyListName);
-                                          selectionData.selectedCompanies.add(companyListName);
-                                        },
-                                        value: selectionData.selectedList[index])
+                                        onChanged: (final bool? x) => ref.read(companySelectionProvider.notifier).selectionItemToggle(index: index, company: companyListName),
+                                        value: selectionState.selectedItems[index])
                                         : const SizedBox.shrink(),
                                   ),
                                 );

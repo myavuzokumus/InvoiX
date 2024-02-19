@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:invoix/models/invoice_data.dart';
 import 'package:invoix/pages/CompaniesPage/company_main.dart';
@@ -19,7 +20,7 @@ void main() async {
 
   await dotenv.load(fileName: ".env");
 
-  runApp(const InvoixMain());
+  runApp(const ProviderScope(child: InvoixMain()));
 
   final Box<int> box = await Hive.openBox<int>('remainingTimeBox');
   for (final key in box.keys) {

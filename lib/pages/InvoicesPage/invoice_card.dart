@@ -2,30 +2,37 @@ import 'dart:io';
 
 import 'package:cross_file/cross_file.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:invoix/models/invoice_data.dart';
 import 'package:invoix/pages/CompaniesPage/mode_selection.dart';
 import 'package:invoix/pages/InvoiceEditPage/invoice_edit_page.dart';
 import 'package:invoix/pages/InvoicesPage/ai_button.dart';
-import 'package:invoix/pages/general_page_scaffold.dart';
+import 'package:invoix/pages/SelectionState.dart';
 
-class InvoiceCard extends StatefulWidget {
+class InvoiceCard extends ConsumerStatefulWidget {
   const InvoiceCard({super.key, required this.invoiceData, required this.index});
 
   final int index;
   final InvoiceData invoiceData;
 
   @override
-  State<InvoiceCard> createState() => _InvoiceCardState();
+  ConsumerState<InvoiceCard> createState() => _InvoiceCardState();
 }
 
-class _InvoiceCardState extends State<InvoiceCard> {
+class _InvoiceCardState extends ConsumerState<InvoiceCard> {
 
   final BorderRadius borderRadiusValue = BorderRadius.circular(16);
 
   @override
+  void initState() {
+    super.initState();
+  }
+
+  @override
   Widget build(final BuildContext context) {
-    final selectionData = SelectionData.of(context);
+    final selectionState = ref.watch(invoiceSelectionProvider);
+
     final int index = widget.index;
     return Container(
       decoration: BoxDecoration(
@@ -41,24 +48,24 @@ class _InvoiceCardState extends State<InvoiceCard> {
         type: MaterialType.transparency,
         child: InkWell(
           onLongPress: () {
-            if (!selectionData.isSelectionMode) {
+            if (!selectionState.isSelectionMode) {
               setState(() {
-                selectionData.selectedList[index] = true;
+                ref.read(invoiceSelectionProvider).selectedItems[index] = true;
               });
-              selectionData.onSelectionChange(true);
+              ref.read(invoiceSelectionProvider.notifier).toggleSelectionMode();
             }
           },
           onTap: () {
-            selectionData.isSelectionMode
-                ? selectionData.selectionToggle(index: index, invoiceData: widget.invoiceData)
-                :
+            selectionState.isSelectionMode
+                ? ref.read(invoiceSelectionProvider.notifier).selectionItemToggle(index: index, invoiceData: widget.invoiceData)
+                    :
             Navigator.push(
                 context,
                 MaterialPageRoute(
                     builder: (final context) =>
                         InvoiceEditPage(
                           imageFile: XFile(widget.invoiceData.ImagePath),
-                          readMode: ReadMode.legacy,
+                              invoiceData: widget.invoiceData,
                         )));
           },
           splashColor: Colors.blue,
@@ -113,15 +120,13 @@ class _InvoiceCardState extends State<InvoiceCard> {
                   Positioned(right: 0, bottom: 0,
                       child: AIButton(invoiceImage: File(widget.invoiceData.ImagePath))
                   ),
-                  if (selectionData.isSelectionMode)
+                  if (selectionState.isSelectionMode)
                     Positioned(
                       right: 0,
                       top: 0,
                       child: Checkbox(
-                          onChanged: (final bool? x) {
-                            selectionData.selectionToggle(index: index, invoiceData: widget.invoiceData);
-                          },
-                          value: selectionData.selectedList[index]),
+                          onChanged: (final bool? x) => ref.read(invoiceSelectionProvider.notifier).selectionItemToggle(index: index, invoiceData: widget.invoiceData),
+                          value: selectionState.selectedItems[index])
                     )
                 ],
               ),
