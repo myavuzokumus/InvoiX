@@ -151,11 +151,8 @@ class _CompanyListState extends ConsumerState<CompanyList> {
                                     return false; // Kaydırma işlemi sonrasında widget'ın kaybolmamasını sağlar
                                   },
                                   child: ListTile(
-                                    title: Hero(
-                                      tag: companyListName,
-                                      child: Text(
-                                        companyListName,
-                                      ),
+                                    title: Text(
+                                      companyListName,
                                     ),
                                     onLongPress: () {
                                       if (!selectionState.isSelectionMode) {

@@ -38,22 +38,19 @@ class _GeneralPageState extends ConsumerState<GeneralPage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Hero(
-          tag: widget.companyName,
-          child: RichText(
-            textAlign: TextAlign.center,
-            text: TextSpan(
-              text: widget.title,
-              style:
-                  const TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
-              children: [
-                TextSpan(
-                  text: widget.companyName,
-                  style: const TextStyle(
-                      fontSize: 16, fontWeight: FontWeight.normal),
-                ),
-              ],
-            ),
+        title: RichText(
+          textAlign: TextAlign.center,
+          text: TextSpan(
+            text: widget.title,
+            style:
+                const TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
+            children: [
+              TextSpan(
+                text: widget.companyName,
+                style: const TextStyle(
+                    fontSize: 16, fontWeight: FontWeight.normal),
+              ),
+            ],
           ),
         ),
         centerTitle: true,
