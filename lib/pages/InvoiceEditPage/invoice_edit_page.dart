@@ -63,6 +63,7 @@ class _InvoiceEditPageState extends State<InvoiceEditPage> {
     _saveButtonState = true;
 
     imageFile = widget.imageFile;
+    readMode = widget.readMode;
 
     companyTextController = TextEditingController();
     invoiceNoTextController = TextEditingController();
@@ -73,8 +74,7 @@ class _InvoiceEditPageState extends State<InvoiceEditPage> {
     _scaffoldKey = GlobalKey<ScaffoldState>();
     _formKey = GlobalKey<FormState>();
 
-    _future =
-      readMode == null ? collectReadData() : fetchInvoiceData();
+    _future = readMode != null ? collectReadData() : fetchInvoiceData();
 
     super.initState();
   }
@@ -158,7 +158,7 @@ class _InvoiceEditPageState extends State<InvoiceEditPage> {
                             FilledButton.tonal(
                               onPressed: () {
                                 setState(() {
-                                  _future = readMode == null
+                                  _future = readMode != null
                                       ? collectReadData()
                                       : fetchInvoiceData();
                                 });
@@ -237,6 +237,13 @@ class _InvoiceEditPageState extends State<InvoiceEditPage> {
                                         suffixIcon: WarnIcon(
                                             message:
                                             "You must enter a valid invoice no.")),
+                                    validator: (final value) {
+                                      if (value == null ||
+                                          value.isEmpty) {
+                                        return 'Please enter some text';
+                                      }
+                                      return null;
+                                    },
                                   ),
                                   TextFormField(
                                     maxLength: 50,
@@ -466,8 +473,8 @@ class _InvoiceEditPageState extends State<InvoiceEditPage> {
 
     final InvoiceData item;
 
-    if (readMode != null) {
-      item = invoiceDataBox.get(widget.invoiceData!.id)!;
+    if (readMode == null) {
+      item = invoiceDataBox.get(widget.invoiceData!.id);
     }
     else {
       item = InvoiceData.fromJson(jsonDecode(aioutput!));
