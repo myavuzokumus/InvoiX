@@ -1,11 +1,13 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:invoix/pages/SelectionState.dart';
+import 'package:invoix/utils/invoice_data_service.dart';
 import 'package:invoix/widgets/toast.dart';
 
 class GeneralPage extends ConsumerStatefulWidget {
   final String title;
-  final String companyName;
+  final String? companyName;
 
   final Widget body;
   final Widget? floatingActionButton;
@@ -15,7 +17,7 @@ class GeneralPage extends ConsumerStatefulWidget {
 
   final AutoDisposeStateNotifierProvider<SelectionNotifier, SelectionState> selectionProvider;
 
-  const GeneralPage({super.key, required this.title, required this.companyName, required this.body, this.floatingActionButton, required this.onExcelExport, required this.onDelete, required this.selectionProvider});
+  const GeneralPage({super.key, required this.title, this.companyName, required this.body, this.floatingActionButton, required this.onExcelExport, required this.onDelete, required this.selectionProvider});
 
   @override
   ConsumerState<GeneralPage> createState() => _GeneralPageState();
@@ -23,12 +25,14 @@ class GeneralPage extends ConsumerStatefulWidget {
 
 class _GeneralPageState extends ConsumerState<GeneralPage> {
 
-  late bool _excelExporting;
+  final ValueNotifier<bool> _excelExportingNotifier = ValueNotifier(false);
+  final ValueNotifier<bool> _deleteProcessingNotifier = ValueNotifier(false);
 
   @override
   void initState() {
     super.initState();
-    _excelExporting = false;
+    _excelExportingNotifier.value = false;
+    _deleteProcessingNotifier.value = false;
   }
 
   @override
@@ -56,43 +60,54 @@ class _GeneralPageState extends ConsumerState<GeneralPage> {
         centerTitle: true,
         actions: <Widget>[
           if (selectionState.isSelectionMode) ...[
-            IconButton(
-              onPressed: () {widget.onDelete();},
-              icon: const Icon(Icons.restore_from_trash_outlined),
+            ValueListenableBuilder(
+              valueListenable: _deleteProcessingNotifier,
+              builder: (final BuildContext context, final value, final Widget? child) {
+                return IconButton(
+                icon: value
+                    ? const CircularProgressIndicator()
+                    : const Icon(Icons.restore_from_trash_outlined),
+                tooltip: "Export all data to Excel",
+                onPressed: value
+                    ? null
+                    : () {
+                  _deleteProcessingNotifier.value = true;
+                  widget.onDelete().whenComplete(() => _deleteProcessingNotifier.value = false);
+                },
+              ); },
             ),
             Checkbox(
               value: selectionState.selectAll,
-              onChanged: (final bool? x) => ref.read(widget.selectionProvider.notifier).toggleSelectAll(),
+              onChanged: (final bool? x) => ref.read(widget.selectionProvider.notifier).toggleSelectAll(widget.companyName),
             )
           ]
           else
-          IconButton(
-              icon: _excelExporting
+          ValueListenableBuilder(
+            valueListenable: _excelExportingNotifier,
+            builder: (BuildContext context, value, Widget? child) { return IconButton(
+              icon: value
                   ? const CircularProgressIndicator()
                   : const Icon(Icons.table_chart),
               tooltip: "Export all data to Excel",
-              onPressed: _excelExporting
+              onPressed: value
                   ? null
                   : () {
-                      setState(() {
-                        _excelExporting = true;
-                      });
-                      widget.onExcelExport()
-                        ..catchError((final Object e) {
-                          return Toast(context,
-                              text: e.toString(), color: Colors.redAccent);
-                        })
-                        ..then((final _) => Toast(context,
-                            text:
-                                "${widget.companyName}'s invoices excel output is saved in the "
-                                "Download"
-                                " file.",
-                            color: Colors.green))
-                        ..whenComplete(() => setState(() {
-                              _excelExporting = false;
-                            }));
-                    },
-            ),
+                _excelExportingNotifier.value = true;
+                widget.onExcelExport()
+                  ..catchError((final Object e) {
+                    return Toast(context,
+                        text: e.toString(), color: Colors.redAccent);
+                  })
+                  ..then((final _) async => Toast(context,
+                      text:
+                      "${widget.companyName ?? (await InvoiceDataService().getCompanyList()).length.toString()}'s invoices excel output is saved in the "
+                          "Download"
+                          " file.",
+                      color: Colors.green))
+                  ..whenComplete(() => _excelExportingNotifier.value = false);
+              },
+            ); },
+          ),
         ],
       ),
       body: widget.body,

@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:cross_file/cross_file.dart';
 import 'package:edge_detection/edge_detection.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive/hive.dart';
@@ -19,6 +20,8 @@ import 'package:path/path.dart' as path;
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
 
+part 'company_main_mixin.dart';
+
 class CompanyPage extends ConsumerStatefulWidget {
   const CompanyPage({super.key});
 
@@ -26,58 +29,11 @@ class CompanyPage extends ConsumerStatefulWidget {
   ConsumerState<CompanyPage> createState() => _CompanyPageState();
 }
 
-class _CompanyPageState extends ConsumerState<CompanyPage> {
+class _CompanyPageState extends ConsumerState<CompanyPage> with _CompanyPageMixin{
 
-  late bool _isLoading;
-  late ReadMode readMode;
-
-  @override
-  void initState() {
-
-    _isLoading = false;
-    initializeModeData();
-
-    super.initState();
-  }
-
-  Future<void> initializeModeData() async {
-    final box = await Hive.openBox('modeBox');
-    box.get('isAI') ?? false ? readMode = ReadMode.ai : readMode = ReadMode.legacy;
-  }
-
-  void handleModeChange(final ReadMode mode) {
-    setState(() {
-      readMode = mode;
-    });
-  }
-
-  void onDelete(final context) {
-
-    final selectionState = ref.read(companySelectionProvider);
-
-    final selectedItems = selectionState.selectedInvoices;
-
-    print(selectedItems);
-
-    if (selectedItems.isNotEmpty) {
-      for (final InvoiceData invoiceData in selectedItems) {
-        InvoiceDataService.deleteInvoiceData(invoiceData);
-      }
-      Toast(context,
-        text: "${selectionState.selectedCompanies.length.toString()} company deleted successfully!",
-        color: Colors.green,
-      );
-    } else {
-      Toast(context,
-        text: "No company selected for deletion!",
-        color: Colors.redAccent,
-      );
-    }
-  }
 
   @override
   Widget build(final BuildContext context) {
-
     final selectionState = ref.watch(companySelectionProvider);
 
     return PopScope(
@@ -94,12 +50,19 @@ class _CompanyPageState extends ConsumerState<CompanyPage> {
         body: Stack(
           children: [
             const CompanyList(),
-            if (_isLoading)
-              Container(
-                  height: double.infinity,
-                  width: double.infinity,
-                  color: Colors.black38,
-                  child: const Center(child: LoadingAnimation()))
+            ValueListenableBuilder(
+              valueListenable: _isLoadingNotifier,
+              builder: (final BuildContext context, final value,
+                  final Widget? child) {
+                return value == true
+                    ? Container(
+                        height: double.infinity,
+                        width: double.infinity,
+                        color: Colors.black38,
+                        child: const Center(child: LoadingAnimation()))
+                    : const SizedBox();
+              },
+            )
           ],
         ),
         onExcelExport: () => exportToExcel(listType: ListType.company),
@@ -127,57 +90,5 @@ class _CompanyPageState extends ConsumerState<CompanyPage> {
     );
   }
 
-  // Get image from camera
-  Future<void> getImageFromCamera() async {
-    final isCameraGranted = await Permission.camera.request();
-
-    if (!mounted) return;
-
-    if (isCameraGranted.isPermanentlyDenied) {
-      unawaited(openAppSettings());
-      Toast(context,
-          text: "You need to give permission to use camera.",
-          color: Colors.redAccent);
-    } else if (!isCameraGranted.isGranted) {
-      Toast(context,
-          text: "You need to give permission to use camera.",
-          color: Colors.redAccent);
-    } else {
-      // Generate filepath for saving
-      final String imagePath = path.join(
-          (await getApplicationSupportDirectory()).path,
-          "${(DateTime.now().millisecondsSinceEpoch / 1000).round()}.jpeg");
-
-      try {
-        setState(() {
-          _isLoading = true;
-        });
-
-        final bool success = await EdgeDetection.detectEdge(imagePath,
-            canUseGallery: true,
-            androidScanTitle: 'Scanning',
-            androidCropTitle: 'Crop');
-
-        if (mounted && success) {
-          unawaited(Navigator.push(
-              context,
-              MaterialPageRoute(
-                  builder: (final context) => InvoiceEditPage(
-                      imageFile: XFile(imagePath), readMode: readMode))));
-        }
-      } catch (e) {
-        if (mounted) {
-          Toast(context,
-              text: "Something went wrong."
-                  "$e",
-              color: Colors.redAccent);
-        }
-      } finally {
-        setState(() {
-          _isLoading = false;
-        });
-      }
-    }
-  }
 
 }
