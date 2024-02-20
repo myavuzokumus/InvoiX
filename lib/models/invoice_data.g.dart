@@ -23,7 +23,7 @@ class InvoiceDataAdapter extends TypeAdapter<InvoiceData> {
       date: fields[4] as DateTime,
       totalAmount: fields[5] as double,
       taxAmount: fields[6] == null ? 0.0 : fields[6] as double,
-    );
+    ).._id = fields[1] as String;
   }
 
   @override
@@ -33,7 +33,7 @@ class InvoiceDataAdapter extends TypeAdapter<InvoiceData> {
       ..writeByte(0)
       ..write(obj.imagePath)
       ..writeByte(1)
-      ..write(obj.id)
+      ..write(obj._id)
       ..writeByte(2)
       ..write(obj.companyName)
       ..writeByte(3)

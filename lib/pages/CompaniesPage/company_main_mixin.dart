@@ -53,10 +53,15 @@ mixin _CompanyPageMixin on ConsumerState<CompanyPage> {
                       final List invoices =
                       await InvoiceDataService().getInvoiceList(company);
                       selectionState.selectedCompanies.remove(company);
+                      selectionState.listLength -= 1;
                       for (final InvoiceData invoice in invoices) {
                         await InvoiceDataService().deleteInvoiceData(invoice);
                         selectionState.selectedInvoices.remove(invoice);
                       }
+                    }
+
+                    if ((await InvoiceDataService().getCompanyList()).isEmpty) {
+                      ref.read(companySelectionProvider.notifier).toggleSelectionMode();
                     }
 
                     Toast(

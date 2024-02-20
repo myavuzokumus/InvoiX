@@ -155,6 +155,7 @@ class _CompanyListState extends ConsumerState<CompanyList> {
                                       companyListName,
                                     ),
                                     onLongPress: () {
+                                      if (ModalRoute.of(context)?.settings.name == null) return;
                                       if (!selectionState.isSelectionMode) {
                                         ref.read(companySelectionProvider.notifier).toggleSelectionMode();
                                         ref.read(companySelectionProvider.notifier).toggleItemSelection(index: index, company: companyListName);
@@ -171,9 +172,19 @@ class _CompanyListState extends ConsumerState<CompanyList> {
                                       else {
                                         Navigator.push(
                                             context,
-                                            MaterialPageRoute(
-                                                builder: (final context) => InvoicePage(
-                                                    companyName: companyListName)));
+                                            PageRouteBuilder(
+                                                pageBuilder: (final BuildContext context, final Animation<double> animation, final Animation<double> secondaryAnimation) => InvoicePage(
+                                                    companyName: companyListName),
+                                              transitionDuration: const Duration(milliseconds: 250),
+                                              transitionsBuilder: (final context, animation, final animationTime, final child) {
+                                                animation = CurvedAnimation(parent: animation, curve: Curves.easeInOut);
+                                                return FadeTransition(
+                                                  opacity: animation,
+                                                  child: child,
+                                                );
+                                              },
+
+                                            ));
                                       }
                                     },
                                     trailing: selectionState.isSelectionMode

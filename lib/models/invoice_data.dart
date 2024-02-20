@@ -9,7 +9,7 @@ class InvoiceData extends HiveObject {
   @HiveField(0)
   final String imagePath;
   @HiveField(1)
-  final String id;
+  late String _id;
   @HiveField(2)
   final String companyName;
   @HiveField(3)
@@ -21,13 +21,18 @@ class InvoiceData extends HiveObject {
   @HiveField(6, defaultValue: 0.0)
   final double taxAmount;
 
+  String get id => _id;
+
   InvoiceData(
       {required this.imagePath,
       required this.companyName,
       required this.invoiceNo,
       required this.date,
       required this.totalAmount,
-      required this.taxAmount}) : id = const Uuid().v4();
+      required this.taxAmount}) {
+
+      _id = const Uuid().v4();
+    }
 
   InvoiceData.fromJson(final Map<String, dynamic> json)
       : imagePath = json["ImagePath"] ?? "",
@@ -36,7 +41,7 @@ class InvoiceData extends HiveObject {
         date = DateParser(json["date"]),
         totalAmount = double.parse(json["totalAmount"]),
         taxAmount = double.parse(json["taxAmount"]),
-        id = const Uuid().v4();
+        _id = const Uuid().v4();
 
   InvoiceData copyWith({
     final String? imagePath,

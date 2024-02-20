@@ -13,9 +13,9 @@ class InvoicePage extends ConsumerWidget {
 
   const InvoicePage({required this.companyName, super.key});
 
-  Future<void> onDelete(final context, final SelectionState selectionData) async {
+  Future<void> onDelete(final context, final SelectionState selectionState) async {
 
-    final selectedItems = List.from(selectionData.selectedInvoices);
+    final selectedItems = List.from(selectionState.selectedInvoices);
 
     if (selectedItems.isNotEmpty) {
 
@@ -35,7 +35,8 @@ class InvoicePage extends ConsumerWidget {
                 Navigator.pop(context);
                 for (final InvoiceData invoiceData in selectedItems) {
                   await InvoiceDataService().deleteInvoiceData(invoiceData);
-                  selectionData.selectedInvoices.remove(invoiceData);
+                  selectionState.selectedInvoices.remove(invoiceData);
+                  selectionState.listLength -= 1;
                 }
 
                 if ((await InvoiceDataService().getInvoiceList(companyName)).isEmpty) {
