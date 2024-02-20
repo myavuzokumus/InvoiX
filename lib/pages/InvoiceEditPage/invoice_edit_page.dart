@@ -163,7 +163,7 @@ class _InvoiceEditPageState extends State<InvoiceEditPage> with _InvoiceEditPage
                                 runSpacing: 16.0,
                                 children: [
                                   TextFormField(
-                                    maxLength: 50,
+                                    maxLength: 100,
                                     controller: companyTextController,
                                     decoration: const InputDecoration(
                                         labelText: "Company name:",

@@ -243,7 +243,7 @@ class _CompanyListState extends ConsumerState<CompanyList> {
             key: _companyNameformKey,
             autovalidateMode: AutovalidateMode.onUserInteraction,
             child: TextFormField(
-              maxLength: 50,
+              maxLength: 100,
               controller: companyNameTextController,
               decoration: const InputDecoration(
                   labelText: "New company name:",
