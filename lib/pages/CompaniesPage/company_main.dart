@@ -45,7 +45,6 @@ class _CompanyPageState extends ConsumerState<CompanyPage> with _CompanyPageMixi
       child: GeneralPage(
         selectionProvider: companySelectionProvider,
         title: "InvoiX",
-        companyName: "",
         body: Stack(
           children: [
             const CompanyList(),

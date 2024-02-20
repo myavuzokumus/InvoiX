@@ -92,7 +92,7 @@ class _GeneralPageState extends ConsumerState<GeneralPage> {
                   ? null
                   : () async {
                 _excelExportingNotifier.value = true;
-                final String text = widget.companyName ?? (await InvoiceDataService().getCompanyList()).length.toString();
+                final String text = widget.companyName != null ? "${widget.companyName!}'s" : (await InvoiceDataService().getCompanyList()).length.toString();
                 widget.onExcelExport()
                   ..catchError((final Object e) {
                     return Toast(context,
@@ -100,7 +100,7 @@ class _GeneralPageState extends ConsumerState<GeneralPage> {
                   })
                   ..then((final _) => Toast(context,
                       text:
-                      "$text's invoices excel output is saved in the "
+                      "$text invoices excel output is saved in the "
                           "Download"
                           " file.",
                       color: Colors.green))
