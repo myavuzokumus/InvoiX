@@ -39,8 +39,8 @@ class InvoiceData extends HiveObject {
         companyName = json["companyName"] ?? "",
         invoiceNo = json["invoiceNo"] ?? "",
         date = DateParser(json["date"]),
-        totalAmount = double.parse(json["totalAmount"]),
-        taxAmount = double.parse(json["taxAmount"]),
+        totalAmount = double.parse(json["totalAmount"].replaceAll(",", ".")),
+        taxAmount = double.parse(json["taxAmount"].replaceAll(",", ".")),
         _id = const Uuid().v4();
 
   InvoiceData copyWith({

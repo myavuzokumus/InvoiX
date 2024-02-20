@@ -62,9 +62,8 @@ mixin _InvoiceEditPageMixin on State<InvoiceEditPage> {
     }
     else if ( widget.readMode == ReadMode.ai) {
       try {
-        final String aioutput = await GeminiAPI().describeImage(imgFile: File(imageFile.path), prompt: identifyInvoicePrompt);
-        print(aioutput);
-        await fetchInvoiceData(aioutput);
+        await imageFilter(imageFile);
+        await fetchInvoiceData(await GeminiAPI().describeImage(imgFile: File(imageFile.path), prompt: identifyInvoicePrompt));
       } catch (e) {
         if (await isInternetConnected()) {
           Toast(context,
