@@ -39,10 +39,6 @@ class InvoiceDataService {
     final Box<int> remainingTimeBox = Hive.box<int>('remainingTimeBox');
     await remainingTimeBox.delete(invoiceData.imagePath);
     await invoiceDataBox.delete(invoiceData.id);
-    print(invoiceData.id);
-    print("-----");
-    print(invoiceDataBox.keys);
-
   }
 
   InvoiceData? getInvoiceData(final InvoiceData invoiceData) {

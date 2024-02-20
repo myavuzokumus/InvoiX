@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:invoix/pages/SelectionState.dart';
@@ -84,7 +83,7 @@ class _GeneralPageState extends ConsumerState<GeneralPage> {
           else
           ValueListenableBuilder(
             valueListenable: _excelExportingNotifier,
-            builder: (BuildContext context, value, Widget? child) { return IconButton(
+            builder: (final BuildContext context, final value, final Widget? child) { return IconButton(
               icon: value
                   ? const CircularProgressIndicator()
                   : const Icon(Icons.table_chart),

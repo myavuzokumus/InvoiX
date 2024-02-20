@@ -46,7 +46,7 @@ class InvoicePage extends ConsumerWidget {
                 Toast(context,
                 text: "${selectedItems.length.toString()} invoice(s) deleted successfully!",
                 color: Colors.green,
-                );;
+                );
               },
               child: const Text("Delete"),
             ),

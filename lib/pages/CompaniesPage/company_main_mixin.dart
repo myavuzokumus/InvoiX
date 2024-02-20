@@ -114,6 +114,7 @@ mixin _CompanyPageMixin on ConsumerState<CompanyPage> {
             androidScanTitle: 'Scanning',
             androidCropTitle: 'Crop');
 
+
         if (mounted && success) {
           unawaited(Navigator.push(
               context,

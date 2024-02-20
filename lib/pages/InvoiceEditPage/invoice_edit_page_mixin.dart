@@ -66,6 +66,7 @@ mixin _InvoiceEditPageMixin on State<InvoiceEditPage> {
         await fetchInvoiceData(await GeminiAPI().describeImage(imgFile: File(imageFile.path), prompt: identifyInvoicePrompt));
       } catch (e) {
         if (await isInternetConnected()) {
+          print(e);
           Toast(context,
               text: "Something went wrong.\n"
                   "$e\n"
@@ -96,6 +97,7 @@ mixin _InvoiceEditPageMixin on State<InvoiceEditPage> {
     for (String i in listText) {
       // Text if match with CompanyRegex
       if (companyRegex.hasMatch(i)) {
+
         // Set text to CompanyTextController.text
         if (i.toUpperCase().contains("A.S.")) {
           i = i.replaceAll("A.S.", "A.Ş.");
@@ -252,7 +254,8 @@ mixin _InvoiceEditPageMixin on State<InvoiceEditPage> {
             invoiceNo: invoiceNoTextController.text,
             date: dateFormat.parse(dateTextController.text),
             totalAmount: double.parse(totalAmountTextController.text),
-            taxAmount: double.parse(taxAmountTextController.text));
+            taxAmount: double.parse(taxAmountTextController.text),
+            id: widget.invoiceData?.id);
 
         await InvoiceDataService().saveInvoiceData(data);
 

@@ -2,7 +2,6 @@ import 'dart:async';
 
 import 'package:cross_file/cross_file.dart';
 import 'package:edge_detection/edge_detection.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive/hive.dart';
