@@ -90,16 +90,17 @@ class _GeneralPageState extends ConsumerState<GeneralPage> {
               tooltip: "Export all data to Excel",
               onPressed: value
                   ? null
-                  : () {
+                  : () async {
                 _excelExportingNotifier.value = true;
+                final String text = widget.companyName ?? (await InvoiceDataService().getCompanyList()).length.toString();
                 widget.onExcelExport()
                   ..catchError((final Object e) {
                     return Toast(context,
                         text: e.toString(), color: Colors.redAccent);
                   })
-                  ..then((final _) async => Toast(context,
+                  ..then((final _) => Toast(context,
                       text:
-                      "${widget.companyName ?? (await InvoiceDataService().getCompanyList()).length.toString()}'s invoices excel output is saved in the "
+                      "$text's invoices excel output is saved in the "
                           "Download"
                           " file.",
                       color: Colors.green))

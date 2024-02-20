@@ -6,7 +6,7 @@ mixin _InvoiceEditPageMixin on State<InvoiceEditPage> {
   late bool _isFileSaved;
 
   late final XFile imageFile;
-  late final ReadMode? readMode;
+  late ReadMode? readMode;
 
   //TextLabelControllers
   late final TextEditingController companyTextController;
@@ -52,7 +52,7 @@ mixin _InvoiceEditPageMixin on State<InvoiceEditPage> {
     _scaffoldKey.currentState?.dispose();
     _formKey.currentState?.dispose();
 
-    if (!_isFileSaved) {
+    if (!_isFileSaved && readMode != null) {
       File(imageFile.path).delete();
     }
 
@@ -61,12 +61,12 @@ mixin _InvoiceEditPageMixin on State<InvoiceEditPage> {
 
   Future<void> collectReadData() async {
 
-    if( widget.readMode == ReadMode.legacy) {
+    if( readMode == ReadMode.legacy) {
       await imageFilter(imageFile);
       getInvoiceData(await getScannedText(imageFile));
       await Future.delayed(const Duration(seconds: 2));
     }
-    else if ( widget.readMode == ReadMode.ai) {
+    else if ( readMode == ReadMode.ai) {
       try {
         await imageFilter(imageFile);
         await fetchInvoiceData(await GeminiAPI().describeImage(imgFile: File(imageFile.path), prompt: identifyInvoicePrompt));
@@ -84,10 +84,8 @@ mixin _InvoiceEditPageMixin on State<InvoiceEditPage> {
                   "Switching to Legacy Mode...",
               color: Colors.redAccent);
         }
-
-        await imageFilter(imageFile);
-        getInvoiceData(await getScannedText(imageFile));
-        await Future.delayed(const Duration(seconds: 2));
+        readMode = ReadMode.legacy;
+        _future = collectReadData();
       }
     }
 

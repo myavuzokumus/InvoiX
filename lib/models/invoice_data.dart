@@ -50,6 +50,7 @@ class InvoiceData extends HiveObject {
     final DateTime? date,
     final double? totalAmount,
     final double? taxAmount,
+    final String? id,
   }) {
     return InvoiceData(
       imagePath: imagePath ?? this.imagePath,
@@ -58,6 +59,7 @@ class InvoiceData extends HiveObject {
       date: date ?? this.date,
       totalAmount: totalAmount ?? this.totalAmount,
       taxAmount: taxAmount ?? this.taxAmount,
+      id: id ?? this._id,
     );
   }
 
