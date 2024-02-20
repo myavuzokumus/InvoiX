@@ -69,3 +69,10 @@ It can contribute to the fight against corruption by increasing financial transp
 - [syncfusion_flutter_xlsio](https://pub.dev/packages/syncfusion_flutter_xlsio) - To export invoices data with image to .xlsx file.
 - [google_mlkit_text_recognition](https://pub.dev/packages/google_mlkit_text_recognition) - To read texts in image.
 - opencv - It reads the corners of the invoice and ensures that it is trimmed.
+
+---
+
+
+#### Credits
+Holding phone image by <a href="https://www.freepik.com/free-photo/digital-nomad-working-remotly-their-project_21795565.htm#from_view=detail_alsolike">Freepik</a>\
+Phone canvas images by <a href="https://www.freepik.com/free-psd/dark-smartphone-mockup_9549207.htm#query=app%20mockup&position=6&from_view=keyword&track=ais&uuid=3a9c6107-c190-4c92-bbb3-7c4a6407e700">Deeplab on Freepik</a> 
