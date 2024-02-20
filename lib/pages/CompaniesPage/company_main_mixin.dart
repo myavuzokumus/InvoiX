@@ -117,9 +117,19 @@ mixin _CompanyPageMixin on ConsumerState<CompanyPage> {
         if (mounted && success) {
           unawaited(Navigator.push(
               context,
-              MaterialPageRoute(
-                  builder: (final context) => InvoiceEditPage(
-                      imageFile: XFile(imagePath), readMode: readMode))));
+              PageRouteBuilder(
+                pageBuilder: (final BuildContext context, final Animation<double> animation, final Animation<double> secondaryAnimation) => InvoiceEditPage(
+                    imageFile: XFile(imagePath), readMode: readMode),
+                transitionDuration: const Duration(milliseconds: 250),
+                transitionsBuilder: (final context, animation, final animationTime, final child) {
+                  animation = CurvedAnimation(parent: animation, curve: Curves.easeInOut);
+                  return FadeTransition(
+                    opacity: animation,
+                    child: child,
+                  );
+                },
+
+              )));
         }
       } catch (e) {
         if (mounted) {
