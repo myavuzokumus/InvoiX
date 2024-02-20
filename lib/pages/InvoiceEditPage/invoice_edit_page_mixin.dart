@@ -3,6 +3,7 @@ part of 'invoice_edit_page.dart';
 mixin _InvoiceEditPageMixin on State<InvoiceEditPage> {
 
   late bool _saveButtonState;
+  late bool _isFileSaved;
 
   late final XFile imageFile;
   late final ReadMode? readMode;
@@ -23,6 +24,7 @@ mixin _InvoiceEditPageMixin on State<InvoiceEditPage> {
   void initState() {
 
     _saveButtonState = true;
+    _isFileSaved = false;
 
     imageFile = widget.imageFile;
     readMode = widget.readMode;
@@ -49,6 +51,10 @@ mixin _InvoiceEditPageMixin on State<InvoiceEditPage> {
     totalAmountTextController.dispose();
     _scaffoldKey.currentState?.dispose();
     _formKey.currentState?.dispose();
+
+    if (!_isFileSaved) {
+      File(imageFile.path).delete();
+    }
 
     super.dispose();
   }
@@ -258,6 +264,7 @@ mixin _InvoiceEditPageMixin on State<InvoiceEditPage> {
             id: widget.invoiceData?.id);
 
         await InvoiceDataService().saveInvoiceData(data);
+        _isFileSaved = true;
 
         if (mounted) {
           Toast(context,

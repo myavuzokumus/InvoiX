@@ -29,10 +29,10 @@ class InvoiceData extends HiveObject {
       required this.invoiceNo,
       required this.date,
       required this.totalAmount,
-      required this.taxAmount}) {
-
-      _id = const Uuid().v4();
-    }
+      required this.taxAmount,
+      final String? id}) {
+    id != null ? _id = id : _id = const Uuid().v4();
+  }
 
   InvoiceData.fromJson(final Map<String, dynamic> json)
       : imagePath = json["ImagePath"] ?? "",
