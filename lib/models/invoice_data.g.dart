@@ -17,7 +17,7 @@ class InvoiceDataAdapter extends TypeAdapter<InvoiceData> {
       for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
     };
     return InvoiceData(
-      ImagePath: fields[0] as String,
+      imagePath: fields[0] as String,
       companyName: fields[2] as String,
       invoiceNo: fields[3] as String,
       date: fields[4] as DateTime,
@@ -31,7 +31,7 @@ class InvoiceDataAdapter extends TypeAdapter<InvoiceData> {
     writer
       ..writeByte(7)
       ..writeByte(0)
-      ..write(obj.ImagePath)
+      ..write(obj.imagePath)
       ..writeByte(1)
       ..write(obj.id)
       ..writeByte(2)

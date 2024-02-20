@@ -47,7 +47,7 @@ Future<void> exportToExcel({required final ListType listType, final String? comp
 
   if (listType == ListType.company) {
     // Get all companies from Hive box
-    final companies = await InvoiceDataService.getCompanyList();
+    final companies = await InvoiceDataService().getCompanyList();
 
     if (companies.isEmpty) {
       throw Exception('No companies found.');
@@ -104,7 +104,7 @@ Future<void> importInvoiceData(final Worksheet sheet, final String companyName, 
   sheet.getRangeByName('A1:D1').cellStyle = titleStyle;
 
   // Get all invoices for the current company
-  final invoices = await InvoiceDataService.getInvoiceList(companyName);
+  final invoices = await InvoiceDataService().getInvoiceList(companyName);
 
   // Create Excel headers
   sheet.getRangeByName('A1').setText('Invoice Number');
@@ -114,7 +114,7 @@ Future<void> importInvoiceData(final Worksheet sheet, final String companyName, 
 
   // Fill the worksheet with invoice data
   for (var i = 0; i < invoices.length; i++) {
-    final Uint8List image = await File(invoices[i].ImagePath).readAsBytes();
+    final Uint8List image = await File(invoices[i].imagePath).readAsBytes();
 
     sheet.getRangeByName('A${i + 2}')
       ..setText(invoices[i].invoiceNo.toString())

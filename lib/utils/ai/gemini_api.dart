@@ -22,3 +22,6 @@ class GeminiAPI {
 
   }
 }
+
+// Using Gemini, invoice diagnosis is made with certain prompts and the output is returned to the user.
+// This class performs invoice identification using the Google Generative AI package.

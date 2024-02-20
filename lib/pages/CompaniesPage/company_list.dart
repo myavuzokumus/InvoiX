@@ -3,7 +3,6 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive_flutter/hive_flutter.dart';
-import 'package:invoix/main.dart';
 import 'package:invoix/models/invoice_data.dart';
 import 'package:invoix/pages/InvoicesPage/invoice_main.dart';
 import 'package:invoix/pages/SelectionState.dart';
@@ -48,7 +47,7 @@ class _CompanyListState extends ConsumerState<CompanyList> {
     final selectionState = ref.watch(companySelectionProvider);
 
     return ValueListenableBuilder<Box>(
-        valueListenable: Hive.box('InvoiceData').listenable(),
+        valueListenable: invoiceDataBox.listenable(),
         builder: (final BuildContext context, final Box<dynamic> value,
             final Widget? child) {
           // Check if there is any invoice data
@@ -62,7 +61,7 @@ class _CompanyListState extends ConsumerState<CompanyList> {
             );
           } else {
             return FutureBuilder<List<String>>(
-              future: InvoiceDataService.getCompanyList(),
+              future: InvoiceDataService().getCompanyList(),
               builder: (final BuildContext context,
                   final AsyncSnapshot<List<String>> company) {
                 if (company.hasData) {
@@ -127,7 +126,7 @@ class _CompanyListState extends ConsumerState<CompanyList> {
                                   key: ValueKey<int>(index),
                                   direction: DismissDirection.endToStart,
                                   background: Container(
-                                    color: Colors.red,
+                                    color: Theme.of(context).colorScheme.primary,
                                     child: const Row(
                                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                       children: <Widget>[
@@ -168,7 +167,6 @@ class _CompanyListState extends ConsumerState<CompanyList> {
                                       }
                                       else if (selectionState.isSelectionMode) {
                                         ref.read(companySelectionProvider.notifier).toggleItemSelection(index: index, company: companyListName);
-                                        ref.read(companySelectionProvider).selectedCompanies.add(companyListName);
                                       }
                                       else {
                                         Navigator.push(
@@ -266,8 +264,8 @@ class _CompanyListState extends ConsumerState<CompanyList> {
           onPressed: () async {
             if (_companyNameformKey.currentState!.validate()) {
               for (final InvoiceData element
-              in await InvoiceDataService.getInvoiceList(companyListName)) {
-                await InvoiceDataService.saveInvoiceData(element.copyWith(
+              in await InvoiceDataService().getInvoiceList(companyListName)) {
+                await InvoiceDataService().saveInvoiceData(element.copyWith(
                     companyName: companyNameTextController.text));
               }
               if (!mounted) return;

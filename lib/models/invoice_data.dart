@@ -7,9 +7,9 @@ part 'invoice_data.g.dart';
 @HiveType(typeId: 0)
 class InvoiceData extends HiveObject {
   @HiveField(0)
-  final String ImagePath;
+  final String imagePath;
   @HiveField(1)
-  final String id = const Uuid().v4();
+  final String id;
   @HiveField(2)
   final String companyName;
   @HiveField(3)
@@ -22,23 +22,24 @@ class InvoiceData extends HiveObject {
   final double taxAmount;
 
   InvoiceData(
-      {required this.ImagePath,
+      {required this.imagePath,
       required this.companyName,
       required this.invoiceNo,
       required this.date,
       required this.totalAmount,
-      required this.taxAmount});
+      required this.taxAmount}) : id = const Uuid().v4();
 
   InvoiceData.fromJson(final Map<String, dynamic> json)
-      : ImagePath = json["ImagePath"] ?? "",
+      : imagePath = json["ImagePath"] ?? "",
         companyName = json["companyName"] ?? "",
         invoiceNo = json["invoiceNo"] ?? "",
         date = DateParser(json["date"]),
         totalAmount = double.parse(json["totalAmount"]),
-        taxAmount = double.parse(json["taxAmount"]);
+        taxAmount = double.parse(json["taxAmount"]),
+        id = const Uuid().v4();
 
   InvoiceData copyWith({
-    final String? ImagePath,
+    final String? imagePath,
     final String? companyName,
     final String? invoiceNo,
     final DateTime? date,
@@ -46,7 +47,7 @@ class InvoiceData extends HiveObject {
     final double? taxAmount,
   }) {
     return InvoiceData(
-      ImagePath: ImagePath ?? this.ImagePath,
+      imagePath: imagePath ?? this.imagePath,
       companyName: companyName ?? this.companyName,
       invoiceNo: invoiceNo ?? this.invoiceNo,
       date: date ?? this.date,

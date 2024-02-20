@@ -34,7 +34,6 @@ class SelectionNotifier extends StateNotifier<SelectionState> {
 
       if (state.selectedItems[index]) {
         if (company != null) {
-          print("eeee");
           state.selectedCompanies.add(company);
         }
         if (invoiceData != null) {
@@ -95,25 +94,26 @@ class SelectionNotifier extends StateNotifier<SelectionState> {
 
   }
 
-  Future<void> toggleSelectAll() async {
+  Future<void> toggleSelectAll(final String? company) async {
 
     state.selectAll = !state.selectAll;
 
     if (state.selectAll) {
-      if (state.selectedCompanies.length == 1) {
-        state.selectedInvoices = await InvoiceDataService.getInvoiceList(state.selectedCompanies[0]);
+      if (company != null) {
+        state.selectedInvoices = await InvoiceDataService().getInvoiceList(company);
       } else {
         state.selectedInvoices.clear();
         for (final String company in state.selectedCompanies) {
           state.selectedInvoices = [
             ...state.selectedInvoices,
-            ...await InvoiceDataService.getInvoiceList(company)
+            ...await InvoiceDataService().getInvoiceList(company)
           ];
         }
       }
     } else {
       state.selectedInvoices = [];
     }
+
     state.selectedItems = List<bool>.filled(state.listLength, state.selectAll, growable: true);
 
     state = SelectionState(

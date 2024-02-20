@@ -9,20 +9,19 @@ import 'package:invoix/pages/CompaniesPage/company_main.dart';
 
 import 'theme.dart';
 
-final invoiceDataBox = Hive.box('InvoiceData');
-
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   await Hive.initFlutter();
   Hive.registerAdapter(InvoiceDataAdapter());
-  await Hive.openBox('InvoiceData');
+  await Hive.openBox<InvoiceData>('InvoiceData');
+  await Hive.openBox<int>('remainingTimeBox');
 
   await dotenv.load(fileName: ".env");
 
   runApp(const ProviderScope(child: InvoixMain()));
 
-  final Box<int> box = await Hive.openBox<int>('remainingTimeBox');
+  final Box<int> box = Hive.box<int>('remainingTimeBox');
   for (final key in box.keys) {
     int remainingTime = box.get(key) ?? 0;
     if (remainingTime > 0) {

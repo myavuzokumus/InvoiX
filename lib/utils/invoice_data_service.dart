@@ -1,5 +1,4 @@
 import 'package:hive/hive.dart';
-import 'package:invoix/main.dart';
 import 'package:invoix/models/invoice_data.dart';
 
 enum ListType { company, invoice }
@@ -27,20 +26,30 @@ extension CompanyTypeExtension on CompanyType {
   }
 }
 
-mixin InvoiceDataService {
 
-  static Future<void> saveInvoiceData(final InvoiceData invoiceData) async {
+final Box<InvoiceData> invoiceDataBox = Hive.box<InvoiceData>('InvoiceData');
+
+class InvoiceDataService {
+
+  Future<void> saveInvoiceData(final InvoiceData invoiceData) async {
     await invoiceDataBox.put(invoiceData.id, invoiceData);
   }
 
-  static Future<void> deleteInvoiceData(final InvoiceData invoiceData) async {
-    final Box box = await Hive.openBox('invoiceDataBox');
-    await box.delete(invoiceData.ImagePath);
+  Future<void> deleteInvoiceData(final InvoiceData invoiceData) async {
+    final Box<int> remainingTimeBox = Hive.box<int>('remainingTimeBox');
+    await remainingTimeBox.delete(invoiceData.imagePath);
     await invoiceDataBox.delete(invoiceData.id);
+    print(invoiceData.id);
+    print("-----");
+    print(invoiceDataBox.keys);
 
   }
 
-  static Future<List<InvoiceData>> getInvoiceList(final String companyName) async {
+  InvoiceData? getInvoiceData(final InvoiceData invoiceData) {
+    return invoiceDataBox.get(invoiceData.id);
+  }
+
+  Future<List<InvoiceData>> getInvoiceList(final String companyName) async {
 
     final Iterable<InvoiceData> savedList = invoiceDataBox.values.cast<InvoiceData>();
 
@@ -49,7 +58,7 @@ mixin InvoiceDataService {
         .toList();
   }
 
-  static Future<List<String>> getCompanyList() async {
+  Future<List<String>> getCompanyList() async {
     final Iterable<InvoiceData> savedList = invoiceDataBox.values.cast<InvoiceData>();
     return savedList.map((final item) => item.companyName).toSet().toList();
   }

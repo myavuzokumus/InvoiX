@@ -61,7 +61,7 @@ class _InvoiceCardState extends ConsumerState<InvoiceCard> {
                 MaterialPageRoute(
                     builder: (final context) =>
                         InvoiceEditPage(
-                          imageFile: XFile(widget.invoiceData.ImagePath),
+                          imageFile: XFile(widget.invoiceData.imagePath),
                               invoiceData: widget.invoiceData,
                         )));
           },
@@ -93,11 +93,11 @@ class _InvoiceCardState extends ConsumerState<InvoiceCard> {
               Stack(
                 children: [
                   Hero(
-                    tag: widget.invoiceData.ImagePath,
+                    tag: widget.invoiceData.imagePath,
                     child: ClipRRect(
                       borderRadius: borderRadiusValue,
                       child: Image.file(File(
-                          XFile(widget.invoiceData.ImagePath).path),
+                          XFile(widget.invoiceData.imagePath).path),
                         width: 144,
                         fit: BoxFit.cover,
                         frameBuilder: (final BuildContext context, final Widget child, final int? frame, final bool wasSynchronouslyLoaded) {
@@ -115,7 +115,7 @@ class _InvoiceCardState extends ConsumerState<InvoiceCard> {
                     ),
                   ),
                   Positioned(right: 0, bottom: 0,
-                      child: AIButton(invoiceImage: File(widget.invoiceData.ImagePath))
+                      child: AIButton(invoiceImage: File(widget.invoiceData.imagePath))
                   ),
                   if (selectionState.isSelectionMode)
                     Positioned(

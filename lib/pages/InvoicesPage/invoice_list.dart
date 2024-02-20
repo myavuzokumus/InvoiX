@@ -16,11 +16,11 @@ class InvoiceList extends ConsumerWidget {
   Widget build(final BuildContext context, final WidgetRef ref) {
 
     return ValueListenableBuilder<Box>(
-      valueListenable: Hive.box('InvoiceData').listenable(),
+      valueListenable: invoiceDataBox.listenable(),
       builder: (final BuildContext context, final Box<dynamic> value,
           final Widget? child) {
         return FutureBuilder<List<InvoiceData>>(
-            future: InvoiceDataService.getInvoiceList(companyName),
+            future: InvoiceDataService().getInvoiceList(companyName),
             builder: (final BuildContext context,
                 final AsyncSnapshot<List<InvoiceData>> invoice) {
 

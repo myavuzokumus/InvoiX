@@ -8,7 +8,7 @@ class LoadingAnimation extends StatelessWidget {
   @override
   Widget build(final BuildContext context) {
     return SizedBox(
-        height: customHeight ?? double.infinity,
+        height: customHeight ?? double.maxFinite,
         child: Column(
           children: [
             const LinearProgressIndicator(),

@@ -13,21 +13,49 @@ class InvoicePage extends ConsumerWidget {
 
   const InvoicePage({required this.companyName, super.key});
 
+  Future<void> onDelete(final context, final SelectionState selectionData) async {
 
-  void onDelete(final context, final SelectionState selectionData) {
-
-    selectionData.selectedCompanies.add(companyName);
-
-    final selectedItems = selectionData.selectedInvoices;
+    final selectedItems = List.from(selectionData.selectedInvoices);
 
     if (selectedItems.isNotEmpty) {
-      for (final InvoiceData invoiceData in selectedItems) {
-        InvoiceDataService.deleteInvoiceData(invoiceData);
-      }
-      Toast(context,
-        text: "${selectedItems.length} invoice(s) deleted successfully!",
-        color: Colors.green,
-      );
+
+      await showDialog(context: context, builder: (final BuildContext context) {
+        return AlertDialog(
+          title: const Text("Delete Invoice(s)"),
+          content: Text("Are you sure you want to delete ${selectedItems.length.toString()} invoice(s)?"),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context);
+              },
+              child: const Text("Cancel"),
+            ),
+            TextButton(
+              onPressed: () async {
+                Navigator.pop(context);
+                for (final InvoiceData invoiceData in selectedItems) {
+                  await InvoiceDataService().deleteInvoiceData(invoiceData);
+                  selectionData.selectedInvoices.remove(invoiceData);
+                }
+
+                if ((await InvoiceDataService().getInvoiceList(companyName)).isEmpty) {
+                Navigator.pop(context);
+                }
+
+                Toast(context,
+                text: "${selectedItems.length.toString()} invoice(s) deleted successfully!",
+                color: Colors.green,
+                );;
+              },
+              child: const Text("Delete"),
+            ),
+          ],
+        );
+      });
+
+
+
+
     } else {
       Toast(context,
         text: "No invoices selected for deletion!",
@@ -38,14 +66,24 @@ class InvoicePage extends ConsumerWidget {
 
   @override
   Widget build(final BuildContext context, final WidgetRef ref) {
-    final selectionData = ref.read(invoiceSelectionProvider);
-    return GeneralPage(
-      selectionProvider: invoiceSelectionProvider,
-      title: "InvoiX\n",
-      companyName: companyName,
-      body: InvoiceList(companyName: companyName),
-      onExcelExport: () => exportToExcel(companyName: companyName, listType: ListType.invoice),
-      onDelete: () {},
+
+    final selectionState = ref.watch(invoiceSelectionProvider);
+
+    return PopScope(
+      canPop: !selectionState.isSelectionMode,
+      onPopInvoked: (final bool bool) {
+        if (selectionState.isSelectionMode) {
+          ref.read(invoiceSelectionProvider.notifier).toggleSelectionMode();
+        }
+      },
+      child: GeneralPage(
+        selectionProvider: invoiceSelectionProvider,
+        title: "InvoiX\n",
+        companyName: companyName,
+        body: InvoiceList(companyName: companyName),
+        onExcelExport: () => exportToExcel(companyName: companyName, listType: ListType.invoice),
+        onDelete: () => onDelete(context, selectionState),
+      ),
     );
   }
 }
