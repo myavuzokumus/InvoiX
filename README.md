@@ -1,10 +1,16 @@
-# InvoiX
+![logo_banner.png](design%2Flogo_banner.png)
 
 > I started this project when I first started learning Flutter in August 2023 when I participated in the SupaBase Hackathon. Of course, I postponed it because it wasn't finished and I was new to Flutter. Months later, I started the project again in January 2024 and after a 3-week process, I got it ready to showcase it. I thought maybe it would work in some way in the Solution Challenge.
 
-A Flutter application that allows you to quickly read the invoices at hand, get the necessary information and then output it as an .xlsx file.
+## Overview 🧾
+- Artificial intelligence supported invoice reading application. It categorizes and saves them on a company basis according to the information in the invoice. It can analyze the impact of the products in the invoices on the person and the environment and can save time on financial transactions by taking Excel output.
 
-## Installation
+
+- [You can download the APK in the releases section.](https://github.com/myavuzokumus/InvoiX/releases)
+
+![invoix_main_design.png](design%2Finvoix_main_design.png)
+
+## Installation ✨
 
 1. Create a new Flutter project:
 ```
@@ -24,6 +30,38 @@ flutter run
 > [!IMPORTANT]
 > You need to create `.env` file in root directory. And add that following things:
 > - GEMINI_API_KEY= ""
+
+## Solution areas covered 🌍
+- **Goal 9 | Industry, Innovation and Infrastructure:**
+  - Promotes industry and infrastructure by optimizing and digitizing invoice processing.
+It can contribute to the fight against corruption by increasing financial transparency and accountability.
+
+
+- **Goal 12 | Responsible Production and Consumption:**
+  - Analyzing invoice data can help reduce resource waste and environmental pollution.
+  It can encourage consumers to consume responsibly and use resources more sustainably.
+
+## Target audience 👥
+- **For Businesses:**
+  - _Increased Productivity:_ Significantly reduces invoice processing time and costs, helping businesses save time and money.
+  - _Error Reduction:_ Improves the accuracy and reliability of the invoicing process by eliminating manual data entry errors.
+  - _Better Insight:_ By analyzing invoice data, it helps businesses better understand their finances and better predict future cash flows.
+
+
+- **For Accountants:**
+  - _Time Savings:_ Reduces time spent on invoice processing and data entry, allowing accountants to focus on more complex tasks.
+  - _Data Accuracy:_ Improves the accuracy and reliability of accounting records by eliminating manual data entry errors.
+  - _Compliance:_ Helps accountants comply with billing regulations by automatically categorizing and organizing invoice data.
+
+
+- **For Consumers:**
+  - _Easy Archiving:_ Helps consumers easily find and manage their invoices by storing invoice archives digitally.
+  - _Income and Expense Tracking:_ Analyzes invoice data to help consumers better track their income and expenses and manage their budgets more effectively.
+  - _Error Reduction_ Detects errors in billing information, helping consumers avoid financial losses due to incorrect invoices.
+
+
+- And of course every audience can see the impact of products on humans and the environment and alternatives through invoice analysis.
+
 
 ## Packages
 
