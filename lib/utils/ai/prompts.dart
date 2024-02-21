@@ -25,13 +25,13 @@ Do not include any description, just provide an RFC8259 compliant JSON response 
   "description": "",
   }
  "conscious_consumption": "",
- "market_research": "",
+ "market_research": ""
 }""";
 
 
 const String identifyInvoicePrompt =
 """
-Read the invoice in the picture. Identify the company name with company type, invoice number, date, total amount, and tax amount.
+Read the invoice in the picture. Identify the company name with company type, invoice number, date in dd-MM-yyyy format, total amount, and tax amount.
 Do not include any description, just provide an RFC8259 compliant JSON response that conforms to this format.
 
 {
@@ -39,6 +39,6 @@ Do not include any description, just provide an RFC8259 compliant JSON response 
  "invoiceNo": "",
  "date": "",
  "totalAmount": "",
- "taxAmount": "",
+ "taxAmount": ""
 }""";
 
