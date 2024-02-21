@@ -122,7 +122,9 @@ Future<void> importInvoiceData(final Worksheet sheet, final String companyName, 
 
     sheet.getRangeByName('B${i + 2}')
       ..setDateTime(invoices[i].date)
-      ..cellStyle = cellStyle;
+      ..cellStyle = cellStyle
+      ..numberFormat = 'dd/mm/yyyy';
+
 
     sheet.getRangeByName('C${i + 2}')
       ..setNumber(invoices[i].totalAmount)
