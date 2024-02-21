@@ -103,8 +103,8 @@ mixin _InvoiceEditPageMixin on State<InvoiceEditPage> {
       if (companyRegex.hasMatch(i)) {
 
         // Set text to CompanyTextController.text
-        if (i.toUpperCase().contains("A.S.")) {
-          i = i.replaceAll("A.S.", "A.Ş.");
+        if (i.contains(RegExp("A.S.", caseSensitive: false))) {
+          i = i.replaceAll(RegExp("A.S.", caseSensitive: false), "A.Ş.");
         }
         companyTextController.text = i;
       }
@@ -117,11 +117,7 @@ mixin _InvoiceEditPageMixin on State<InvoiceEditPage> {
           i = i.substring(matchedDate.start, matchedDate.end);
         }
 
-        late final DateTime? parsedDate;
-
-        parsedDate = DateParser(i);
-
-        dateTextController.text = dateFormat.format(parsedDate);
+        dateTextController.text = dateFormat.format(DateParser(i));
       }
       // If text length is 16
       else if (invoiceNoRegex.hasMatch(i)) {
@@ -135,7 +131,7 @@ mixin _InvoiceEditPageMixin on State<InvoiceEditPage> {
 
       }
       // Text if match with AmountRegex
-      else if (amountRegex.hasMatch(i)) {
+      else if (amountRegex.hasMatch(i) && !RegExp(r"[a-z]", caseSensitive: false).hasMatch(i)) {
         // Set text to AmountTextController.text
         String tax = listText.elementAt(listText.indexOf(i) - 1);
 
@@ -171,6 +167,8 @@ mixin _InvoiceEditPageMixin on State<InvoiceEditPage> {
       item = InvoiceDataService().getInvoiceData(widget.invoiceData!)!;
     }
     else {
+      //For test
+      print(aioutput);
       item = InvoiceData.fromJson(jsonDecode(aioutput!));
     }
 
