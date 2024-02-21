@@ -101,7 +101,7 @@ Future<void> exportToExcel({required final ListType listType, final String? comp
 }
 
 Future<void> importInvoiceData(final Worksheet sheet, final String companyName, final titleStyle, final cellStyle) async {
-  sheet.getRangeByName('A1:D1').cellStyle = titleStyle;
+  sheet.getRangeByName('A1:E1').cellStyle = titleStyle;
 
   // Get all invoices for the current company
   final invoices = await InvoiceDataService().getInvoiceList(companyName);
@@ -109,8 +109,9 @@ Future<void> importInvoiceData(final Worksheet sheet, final String companyName, 
   // Create Excel headers
   sheet.getRangeByName('A1').setText('Invoice Number');
   sheet.getRangeByName('B1').setText('Date');
-  sheet.getRangeByName('C1').setText('Amount');
-  sheet.getRangeByName('D1').setText('Image');
+  sheet.getRangeByName('C1').setText('Total Amount');
+  sheet.getRangeByName('D1').setText('Tax Amount');
+  sheet.getRangeByName('E1').setText('Image');
 
   // Fill the worksheet with invoice data
   for (var i = 0; i < invoices.length; i++) {
@@ -125,20 +126,23 @@ Future<void> importInvoiceData(final Worksheet sheet, final String companyName, 
       ..cellStyle = cellStyle
       ..numberFormat = 'dd/mm/yyyy';
 
-
     sheet.getRangeByName('C${i + 2}')
       ..setNumber(invoices[i].totalAmount)
       ..cellStyle = cellStyle;
 
-    sheet.pictures.addStream(i + 2, 4, image)
+    sheet.getRangeByName('D${i + 2}')
+      ..setNumber(invoices[i].taxAmount)
+      ..cellStyle = cellStyle;
+
+    sheet.pictures.addStream(i + 2, 5, image)
       ..height = 344
       ..width = 216;
-    sheet.getRangeByName('D${i + 2}')
+    sheet.getRangeByName('E${i + 2}')
       ..columnWidth = 32
       ..rowHeight = 256
       ..cellStyle = cellStyle;
     // ... add more data as needed
   }
 
-  sheet..autoFitColumn(1)..autoFitColumn(2)..autoFitColumn(3);
+  sheet..autoFitColumn(1)..autoFitColumn(2)..autoFitColumn(3)..autoFitColumn(4);
 }
