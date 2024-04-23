@@ -1,14 +1,14 @@
 ![logo_banner.png](design%2Flogo_banner.png)
 
-> I started this project when I first started learning Flutter in August 2023 when I participated in the SupaBase Hackathon. Of course, I postponed it because it wasn't finished and I was new to Flutter. Months later, I started the project again in January 2024 and after a 3-week process, I got it ready to showcase it. I thought maybe it would work in some way in the Solution Challenge.
-
 ## Overview 🧾
 - Artificial intelligence supported invoice reading application. It categorizes and saves them on a company basis according to the information in the invoice. It can analyze the impact of the products in the invoices on the person and the environment and can save time on financial transactions by taking Excel output.
 
 
 - [You can download the APK in the releases section.](https://github.com/myavuzokumus/InvoiX/releases)
 
-![invoix_main_design.png](design%2Finvoix_main_design.png)
+[![invoix_main_design.png](design%2Finvoix_main_design.png)](https://www.youtube.com/watch?v=AqoNQcQMUhA)
+> Click on image to watch trailer of app.
+
 
 ## Installation ✨
 
