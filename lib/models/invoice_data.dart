@@ -59,7 +59,7 @@ class InvoiceData extends HiveObject {
       date: date ?? this.date,
       totalAmount: totalAmount ?? this.totalAmount,
       taxAmount: taxAmount ?? this.taxAmount,
-      id: id ?? this._id,
+      id: id ?? _id,
     );
   }
 

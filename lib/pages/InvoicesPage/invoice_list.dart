@@ -27,7 +27,6 @@ class InvoiceList extends ConsumerWidget {
               if (invoice.hasData) {
 
                 final List<InvoiceData> invoiceList = List.from(invoice.data!);
-                ref.read(invoiceSelectionProvider).listLength = invoiceList.length;
 
                 return Column(
                   children: [
@@ -54,7 +53,7 @@ class InvoiceList extends ConsumerWidget {
                           final invoiceData = invoiceList.elementAt(index);
 
                           return InvoiceCard(
-                              invoiceData: invoiceData, index: index
+                              invoiceData: invoiceData
                           );
                         },
                       ),

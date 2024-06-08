@@ -3,6 +3,17 @@ import 'package:invoix/models/invoice_data.dart';
 
 enum ListType { company, invoice }
 
+extension ListTypeExtension on ListType {
+  String get name {
+    switch (this) {
+      case ListType.company:
+        return 'Company';
+      case ListType.invoice:
+        return 'Invoice';
+    }
+  }
+}
+
 enum CompanyType { AS, LTD, STI, LLC, PLC, INC, GMBH }
 
 extension CompanyTypeExtension on CompanyType {
@@ -35,10 +46,18 @@ class InvoiceDataService {
     await invoiceDataBox.put(invoiceData.id, invoiceData);
   }
 
-  Future<void> deleteInvoiceData(final InvoiceData invoiceData) async {
+  Future<void> deleteInvoiceData(final List<InvoiceData> invoiceData) async {
     final Box<int> remainingTimeBox = Hive.box<int>('remainingTimeBox');
-    await remainingTimeBox.delete(invoiceData.imagePath);
-    await invoiceDataBox.delete(invoiceData.id);
+    await remainingTimeBox.deleteAll(invoiceData.map((final invoiceData) => invoiceData.imagePath));
+    await invoiceDataBox.deleteAll(invoiceData.map((final invoiceData) => invoiceData.id));
+  }
+
+  Future<void> deleteCompany(final String companyName) async {
+    await getInvoiceList(companyName).then((final List<InvoiceData> invoices) {
+      for (final InvoiceData invoice in invoices) {
+        deleteInvoiceData([invoice]);
+      }
+    });
   }
 
   InvoiceData? getInvoiceData(final InvoiceData invoiceData) {

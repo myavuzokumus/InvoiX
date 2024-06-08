@@ -66,10 +66,11 @@ class _GeneralPageState extends ConsumerState<GeneralPage> {
                 icon: value
                     ? const CircularProgressIndicator()
                     : const Icon(Icons.restore_from_trash_outlined),
-                tooltip: "Export all data to Excel",
+                tooltip: "Delete Items",
                 onPressed: value
                     ? null
                     : () {
+
                   _deleteProcessingNotifier.value = true;
                   widget.onDelete().whenComplete(() => _deleteProcessingNotifier.value = false);
                 },
@@ -77,10 +78,8 @@ class _GeneralPageState extends ConsumerState<GeneralPage> {
             ),
             Checkbox(
               value: selectionState.selectAll,
-              onChanged: (final bool? x) => ref.read(widget.selectionProvider.notifier).toggleSelectAll(widget.companyName),
-            )
-          ]
-          else
+              onChanged: (final bool? x) => ref.read(widget.selectionProvider.notifier).selectAll(widget.companyName),
+            ),
           ValueListenableBuilder(
             valueListenable: _excelExportingNotifier,
             builder: (final BuildContext context, final value, final Widget? child) { return IconButton(
@@ -107,7 +106,8 @@ class _GeneralPageState extends ConsumerState<GeneralPage> {
                   ..whenComplete(() => _excelExportingNotifier.value = false);
               },
             ); },
-          ),
+          )]
+          //else add Icons for other actions
         ],
       ),
       body: widget.body,

@@ -78,9 +78,9 @@ Future<void> exportToExcel({required final ListType listType, final String? comp
     await importInvoiceData(sheet, companyName, titleStyle, cellStyle);
   }
 
-  final String? downloadDirectoryPath = await getDownloadDirectoryPath();
+  final String downloadDirectoryPath = getDownloadDirectory().toString();
 
-  if (downloadDirectoryPath != null) {
+  try {
     // Save the Excel file.
     final List<int> bytes = workbook.saveAsStream();
     workbook.dispose();
@@ -93,7 +93,7 @@ Future<void> exportToExcel({required final ListType listType, final String? comp
 
     // Write the Excel file to the documents directory.
     await File('$downloadDirectoryPath/$fileName').writeAsBytes(bytes);
-  } else {
+  } catch (e) {
     workbook.dispose();
     throw Exception('Failed to retrieve downloads folder path.');
   }

@@ -10,9 +10,8 @@ import 'package:invoix/pages/InvoicesPage/ai_button.dart';
 import 'package:invoix/pages/SelectionState.dart';
 
 class InvoiceCard extends ConsumerStatefulWidget {
-  const InvoiceCard({super.key, required this.invoiceData, required this.index});
+  const InvoiceCard({super.key, required this.invoiceData});
 
-  final int index;
   final InvoiceData invoiceData;
 
   @override
@@ -30,9 +29,9 @@ class _InvoiceCardState extends ConsumerState<InvoiceCard> {
 
   @override
   Widget build(final BuildContext context) {
-    final selectionState = ref.watch(invoiceSelectionProvider);
 
-    final int index = widget.index;
+    final selectionState = ref.watch(invoiceProvider);
+
     return Container(
       decoration: BoxDecoration(
         borderRadius: borderRadiusValue,
@@ -48,13 +47,13 @@ class _InvoiceCardState extends ConsumerState<InvoiceCard> {
         child: InkWell(
           onLongPress: () {
             if (!selectionState.isSelectionMode) {
-              ref.read(invoiceSelectionProvider.notifier).toggleSelectionMode();
-              ref.read(invoiceSelectionProvider.notifier).toggleItemSelection(index: index, invoiceData: widget.invoiceData);
+              ref.read(invoiceProvider).isSelectionMode = !ref.read(invoiceProvider).isSelectionMode;
+              ref.read(invoiceProvider.notifier).toggleItemSelection(company: widget.invoiceData.companyName, invoiceData: widget.invoiceData);
             }
           },
           onTap: () {
             selectionState.isSelectionMode
-                ? ref.read(invoiceSelectionProvider.notifier).toggleItemSelection(index: index, invoiceData: widget.invoiceData)
+                ? ref.read(invoiceProvider.notifier).toggleItemSelection(company: widget.invoiceData.companyName, invoiceData: widget.invoiceData)
                     :
             Navigator.push(
                 context,
@@ -82,8 +81,8 @@ class _InvoiceCardState extends ConsumerState<InvoiceCard> {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Text("Total Amount\n${widget.invoiceData.totalAmount}"),
-                          Text("Tax Amount\n${widget.invoiceData.taxAmount}"),
+                          Text("Total\n${widget.invoiceData.totalAmount}"),
+                          Text("Tax\n${widget.invoiceData.taxAmount}"),
                         ],
                       ),
                     ],
@@ -122,9 +121,9 @@ class _InvoiceCardState extends ConsumerState<InvoiceCard> {
                       right: 0,
                       top: 0,
                       child: Checkbox(
-                          onChanged: (final bool? x) => ref.read(invoiceSelectionProvider.notifier).toggleItemSelection(index: index, invoiceData: widget.invoiceData),
-                          value: selectionState.selectedItems[index])
-                    )
+                          onChanged: (final bool? x) => ref.read(invoiceProvider.notifier).toggleItemSelection(company: widget.invoiceData.companyName, invoiceData: widget.invoiceData),
+                          value: selectionState.selectedItems[widget.invoiceData.companyName]?.contains(widget.invoiceData) ?? false,
+                    ))
                 ],
               ),
             ],

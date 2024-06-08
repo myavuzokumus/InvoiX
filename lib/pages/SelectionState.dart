@@ -5,129 +5,88 @@ import 'package:invoix/utils/invoice_data_service.dart';
 class SelectionState {
   bool isSelectionMode;
   bool selectAll;
-  int listLength;
-  List<bool> selectedItems;
-  List<InvoiceData> selectedInvoices;
-  List<String> selectedCompanies;
+  Map<String, List<InvoiceData>> selectedItems;
 
-  SelectionState(
-    this.isSelectionMode,
-    this.selectAll,
-    this.listLength,
-    this.selectedItems,
-    this.selectedInvoices,
-    this.selectedCompanies,
-  );
+  SelectionState(this.isSelectionMode, this.selectAll, this.selectedItems);
 }
 
 class SelectionNotifier extends StateNotifier<SelectionState> {
-  SelectionNotifier() : super(SelectionState(false, false, 0, [], [], []));
+  SelectionNotifier() : super(SelectionState(false, false, {}));
 
-  void toggleItemSelection({
-    required final int index,
-    final String? company,
+  Future<void> toggleItemSelection({
+    required final String company,
     final InvoiceData? invoiceData,
-  }) {
+  }) async {
     if (state.isSelectionMode) {
-
-      state.selectedItems[index] = !state.selectedItems[index];
-
-      if (state.selectedItems[index]) {
-        if (company != null) {
-          state.selectedCompanies.add(company);
-        }
-        if (invoiceData != null) {
-          state.selectedInvoices.add(invoiceData);
+      if (invoiceData == null) {
+        if (state.selectedItems.containsKey(company)) {
+          state.selectedItems.remove(company);
+        } else {
+          state.selectedItems[company] = [];
         }
       } else {
-        if (company != null) {
-          state.selectedCompanies.remove(company);
+        if (state.selectedItems[company] == null) {
+          state.selectedItems[company] = [];
         }
-        if (invoiceData != null) {
-          state.selectedInvoices.remove(invoiceData);
+        if (state.selectedItems[company]!.contains(invoiceData)) {
+          state.selectedItems[company]!.remove(invoiceData);
+        } else {
+          state.selectedItems[company]!.add(invoiceData);
         }
       }
     }
 
-    if (state.selectedItems.every((final element) => element == true)) {
+    final realLength = invoiceData == null ? await InvoiceDataService().getCompanyList() : await InvoiceDataService().getInvoiceList(company);
+    final currentLength = invoiceData == null ? state.selectedItems.length : state.selectedItems[company]!.length;
+    if (currentLength == realLength.length) {
       state.selectAll = true;
-    }
-    else {
+    } else {
       state.selectAll = false;
     }
 
-    // Update the state with the new list
+    // Update the state with the new map
     state = SelectionState(
-      state.isSelectionMode,
-      state.selectAll,
-      state.listLength,
-      state.selectedItems,
-      state.selectedInvoices,
-      state.selectedCompanies,
-    );
-
+        state.isSelectionMode, state.selectAll, state.selectedItems);
   }
 
-
-  //You must set the list length before calling this function
-  void toggleSelectionMode() {
-
-    state.isSelectionMode = !state.isSelectionMode;
-
-    if (!state.isSelectionMode) {
-      state.selectedInvoices.clear();
-      state.selectedCompanies.clear();
-      state.selectedItems.clear();
-    }
-    else {
-      state.selectedItems = List<bool>.filled(state.listLength, false, growable: true);
-    }
-
-    state = SelectionState(
-      state.isSelectionMode,
-      state.selectAll,
-      state.listLength,
-      state.selectedItems,
-      state.selectedInvoices,
-      state.selectedCompanies,
-    );
-
-  }
-
-  Future<void> toggleSelectAll(final String? company) async {
-
+  Future<void> selectAll(final String? company) async {
     state.selectAll = !state.selectAll;
 
     if (state.selectAll) {
       if (company != null) {
-        state.selectedInvoices = await InvoiceDataService().getInvoiceList(company);
+        state.selectedItems[company] =
+            await InvoiceDataService().getInvoiceList(company);
       } else {
-        state.selectedInvoices.clear();
-        for (final String company in state.selectedCompanies) {
-          state.selectedInvoices = [
-            ...state.selectedInvoices,
-            ...await InvoiceDataService().getInvoiceList(company)
-          ];
-        }
+        state.selectedItems = Map.fromIterable(await InvoiceDataService().getCompanyList(), value: (_) => []);
+        //state.selectedItems.addAll();
       }
     } else {
-      state.selectedInvoices = [];
+      state.selectedItems.clear();
     }
 
-    state.selectedItems = List<bool>.filled(state.listLength, state.selectAll, growable: true);
+    state = SelectionState(
+        state.isSelectionMode, state.selectAll, state.selectedItems);
+  }
+
+  //You must set the list length before calling this function
+  void toggleSelectionMode() {
+    state.isSelectionMode = !state.isSelectionMode;
+
+    if (!state.isSelectionMode) {
+      state.selectedItems.clear();
+    }
 
     state = SelectionState(
       state.isSelectionMode,
       state.selectAll,
-      state.listLength,
       state.selectedItems,
-      state.selectedInvoices,
-      state.selectedCompanies,
     );
   }
-
 }
 
-final companySelectionProvider = StateNotifierProvider.autoDispose<SelectionNotifier, SelectionState>((final ref) => SelectionNotifier());
-
-final invoiceSelectionProvider = StateNotifierProvider.autoDispose<SelectionNotifier, SelectionState>((final ref) => SelectionNotifier());
+final companyProvider =
+    StateNotifierProvider.autoDispose<SelectionNotifier, SelectionState>(
+        (final ref) => SelectionNotifier());
+final invoiceProvider =
+    StateNotifierProvider.autoDispose<SelectionNotifier, SelectionState>(
+        (final ref) => SelectionNotifier());
