@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:invoix/pages/SelectionState.dart';
+import 'package:invoix/models/selection_state.dart';
 import 'package:invoix/utils/invoice_data_service.dart';
 import 'package:invoix/widgets/toast.dart';
 

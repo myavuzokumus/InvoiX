@@ -5,7 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:invoix/models/invoice_data.dart';
 import 'package:invoix/pages/InvoicesPage/invoice_main.dart';
-import 'package:invoix/pages/SelectionState.dart';
+import 'package:invoix/models/selection_state.dart';
 import 'package:invoix/utils/invoice_data_service.dart';
 import 'package:invoix/utils/text_to_invoicedata_regex.dart';
 import 'package:invoix/widgets/loading_animation.dart';

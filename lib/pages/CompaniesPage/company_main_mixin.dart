@@ -8,9 +8,7 @@ mixin _CompanyPageMixin on ConsumerState<CompanyPage> {
 
   @override
   void initState() {
-    _isLoadingNotifier.value = false;
     initializeModeData();
-
     super.initState();
   }
 

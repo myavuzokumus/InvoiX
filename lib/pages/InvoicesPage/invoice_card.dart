@@ -7,34 +7,21 @@ import 'package:intl/intl.dart';
 import 'package:invoix/models/invoice_data.dart';
 import 'package:invoix/pages/InvoiceEditPage/invoice_edit_page.dart';
 import 'package:invoix/pages/InvoicesPage/ai_button.dart';
-import 'package:invoix/pages/SelectionState.dart';
+import 'package:invoix/models/selection_state.dart';
 
-class InvoiceCard extends ConsumerStatefulWidget {
+class InvoiceCard extends ConsumerWidget {
   const InvoiceCard({super.key, required this.invoiceData});
 
   final InvoiceData invoiceData;
 
   @override
-  ConsumerState<InvoiceCard> createState() => _InvoiceCardState();
-}
-
-class _InvoiceCardState extends ConsumerState<InvoiceCard> {
-
-  final BorderRadius borderRadiusValue = BorderRadius.circular(16);
-
-  @override
-  void initState() {
-    super.initState();
-  }
-
-  @override
-  Widget build(final BuildContext context) {
+  Widget build(final BuildContext context, final WidgetRef ref) {
 
     final selectionState = ref.watch(invoiceProvider);
 
     return Container(
       decoration: BoxDecoration(
-        borderRadius: borderRadiusValue,
+        borderRadius: BorderRadius.circular(16),
         gradient: const LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
@@ -48,24 +35,24 @@ class _InvoiceCardState extends ConsumerState<InvoiceCard> {
           onLongPress: () {
             if (!selectionState.isSelectionMode) {
               ref.read(invoiceProvider).isSelectionMode = !ref.read(invoiceProvider).isSelectionMode;
-              ref.read(invoiceProvider.notifier).toggleItemSelection(company: widget.invoiceData.companyName, invoiceData: widget.invoiceData);
+              ref.read(invoiceProvider.notifier).toggleItemSelection(company: invoiceData.companyName, invoiceData: invoiceData);
             }
           },
           onTap: () {
             selectionState.isSelectionMode
-                ? ref.read(invoiceProvider.notifier).toggleItemSelection(company: widget.invoiceData.companyName, invoiceData: widget.invoiceData)
+                ? ref.read(invoiceProvider.notifier).toggleItemSelection(company: invoiceData.companyName, invoiceData: invoiceData)
                     :
             Navigator.push(
                 context,
                 MaterialPageRoute(
                     builder: (final context) =>
                         InvoiceEditPage(
-                          imageFile: XFile(widget.invoiceData.imagePath),
-                              invoiceData: widget.invoiceData,
+                          imageFile: XFile(invoiceData.imagePath),
+                              invoiceData: invoiceData,
                         )));
           },
           splashColor: Colors.blue,
-          borderRadius: borderRadiusValue,
+          borderRadius: BorderRadius.circular(16),
           child: Row(
             children: [
               Expanded(
@@ -74,15 +61,15 @@ class _InvoiceCardState extends ConsumerState<InvoiceCard> {
                   child: ListView(
                     shrinkWrap: true,
                     children: <Widget>[
-                      Text("Invoice No\n${widget.invoiceData.invoiceNo}"),
+                      Text("Invoice No\n${invoiceData.invoiceNo}"),
                       const Divider(height: 2),
-                      Text("Date\n${DateFormat("dd-MM-yyyy").format(widget.invoiceData.date)}"),
+                      Text("Date\n${DateFormat("dd-MM-yyyy").format(invoiceData.date)}"),
                       const Divider(height: 2),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Text("Total\n${widget.invoiceData.totalAmount}"),
-                          Text("Tax\n${widget.invoiceData.taxAmount}"),
+                          Text("Total\n${invoiceData.totalAmount}"),
+                          Text("Tax\n${invoiceData.taxAmount}"),
                         ],
                       ),
                     ],
@@ -92,11 +79,11 @@ class _InvoiceCardState extends ConsumerState<InvoiceCard> {
               Stack(
                 children: [
                   Hero(
-                    tag: widget.invoiceData.imagePath,
+                    tag: invoiceData.imagePath,
                     child: ClipRRect(
-                      borderRadius: borderRadiusValue,
+                      borderRadius: BorderRadius.circular(16),
                       child: Image.file(File(
-                          XFile(widget.invoiceData.imagePath).path),
+                          XFile(invoiceData.imagePath).path),
                         width: 144,
                         fit: BoxFit.cover,
                         frameBuilder: (final BuildContext context, final Widget child, final int? frame, final bool wasSynchronouslyLoaded) {
@@ -114,15 +101,15 @@ class _InvoiceCardState extends ConsumerState<InvoiceCard> {
                     ),
                   ),
                   Positioned(right: 0, bottom: 0,
-                      child: AIButton(invoiceImage: File(widget.invoiceData.imagePath))
+                      child: AIButton(invoiceImage: File(invoiceData.imagePath))
                   ),
                   if (selectionState.isSelectionMode)
                     Positioned(
                       right: 0,
                       top: 0,
                       child: Checkbox(
-                          onChanged: (final bool? x) => ref.read(invoiceProvider.notifier).toggleItemSelection(company: widget.invoiceData.companyName, invoiceData: widget.invoiceData),
-                          value: selectionState.selectedItems[widget.invoiceData.companyName]?.contains(widget.invoiceData) ?? false,
+                          onChanged: (final bool? x) => ref.read(invoiceProvider.notifier).toggleItemSelection(company: invoiceData.companyName, invoiceData: invoiceData),
+                          value: selectionState.selectedItems[invoiceData.companyName]?.contains(invoiceData) ?? false,
                     ))
                 ],
               ),

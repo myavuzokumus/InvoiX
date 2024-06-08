@@ -3,10 +3,11 @@ import 'dart:io';
 
 import 'package:downloadsfolder/downloadsfolder.dart';
 import 'package:flutter/foundation.dart';
+import 'package:invoix/models/invoice_data.dart';
 import 'package:invoix/utils/invoice_data_service.dart';
 import 'package:syncfusion_flutter_xlsio/xlsio.dart';
 
-Future<void> exportToExcel({required final ListType listType, final String? companyName}) async {
+Future<void> exportToExcel({required final ListType listType, final String? companyName, required final Map<String, List<InvoiceData>> outputList}) async {
 
 /*  PermissionStatus status = await Permission.storage.status;
 
@@ -46,12 +47,8 @@ Future<void> exportToExcel({required final ListType listType, final String? comp
     ..borders.all.color = '#e7bdb2';
 
   if (listType == ListType.company) {
-    // Get all companies from Hive box
-    final companies = await InvoiceDataService().getCompanyList();
 
-    if (companies.isEmpty) {
-      throw Exception('No companies found.');
-    }
+    final companies = outputList.keys.toList();
 
     for (final String companyName in companies) {
       final Worksheet sheet;
@@ -65,7 +62,7 @@ Future<void> exportToExcel({required final ListType listType, final String? comp
         sheet = workbook.worksheets.addWithName(companyName);
       }
 
-      await importInvoiceData(sheet, companyName, titleStyle, cellStyle);
+      await importInvoiceData(sheet, companyName, titleStyle, cellStyle, null);
     }
   } else if (listType == ListType.invoice) {
 
@@ -75,10 +72,10 @@ Future<void> exportToExcel({required final ListType listType, final String? comp
 
     final Worksheet sheet = workbook.worksheets[0];
 
-    await importInvoiceData(sheet, companyName, titleStyle, cellStyle);
+    await importInvoiceData(sheet, companyName, titleStyle, cellStyle, outputList[companyName]);
   }
 
-  final String downloadDirectoryPath = getDownloadDirectory().toString();
+  final String downloadDirectoryPath = (await getDownloadDirectory()).path;
 
   try {
     // Save the Excel file.
@@ -94,17 +91,18 @@ Future<void> exportToExcel({required final ListType listType, final String? comp
     // Write the Excel file to the documents directory.
     await File('$downloadDirectoryPath/$fileName').writeAsBytes(bytes);
   } catch (e) {
+    throw Exception('Failed to retrieve downloads folder path. $e');
+  } finally {
     workbook.dispose();
-    throw Exception('Failed to retrieve downloads folder path.');
   }
 
 }
 
-Future<void> importInvoiceData(final Worksheet sheet, final String companyName, final titleStyle, final cellStyle) async {
+Future<void> importInvoiceData(final Worksheet sheet, final String companyName, final titleStyle, final cellStyle, final List<InvoiceData>? invoiceList) async {
   sheet.getRangeByName('A1:E1').cellStyle = titleStyle;
 
   // Get all invoices for the current company
-  final invoices = await InvoiceDataService().getInvoiceList(companyName);
+  final List<InvoiceData> invoices = invoiceList ?? await InvoiceDataService().getInvoiceList(companyName);
 
   // Create Excel headers
   sheet.getRangeByName('A1').setText('Invoice Number');
