@@ -27,7 +27,6 @@ import '../../widgets/warn_icon.dart';
 part 'invoice_edit_page_mixin.dart';
 
 class InvoiceEditPage extends StatefulWidget {
-
   const InvoiceEditPage(
       {super.key, required this.imageFile, this.readMode, this.invoiceData});
 
@@ -39,11 +38,10 @@ class InvoiceEditPage extends StatefulWidget {
   State<InvoiceEditPage> createState() => _InvoiceEditPageState();
 }
 
-class _InvoiceEditPageState extends State<InvoiceEditPage> with _InvoiceEditPageMixin{
-
+class _InvoiceEditPageState extends State<InvoiceEditPage>
+    with _InvoiceEditPageMixin {
   @override
   Widget build(final BuildContext context) {
-
     return SafeArea(
       child: Scaffold(
         key: _scaffoldKey,
@@ -62,8 +60,7 @@ class _InvoiceEditPageState extends State<InvoiceEditPage> with _InvoiceEditPage
         ),
         body: GestureDetector(
           onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
-          child: CustomScrollView(
-              slivers: [
+          child: CustomScrollView(slivers: [
             SliverAppBar(
               actions: const [
                 Tooltip(
@@ -94,10 +91,8 @@ class _InvoiceEditPageState extends State<InvoiceEditPage> with _InvoiceEditPage
                 future: _future,
                 builder: (final BuildContext context,
                     final AsyncSnapshot<dynamic> snapshot) {
-
                   if (snapshot.connectionState == ConnectionState.done) {
                     if (snapshot.hasError) {
-
                       return Center(
                         child: Column(
                           children: [
@@ -118,9 +113,7 @@ class _InvoiceEditPageState extends State<InvoiceEditPage> with _InvoiceEditPage
                           ],
                         ),
                       );
-                    }
-
-                    else {
+                    } else {
                       return Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         mainAxisSize: MainAxisSize.min,
@@ -135,15 +128,12 @@ class _InvoiceEditPageState extends State<InvoiceEditPage> with _InvoiceEditPage
                                   },
                                   icon: const Icon(Icons.search)),
                               DateFormatSegmented(onChange: (final value) {
-
                                 if (value == DateFormatSegment.uk) {
-
                                   dateTextController.text =
                                       DateFormat("dd-MM-yyyy").format(
                                           DateFormat("MM-dd-yyyy")
                                               .parse(dateTextController.text));
                                 } else if (value == DateFormatSegment.us) {
-
                                   dateTextController.text =
                                       DateFormat("MM-dd-yyyy").format(
                                           DateFormat("dd-MM-yyyy")
@@ -154,7 +144,7 @@ class _InvoiceEditPageState extends State<InvoiceEditPage> with _InvoiceEditPage
                           ),
                           Form(
                             autovalidateMode:
-                            AutovalidateMode.onUserInteraction,
+                                AutovalidateMode.onUserInteraction,
                             key: _formKey,
                             child: Padding(
                               padding: const EdgeInsets.only(
@@ -169,7 +159,7 @@ class _InvoiceEditPageState extends State<InvoiceEditPage> with _InvoiceEditPage
                                         labelText: "Company name:",
                                         suffixIcon: WarnIcon(
                                             message:
-                                            "You must enter a valid company name.\nNeed include 'LTD., ŞTİ., A.Ş., LLC, PLC, INC, GMBH'")),
+                                                "You must enter a valid company name.\nNeed include 'LTD., ŞTİ., A.Ş., LLC, PLC, INC, GMBH'")),
                                     validator: (final value) {
                                       if (value == null ||
                                           value.isEmpty ||
@@ -186,10 +176,9 @@ class _InvoiceEditPageState extends State<InvoiceEditPage> with _InvoiceEditPage
                                         labelText: "Invoice No:",
                                         suffixIcon: WarnIcon(
                                             message:
-                                            "You must enter a valid invoice no.")),
+                                                "You must enter a valid invoice no.")),
                                     validator: (final value) {
-                                      if (value == null ||
-                                          value.isEmpty) {
+                                      if (value == null || value.isEmpty) {
                                         return 'Please enter some text';
                                       }
                                       return null;
@@ -203,23 +192,23 @@ class _InvoiceEditPageState extends State<InvoiceEditPage> with _InvoiceEditPage
                                         labelText: "Date:",
                                         suffixIcon: WarnIcon(
                                             message:
-                                            "You must enter a valid date.")),
+                                                "You must enter a valid date.")),
                                     onTap: () async {
                                       final DateTime today = DateTime.now();
                                       final DateTime? pickedDate =
-                                      await showDatePicker(
-                                          context: context,
-                                          initialDate: today,
-                                          //get today's date
-                                          firstDate: DateTime(1900),
-                                          //DateTime.now() - not to allow to choose before today.
-                                          lastDate: DateTime(today.year,
-                                              today.month, today.day));
+                                          await showDatePicker(
+                                              context: context,
+                                              initialDate: today,
+                                              //get today's date
+                                              firstDate: DateTime(1900),
+                                              //DateTime.now() - not to allow to choose before today.
+                                              lastDate: DateTime(today.year,
+                                                  today.month, today.day));
 
                                       if (pickedDate != null) {
                                         final String formattedDate =
-                                        dateFormat.format(
-                                            pickedDate); // format date in required form here we use yyyy-MM-dd that means time is removed
+                                            dateFormat.format(
+                                                pickedDate); // format date in required form here we use yyyy-MM-dd that means time is removed
 
                                         setState(() {
                                           dateTextController.text =
@@ -236,19 +225,23 @@ class _InvoiceEditPageState extends State<InvoiceEditPage> with _InvoiceEditPage
                                   ),
                                   Row(
                                     mainAxisSize: MainAxisSize.min,
-                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
                                     children: [
                                       Flexible(
                                         child: TextFormField(
                                           maxLength: 50,
                                           controller: totalAmountTextController,
-                                          keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                                          keyboardType: const TextInputType
+                                              .numberWithOptions(decimal: true),
                                           inputFormatters: <TextInputFormatter>[
-                                            FilteringTextInputFormatter.allow(RegExp(r'[0-9.]')),
+                                            FilteringTextInputFormatter.allow(
+                                                RegExp(r'[0-9.]')),
                                           ],
                                           // Only numbers can be entered
                                           validator: (final value) {
-                                            if (value == null || value.isEmpty) {
+                                            if (value == null ||
+                                                value.isEmpty) {
                                               return "";
                                             }
                                             return null;
@@ -257,9 +250,10 @@ class _InvoiceEditPageState extends State<InvoiceEditPage> with _InvoiceEditPage
                                               labelText: "Total Amount:",
                                               suffixIcon: WarnIcon(
                                                   message:
-                                                  "You must enter a valid amount."),
+                                                      "You must enter a valid amount."),
                                               labelStyle: TextStyle(
-                                                  fontSize: 15, fontWeight: FontWeight.bold)),
+                                                  fontSize: 15,
+                                                  fontWeight: FontWeight.bold)),
                                         ),
                                       ),
                                       const SizedBox(width: 16),
@@ -267,13 +261,16 @@ class _InvoiceEditPageState extends State<InvoiceEditPage> with _InvoiceEditPage
                                         child: TextFormField(
                                           maxLength: 50,
                                           controller: taxAmountTextController,
-                                          keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                                          keyboardType: const TextInputType
+                                              .numberWithOptions(decimal: true),
                                           inputFormatters: <TextInputFormatter>[
-                                            FilteringTextInputFormatter.allow(RegExp(r'[0-9.]')),
+                                            FilteringTextInputFormatter.allow(
+                                                RegExp(r'[0-9.]')),
                                           ],
                                           // Only numbers can be entered
                                           validator: (final value) {
-                                            if (value == null || value.isEmpty) {
+                                            if (value == null ||
+                                                value.isEmpty) {
                                               return "";
                                             }
                                             return null;
@@ -282,9 +279,10 @@ class _InvoiceEditPageState extends State<InvoiceEditPage> with _InvoiceEditPage
                                               labelText: "Tax Amount:",
                                               suffixIcon: WarnIcon(
                                                   message:
-                                                  "You must enter a valid amount."),
+                                                      "You must enter a valid amount."),
                                               labelStyle: TextStyle(
-                                                  fontSize: 15, fontWeight: FontWeight.bold)),
+                                                  fontSize: 15,
+                                                  fontWeight: FontWeight.bold)),
                                         ),
                                       ),
                                     ],
@@ -293,17 +291,23 @@ class _InvoiceEditPageState extends State<InvoiceEditPage> with _InvoiceEditPage
                               ),
                             ),
                           ),
-                          ElevatedButton(
-                            onPressed: _saveButtonState ? saveInvoice : null,
-                            child: _saveButtonState
-                                ? const Icon(Icons.save_as_rounded)
-                                : const CircularProgressIndicator(),
+                          ValueListenableBuilder(
+                            valueListenable: _saveButtonState,
+                            builder: (BuildContext context, bool value,
+                                    Widget? child) =>
+                                value == false
+                                    ? ElevatedButton(
+                                        onPressed: saveInvoice,
+                                        child:
+                                            const Icon(Icons.save_as_rounded))
+                                    : const CircularProgressIndicator(),
                           ),
                         ],
                       );
                     }
                   } else {
-                    return LoadingAnimation(customHeight: MediaQuery.of(context).size.height - 350);
+                    return LoadingAnimation(
+                        customHeight: MediaQuery.of(context).size.height - 350);
                   }
                 },
               ),
@@ -313,6 +317,4 @@ class _InvoiceEditPageState extends State<InvoiceEditPage> with _InvoiceEditPage
       ),
     );
   }
-
-
 }

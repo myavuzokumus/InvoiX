@@ -2,7 +2,8 @@ part of 'invoice_edit_page.dart';
 
 mixin _InvoiceEditPageMixin on State<InvoiceEditPage> {
 
-  late bool _saveButtonState;
+  late final ValueNotifier<bool> _saveButtonState;
+
   late bool _isFileSaved;
 
   late final XFile imageFile;
@@ -23,7 +24,7 @@ mixin _InvoiceEditPageMixin on State<InvoiceEditPage> {
   @override
   void initState() {
 
-    _saveButtonState = true;
+    _saveButtonState = ValueNotifier(true);
     _isFileSaved = false;
 
     imageFile = widget.imageFile;
@@ -183,9 +184,7 @@ mixin _InvoiceEditPageMixin on State<InvoiceEditPage> {
   Future<void> saveInvoice() async {
     // Validate returns true if the form is valid, or false otherwise.
     if (_formKey.currentState!.validate()) {
-      setState(() {
-        _saveButtonState = false;
-      });
+      _saveButtonState.value = true;
 
       // If the form is valid, display a snack bar. In the real world,
       // you'd often call a server or save the information in a database.
@@ -276,7 +275,7 @@ mixin _InvoiceEditPageMixin on State<InvoiceEditPage> {
             color: Colors.redAccent);
       } finally {
         setState(() {
-          _saveButtonState = true;
+          _saveButtonState.value = false;
         });
       }
     }
