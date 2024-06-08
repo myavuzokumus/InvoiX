@@ -23,6 +23,7 @@ class CompanyList extends ConsumerStatefulWidget {
 }
 
 class _CompanyListState extends ConsumerState<CompanyList> {
+
   late Set<String> filters;
   late final TextEditingController companyNameTextController;
   late final GlobalKey<FormState> _companyNameformKey;
@@ -44,168 +45,168 @@ class _CompanyListState extends ConsumerState<CompanyList> {
   @override
   Widget build(final BuildContext context) {
 
-    final selectionState = ref.watch(companySelectionProvider);
+    final selectionState = ref.watch(companyProvider);
 
-    return ValueListenableBuilder<Box>(
-        valueListenable: invoiceDataBox.listenable(),
-        builder: (final BuildContext context, final Box<dynamic> value,
-            final Widget? child) {
-          // Check if there is any invoice data
-          if (invoiceDataBox.values.isEmpty) {
-            return const Center(
-              child: Text(
-                "No invoice added yet.",
-                textAlign: TextAlign.center,
-                style: TextStyle(fontSize: 28),
-              ),
-            );
-          } else {
-            return FutureBuilder<List<String>>(
-              future: InvoiceDataService().getCompanyList(),
-              builder: (final BuildContext context,
-                  final AsyncSnapshot<List<String>> company) {
-                if (company.hasData) {
-                  // Create a list of companies with copy of company data
-                  final List<String> companyList = List.from(company.data!);
-                  ref.read(companySelectionProvider).listLength = companyList.length;
+    return ProviderScope(
+      child: ValueListenableBuilder<Box>(
+          valueListenable: invoiceDataBox.listenable(),
+          builder: (final BuildContext context, final Box<dynamic> value,
+              final Widget? child) {
+            // Check if there is any invoice data
+            if (invoiceDataBox.values.isEmpty) {
+              return const Center(
+                child: Text(
+                  "No invoice added yet.",
+                  textAlign: TextAlign.center,
+                  style: TextStyle(fontSize: 28),
+                ),
+              );
+            } else {
+              return FutureBuilder<List<String>>(
+                future: InvoiceDataService().getCompanyList(),
+                builder: (final BuildContext context,
+                    final AsyncSnapshot<List<String>> company) {
+                  if (company.hasData) {
+                    // Create a list of companies with copy of company data
+                    final List<String> companyList = List.from(company.data!);
 
-                  if (filters.length == 1) {
-                    companyList.removeWhere(
-                            (final String element) => !filters.every((final e) {
-                          return element
-                              .toUpperCase()
-                              .contains(e.toUpperCase());
-                        }));
-                  } else if (filters.length > 1) {
-                    companyList.removeWhere(
-                            (final String element) => !filters.any((final e) {
-                          return element
-                              .toUpperCase()
-                              .contains(e.toUpperCase());
-                        }));
+                    if (filters.length == 1) {
+                      companyList.removeWhere(
+                              (final String element) => !filters.every((final e) {
+                            return element
+                                .toUpperCase()
+                                .contains(e.toUpperCase());
+                          }));
+                    } else if (filters.length > 1) {
+                      companyList.removeWhere(
+                              (final String element) => !filters.any((final e) {
+                            return element
+                                .toUpperCase()
+                                .contains(e.toUpperCase());
+                          }));
+                    }
+
+                    final List<Widget> filterlist = filterList(company.data!);
+
+                    return SizedBox(
+                      height: MediaQuery.of(context).size.height,
+                      child: Column(
+                        children: [
+                          Padding(
+                            padding: const EdgeInsets.only(bottom: 10, top: 10),
+                            child: FilledButton(
+                              onPressed: () {},
+                              child: Text(companyList.length.toString()),
+                            ),
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 20),
+                            child: SingleChildScrollView(
+                              scrollDirection: Axis.horizontal,
+                              child: Wrap(
+                                  spacing: 10.0,
+                                  children: filterlist.length > 1
+                                      ? filterlist
+                                      : const [SizedBox()]),
+                            ),
+                          ),
+                          Flexible(
+                              child: ListView.separated(
+                                padding: const EdgeInsets.only(
+                                    left: 10, right: 10, top: 20),
+                                itemCount: companyList.length,
+                                separatorBuilder:
+                                    (final BuildContext context, final int index) =>
+                                const Divider(),
+                                itemBuilder:
+                                    (final BuildContext context, final int index) {
+                                  final companyListName =
+                                  companyList.elementAt(index);
+
+                                  return Dismissible(
+                                    key: ValueKey<int>(index),
+                                    direction: DismissDirection.endToStart,
+                                    background: Container(
+                                      color: Theme.of(context).colorScheme.primary,
+                                      child: const Row(
+                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                        children: <Widget>[
+                                          Padding(
+                                            padding: EdgeInsets.only(left: 20.0),
+                                            child: Icon(Icons.published_with_changes, color: Colors.white),
+                                          ),
+                                          Padding(
+                                            padding: EdgeInsets.only(right: 20.0),
+                                            child: Icon(Icons.published_with_changes, color: Colors.white),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                    confirmDismiss: (final direction) async {
+                                      unawaited(showDialog(
+                                          context: context,
+                                          builder: (final BuildContext context) {
+                                            return changeCompanyNameDialog(
+                                                companyListName);
+                                          }));
+                                      return false; // Kaydırma işlemi sonrasında widget'ın kaybolmamasını sağlar
+                                    },
+                                    child: ListTile(
+                                      title: Text(
+                                        companyListName,
+                                      ),
+                                      onLongPress: () {
+                                        if (ModalRoute.of(context)?.settings.name == null) return;
+                                        if (!selectionState.isSelectionMode) {
+                                          ref.read(companyProvider).isSelectionMode = !ref.read(companyProvider).isSelectionMode;
+                                          ref.read(companyProvider.notifier).toggleItemSelection(company: companyListName);
+                                        }
+                                      },
+                                      onTap: () {
+                                        if (widget.onTap != null) {
+                                          widget.onTap!(companyListName);
+                                          return;
+                                        }
+                                        else if (selectionState.isSelectionMode) {
+                                          ref.read(companyProvider.notifier).toggleItemSelection(company: companyListName);
+                                        }
+                                        else {
+                                          Navigator.push(
+                                              context,
+                                              PageRouteBuilder(
+                                                  pageBuilder: (final BuildContext context, final Animation<double> animation, final Animation<double> secondaryAnimation) => InvoicePage(
+                                                      companyName: companyListName),
+                                                transitionDuration: const Duration(milliseconds: 250),
+                                                transitionsBuilder: (final context, animation, final animationTime, final child) {
+                                                  animation = CurvedAnimation(parent: animation, curve: Curves.easeInOut);
+                                                  return FadeTransition(
+                                                    opacity: animation,
+                                                    child: child,
+                                                  );
+                                                },
+
+                                              ));
+                                        }
+                                      },
+                                      trailing: selectionState.isSelectionMode
+                                          ? Checkbox(
+                                          onChanged: (final bool? x) => ref.read(companyProvider.notifier).toggleItemSelection(company: companyListName),
+                                          value: selectionState.selectedItems.containsKey(companyListName)) : const SizedBox.shrink(),
+                                    ),
+                                  );
+                                },
+                              )),
+                        ],
+                      ),
+                    );
+                  } else {
+                    return const LoadingAnimation();
                   }
-
-                  final List<Widget> filterlist = filterList(company.data!);
-
-                  return SizedBox(
-                    height: MediaQuery.of(context).size.height,
-                    child: Column(
-                      children: [
-                        Padding(
-                          padding: const EdgeInsets.only(bottom: 10, top: 10),
-                          child: FilledButton(
-                            onPressed: () {},
-                            child: Text(companyList.length.toString()),
-                          ),
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 20),
-                          child: SingleChildScrollView(
-                            scrollDirection: Axis.horizontal,
-                            child: Wrap(
-                                spacing: 10.0,
-                                children: filterlist.length > 1
-                                    ? filterlist
-                                    : const [SizedBox()]),
-                          ),
-                        ),
-                        Flexible(
-                            child: ListView.separated(
-                              padding: const EdgeInsets.only(
-                                  left: 10, right: 10, top: 20),
-                              itemCount: companyList.length,
-                              separatorBuilder:
-                                  (final BuildContext context, final int index) =>
-                              const Divider(),
-                              itemBuilder:
-                                  (final BuildContext context, final int index) {
-                                final companyListName =
-                                companyList.elementAt(index);
-
-                                return Dismissible(
-                                  key: ValueKey<int>(index),
-                                  direction: DismissDirection.endToStart,
-                                  background: Container(
-                                    color: Theme.of(context).colorScheme.primary,
-                                    child: const Row(
-                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                      children: <Widget>[
-                                        Padding(
-                                          padding: EdgeInsets.only(left: 20.0),
-                                          child: Icon(Icons.published_with_changes, color: Colors.white),
-                                        ),
-                                        Padding(
-                                          padding: EdgeInsets.only(right: 20.0),
-                                          child: Icon(Icons.published_with_changes, color: Colors.white),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                  confirmDismiss: (final direction) async {
-                                    unawaited(showDialog(
-                                        context: context,
-                                        builder: (final BuildContext context) {
-                                          return changeCompanyNameDialog(
-                                              companyListName);
-                                        }));
-                                    return false; // Kaydırma işlemi sonrasında widget'ın kaybolmamasını sağlar
-                                  },
-                                  child: ListTile(
-                                    title: Text(
-                                      companyListName,
-                                    ),
-                                    onLongPress: () {
-                                      if (ModalRoute.of(context)?.settings.name == null) return;
-                                      if (!selectionState.isSelectionMode) {
-                                        ref.read(companySelectionProvider.notifier).toggleSelectionMode();
-                                        ref.read(companySelectionProvider.notifier).toggleItemSelection(index: index, company: companyListName);
-                                      }
-                                    },
-                                    onTap: () {
-                                      if (widget.onTap != null) {
-                                        widget.onTap!(companyListName);
-                                        return;
-                                      }
-                                      else if (selectionState.isSelectionMode) {
-                                        ref.read(companySelectionProvider.notifier).toggleItemSelection(index: index, company: companyListName);
-                                      }
-                                      else {
-                                        Navigator.push(
-                                            context,
-                                            PageRouteBuilder(
-                                                pageBuilder: (final BuildContext context, final Animation<double> animation, final Animation<double> secondaryAnimation) => InvoicePage(
-                                                    companyName: companyListName),
-                                              transitionDuration: const Duration(milliseconds: 250),
-                                              transitionsBuilder: (final context, animation, final animationTime, final child) {
-                                                animation = CurvedAnimation(parent: animation, curve: Curves.easeInOut);
-                                                return FadeTransition(
-                                                  opacity: animation,
-                                                  child: child,
-                                                );
-                                              },
-
-                                            ));
-                                      }
-                                    },
-                                    trailing: selectionState.isSelectionMode
-                                        ? Checkbox(
-                                        onChanged: (final bool? x) => ref.read(companySelectionProvider.notifier).toggleItemSelection(index: index, company: companyListName),
-                                        value: selectionState.selectedItems[index])
-                                        : const SizedBox.shrink(),
-                                  ),
-                                );
-                              },
-                            )),
-                      ],
-                    ),
-                  );
-                } else {
-                  return const LoadingAnimation();
-                }
-              },
-            );
-          }
-        });
+                },
+              );
+            }
+          }),
+    );
   }
 
   List<Widget> filterList(final List<String> company) {

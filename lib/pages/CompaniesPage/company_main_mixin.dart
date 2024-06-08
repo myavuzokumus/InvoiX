@@ -27,64 +27,6 @@ mixin _CompanyPageMixin on ConsumerState<CompanyPage> {
     });
   }
 
-  Future<void> onDelete(final context) async {
-    final selectionState = ref.read(companySelectionProvider);
-    final selectedItems = List.from(selectionState.selectedCompanies);
-
-    if (selectedItems.isNotEmpty) {
-      await showDialog(
-          context: context,
-          builder: (final BuildContext context) {
-            return AlertDialog(
-              title: const Text("Delete Company(s)"),
-              content: Text(
-                  "Are you sure you want to delete ${selectedItems.length.toString()} company(s)?"),
-              actions: [
-                TextButton(
-                  onPressed: () {
-                    Navigator.pop(context);
-                  },
-                  child: const Text("Cancel"),
-                ),
-                TextButton(
-                  onPressed: () async {
-                    Navigator.pop(context);
-                    for (final String company in selectedItems) {
-                      final List invoices =
-                      await InvoiceDataService().getInvoiceList(company);
-                      selectionState.selectedCompanies.remove(company);
-                      selectionState.listLength -= 1;
-                      for (final InvoiceData invoice in invoices) {
-                        await InvoiceDataService().deleteInvoiceData(invoice);
-                        selectionState.selectedInvoices.remove(invoice);
-                      }
-                    }
-
-                    if ((await InvoiceDataService().getCompanyList()).isEmpty) {
-                      ref.read(companySelectionProvider.notifier).toggleSelectionMode();
-                    }
-
-                    Toast(
-                      context,
-                      text:
-                      "${selectedItems.length.toString()} company deleted successfully!",
-                      color: Colors.green,
-                    );
-                  },
-                  child: const Text("Delete"),
-                ),
-              ],
-            );
-          });
-    } else {
-      Toast(
-        context,
-        text: "No company selected for deletion!",
-        color: Colors.redAccent,
-      );
-    }
-  }
-
   // Get image from camera
   Future<void> getImageFromCamera() async {
     final isCameraGranted = await Permission.camera.request();

@@ -5,13 +5,13 @@ import 'package:edge_detection/edge_detection.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive/hive.dart';
-import 'package:invoix/models/invoice_data.dart';
 import 'package:invoix/pages/CompaniesPage/company_list.dart';
 import 'package:invoix/pages/CompaniesPage/mode_selection.dart';
 import 'package:invoix/pages/InvoiceEditPage/invoice_edit_page.dart';
 import 'package:invoix/pages/SelectionState.dart';
 import 'package:invoix/utils/export_to_excel.dart';
 import 'package:invoix/utils/invoice_data_service.dart';
+import 'package:invoix/widgets/deletion_dialog.dart';
 import 'package:invoix/widgets/general_page_scaffold.dart';
 import 'package:invoix/widgets/loading_animation.dart';
 import 'package:invoix/widgets/toast.dart';
@@ -33,17 +33,17 @@ class _CompanyPageState extends ConsumerState<CompanyPage> with _CompanyPageMixi
 
   @override
   Widget build(final BuildContext context) {
-    final selectionState = ref.watch(companySelectionProvider);
+    final selectionState = ref.watch(companyProvider);
 
     return PopScope(
       canPop: !selectionState.isSelectionMode,
       onPopInvoked: (final bool bool) {
         if (selectionState.isSelectionMode) {
-          ref.read(companySelectionProvider.notifier).toggleSelectionMode();
+          ref.read(companyProvider.notifier).toggleSelectionMode();
         }
       },
       child: GeneralPage(
-        selectionProvider: companySelectionProvider,
+        selectionProvider: companyProvider,
         title: "InvoiX",
         body: Stack(
           children: [
@@ -64,7 +64,31 @@ class _CompanyPageState extends ConsumerState<CompanyPage> with _CompanyPageMixi
           ],
         ),
         onExcelExport: () => exportToExcel(listType: ListType.company),
-        onDelete: () => onDelete(context),
+        onDelete: () async {
+          try {
+            if (selectionState.selectedItems.isNotEmpty) {
+              showDialog(
+                context: context,
+                builder: (final BuildContext context) {
+                  return DeletionDialog(
+                      type: ListType.company, selectionProvider: companyProvider);
+                },
+              );
+            } else {
+              Toast(
+                context,
+                text: "No company selected for deletion!",
+                color: Colors.redAccent,
+              );
+            }
+          } catch (e) {
+            Toast(
+              context,
+              text: "An error occurred while deleting company! $e",
+              color: Colors.redAccent,
+            );
+          }
+          },
         floatingActionButton: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           crossAxisAlignment: CrossAxisAlignment.center,
