@@ -4,8 +4,9 @@ import 'package:google_generative_ai/google_generative_ai.dart';
 
 class GeminiAPI {
   final model = GenerativeModel(
-      model: 'gemini-pro-vision',
-      apiKey: dotenv.env['GEMINI_API_KEY']!
+      model: 'gemini-1.5-flash-latest',
+      apiKey: dotenv.env['GEMINI_API_KEY']!,
+      generationConfig: GenerationConfig(responseMimeType: 'application/json'),
   );
 
   Future<String> describeImage({required final File imgFile, required final String prompt}) async {
@@ -17,8 +18,7 @@ class GeminiAPI {
           ])
         ]));
 
-    return response.text!.replaceAll("```", "")
-        .replaceFirst("json", "");
+    return response.text!;
 
   }
 }

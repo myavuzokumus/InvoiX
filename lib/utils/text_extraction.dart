@@ -6,12 +6,11 @@ final TextRecognizer textRecognizer = TextRecognizer(script: TextRecognitionScri
 Future<List<String>> getScannedText(final XFile image) async {
 
   final inputImage = InputImage.fromFilePath(image.path);
+
   final RecognizedText extractedText =
   await textRecognizer.processImage(inputImage);
-  await textRecognizer.close();
 
-  //For test
-  print(extractedText.text.split("\n"));
+  await textRecognizer.close();
 
   return extractedText.text.split("\n");
 
