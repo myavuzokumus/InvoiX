@@ -295,7 +295,7 @@ class _InvoiceEditPageState extends State<InvoiceEditPage>
                             valueListenable: _saveButtonState,
                             builder: (BuildContext context, bool value,
                                     Widget? child) =>
-                                value == false
+                                value == true
                                     ? ElevatedButton(
                                         onPressed: saveInvoice,
                                         child:
