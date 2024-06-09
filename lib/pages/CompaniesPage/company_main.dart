@@ -1,22 +1,19 @@
 import 'dart:async';
 
 import 'package:cross_file/cross_file.dart';
-import 'package:edge_detection/edge_detection.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:google_mlkit_document_scanner/google_mlkit_document_scanner.dart';
 import 'package:hive/hive.dart';
 import 'package:invoix/misc/selection_mode.dart';
+import 'package:invoix/models/selection_state.dart';
 import 'package:invoix/pages/CompaniesPage/company_list.dart';
 import 'package:invoix/pages/CompaniesPage/mode_selection.dart';
 import 'package:invoix/pages/InvoiceEditPage/invoice_edit_page.dart';
-import 'package:invoix/models/selection_state.dart';
 import 'package:invoix/utils/invoice_data_service.dart';
 import 'package:invoix/widgets/loading_animation.dart';
-
 import 'package:invoix/widgets/toast.dart';
-import 'package:path/path.dart' as path;
-import 'package:path_provider/path_provider.dart';
-import 'package:permission_handler/permission_handler.dart';
 
 part 'company_main_mixin.dart';
 

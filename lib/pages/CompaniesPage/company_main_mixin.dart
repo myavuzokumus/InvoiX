@@ -27,40 +27,27 @@ mixin _CompanyPageMixin on ConsumerState<CompanyPage> {
 
   // Get image from camera
   Future<void> getImageFromCamera() async {
-    final isCameraGranted = await Permission.camera.request();
 
-    if (!mounted) return;
+    final DocumentScannerOptions documentOptions = DocumentScannerOptions(
+      documentFormat: DocumentFormat.jpeg, // set output document format
+      mode: ScannerMode.full, // to control what features are enabled
+      pageLimit: 1, // setting a limit to the number of pages scanned
+      isGalleryImport: true, // importing from the photo gallery
+    );
 
-    if (isCameraGranted.isPermanentlyDenied) {
-      unawaited(openAppSettings());
-      Toast(context,
-          text: "You need to give permission to use camera.",
-          color: Colors.redAccent);
-    } else if (!isCameraGranted.isGranted) {
-      Toast(context,
-          text: "You need to give permission to use camera.",
-          color: Colors.redAccent);
-    } else {
-      // Generate filepath for saving
-      final String imagePath = path.join(
-          (await getApplicationSupportDirectory()).path,
-          "${(DateTime.now().millisecondsSinceEpoch / 1000).round()}.jpeg");
+    final documentScanner = DocumentScanner(options: documentOptions);
 
       try {
         _isLoadingNotifier.value = true;
 
-        final bool success = await EdgeDetection.detectEdge(imagePath,
-            canUseGallery: true,
-            androidScanTitle: 'Scanning',
-            androidCropTitle: 'Crop');
+        final DocumentScanningResult result = await documentScanner.scanDocument();
 
-
-        if (mounted && success) {
+        if (mounted && result.images.isNotEmpty) {
           unawaited(Navigator.push(
               context,
               PageRouteBuilder(
                 pageBuilder: (final BuildContext context, final Animation<double> animation, final Animation<double> secondaryAnimation) => InvoiceEditPage(
-                    imageFile: XFile(imagePath), readMode: readMode),
+                    imageFile: XFile(result.images[0]), readMode: readMode),
                 transitionDuration: const Duration(milliseconds: 250),
                 transitionsBuilder: (final context, animation, final animationTime, final child) {
                   animation = CurvedAnimation(parent: animation, curve: Curves.easeInOut);
@@ -72,8 +59,8 @@ mixin _CompanyPageMixin on ConsumerState<CompanyPage> {
 
               )));
         }
-      } catch (e) {
-        if (mounted) {
+      } on PlatformException catch (e) {
+        if (mounted && e.message != "Operation cancelled") {
           Toast(context,
               text: "Something went wrong."
                   "$e",
@@ -83,6 +70,4 @@ mixin _CompanyPageMixin on ConsumerState<CompanyPage> {
         _isLoadingNotifier.value = false;
       }
     }
-  }
-
 }
