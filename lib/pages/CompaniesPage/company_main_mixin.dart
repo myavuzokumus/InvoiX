@@ -24,9 +24,6 @@ mixin _CompanyPageMixin on ConsumerState<CompanyPage> {
     });
   }
 
-  // Get image from camera
-
-
   Future<void> nextPage() async {
     _isLoadingNotifier.value = true;
 
