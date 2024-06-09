@@ -54,7 +54,7 @@ class _DeletionDialogState extends ConsumerState<DeletionDialog> {
             });
             switch (widget.type) {
               case ListType.company:
-                var companyList = List.from(selectedItems.keys);
+                final companyList = List.from(selectedItems.keys);
                 for (final String company in companyList) {
                   await InvoiceDataService().deleteCompany(company);
                   selectedItems.remove(company);
