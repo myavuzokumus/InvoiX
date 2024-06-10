@@ -22,7 +22,7 @@ class ToastContent extends StatefulWidget {
   final String text;
   final Duration duration;
 
-  const ToastContent({Key? key, required this.text, required this.duration}) : super(key: key);
+  const ToastContent({super.key, required this.text, required this.duration});
 
   @override
   _ToastContentState createState() => _ToastContentState();
@@ -47,7 +47,7 @@ class _ToastContentState extends State<ToastContent> with SingleTickerProviderSt
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     return Column(
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -58,7 +58,7 @@ class _ToastContentState extends State<ToastContent> with SingleTickerProviderSt
           child: Text(widget.text, style: const TextStyle(color: Colors.white)),
         ),
         AnimatedBuilder(animation: _controller,
-        builder: (BuildContext context, Widget? child) => LinearProgressIndicator(value: 1.0 - _controller.value)),
+        builder: (final BuildContext context, final Widget? child) => LinearProgressIndicator(value: 1.0 - _controller.value)),
       ],
     );
   }

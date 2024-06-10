@@ -7,6 +7,7 @@ class CompanySearchBar extends ConsumerWidget {
 
   final TextEditingController _controller = TextEditingController();
 
+
   @override
   Widget build(final BuildContext context, final ref) {
     final query = ref.watch(queryProvider);

@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 class QueryState extends StateNotifier<String> {
   QueryState() : super('');
 
-  void updateQuery(String newQuery) {
+  void updateQuery(final String newQuery) {
     state = newQuery;
   }
 
@@ -12,4 +12,4 @@ class QueryState extends StateNotifier<String> {
   }
 }
 
-final queryProvider = StateNotifierProvider<QueryState, String>((ref) => QueryState());
+final queryProvider = StateNotifierProvider<QueryState, String>((final ref) => QueryState());

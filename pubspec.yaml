@@ -46,6 +46,7 @@ dependencies:
   flutter_dotenv: ^5.1.0
   flutter_riverpod: ^2.5.1
   google_mlkit_document_scanner: ^0.2.0
+  blur_detector_image: ^1.0.1
   #shared_preferences: ^2.2.2
 
 dev_dependencies:

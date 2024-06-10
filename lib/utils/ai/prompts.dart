@@ -31,14 +31,17 @@ Do not include any description, just provide an RFC8259 compliant JSON response 
 
 const String identifyInvoicePrompt =
 """
-Read the invoice in the picture. Identify the company name with company type, invoice number, date in dd-MM-yyyy format, total amount, and tax amount.
+Read the invoice in the picture. Identify the company name with company type, invoice number, date in dd-MM-yyyy format, total amount, tax amount and invoice category.
 Do not include any description, just provide an RFC8259 compliant JSON response that conforms to this format.
+
+Category types: Food, Clothing, Electronics, Health, Education, Transportation, Entertainment, Others
 
 {
  "companyName": "",
  "invoiceNo": "",
  "date": "",
  "totalAmount": "",
- "taxAmount": ""
+ "taxAmount": "",
+ "category": ""
 }""";
 
