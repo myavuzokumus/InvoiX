@@ -1,6 +1,6 @@
-part of 'selection_mode.dart';
+part of 'list_page_scaffold.dart';
 
-mixin _SelectionModeMixin on ConsumerState<SelectionMode> {
+mixin _ListPageScaffoldMixin on ConsumerState<ListPageScaffold> {
 
   final ValueNotifier<bool> _excelExportingNotifier = ValueNotifier(false);
   final ValueNotifier<bool> _deleteProcessingNotifier = ValueNotifier(false);
