@@ -48,12 +48,14 @@ class InvoixMain extends StatelessWidget {
       title: 'InvoiX',
       theme: const MaterialTheme(TextTheme()).dark().copyWith(
 
-      inputDecorationTheme: const InputDecorationTheme(
-             labelStyle: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
-             border: OutlineInputBorder(),
+      inputDecorationTheme: InputDecorationTheme(
+             labelStyle: const TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
+             border: OutlineInputBorder(
+               borderRadius: BorderRadius.circular(150),
+             ),
              isDense: true,
-             counterStyle: TextStyle(fontSize: 0),
-             errorStyle: TextStyle(fontSize: 0),
+             counterStyle: const TextStyle(fontSize: 0),
+             errorStyle: const TextStyle(fontSize: 0),
          ),
         listTileTheme: const ListTileThemeData(
           shape: Border.symmetric(

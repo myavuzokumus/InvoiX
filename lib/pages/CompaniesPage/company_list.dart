@@ -4,13 +4,17 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:invoix/models/invoice_data.dart';
-import 'package:invoix/pages/InvoicesPage/invoice_main.dart';
+import 'package:invoix/models/search_state.dart';
 import 'package:invoix/models/selection_state.dart';
+import 'package:invoix/pages/InvoicesPage/invoice_main.dart';
 import 'package:invoix/utils/invoice_data_service.dart';
 import 'package:invoix/utils/text_to_invoicedata_regex.dart';
 import 'package:invoix/widgets/loading_animation.dart';
 import 'package:invoix/widgets/toast.dart';
 import 'package:invoix/widgets/warn_icon.dart';
+import 'package:string_similarity/string_similarity.dart';
+
+part 'company_list_mixin.dart';
 
 // Return list of companies
 class CompanyList extends ConsumerStatefulWidget {
@@ -22,30 +26,13 @@ class CompanyList extends ConsumerStatefulWidget {
   ConsumerState<CompanyList> createState() => _CompanyListState();
 }
 
-class _CompanyListState extends ConsumerState<CompanyList> {
-
-  late Set<String> filters;
-  late final TextEditingController companyNameTextController;
-  late final GlobalKey<FormState> _companyNameformKey;
-
-  @override
-  void initState() {
-    filters = <String>{};
-    companyNameTextController = TextEditingController();
-    _companyNameformKey = GlobalKey<FormState>();
-    super.initState();
-  }
-
-  @override
-  void dispose() {
-    companyNameTextController.dispose();
-    super.dispose();
-  }
+class _CompanyListState extends ConsumerState<CompanyList> with _CompanyListMixin{
 
   @override
   Widget build(final BuildContext context) {
 
     final selectionState = ref.watch(companyProvider);
+    final query = ref.watch(queryProvider).toLowerCase();
 
     return ProviderScope(
       child: ValueListenableBuilder<Box>(
@@ -68,23 +55,8 @@ class _CompanyListState extends ConsumerState<CompanyList> {
                     final AsyncSnapshot<List<String>> company) {
                   if (company.hasData) {
                     // Create a list of companies with copy of company data
-                    final List<String> companyList = List.from(company.data!);
 
-                    if (filters.length == 1) {
-                      companyList.removeWhere(
-                              (final String element) => !filters.every((final e) {
-                            return element
-                                .toUpperCase()
-                                .contains(e.toUpperCase());
-                          }));
-                    } else if (filters.length > 1) {
-                      companyList.removeWhere(
-                              (final String element) => !filters.any((final e) {
-                            return element
-                                .toUpperCase()
-                                .contains(e.toUpperCase());
-                          }));
-                    }
+                    final List<String> companyList = search_query(query, company);
 
                     final List<Widget> filterlist = filterList(company.data!);
 

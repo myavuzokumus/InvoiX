@@ -30,13 +30,14 @@ extension CompanyTypeExtension on CompanyType {
       case CompanyType.PLC:
         return 'PLC';
       case CompanyType.INC:
-        return 'Inc.';
+        return 'INC';
       case CompanyType.GMBH:
         return 'GmbH';
     }
   }
 }
 
+enum InvoiceCategory { Food, Clothing, Electronics, Health, Education, Transportation, Entertainment, Others }
 
 final Box<InvoiceData> invoiceDataBox = Hive.box<InvoiceData>('InvoiceData');
 

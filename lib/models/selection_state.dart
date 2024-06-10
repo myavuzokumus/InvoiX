@@ -57,7 +57,7 @@ class SelectionNotifier extends StateNotifier<SelectionState> {
         state.selectedItems[company] =
             await InvoiceDataService().getInvoiceList(company);
       } else {
-        state.selectedItems = Map.fromIterable(await InvoiceDataService().getCompanyList(), value: (_) => []);
+        state.selectedItems = Map.fromIterable(await InvoiceDataService().getCompanyList(), value: (final _) => []);
         //state.selectedItems.addAll();
       }
     } else {

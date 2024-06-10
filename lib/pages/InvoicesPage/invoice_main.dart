@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:invoix/misc/selection_mode.dart';
-import 'package:invoix/pages/InvoicesPage/invoice_list.dart';
 import 'package:invoix/models/selection_state.dart';
+import 'package:invoix/pages/InvoicesPage/invoice_list.dart';
+import 'package:invoix/pages/list_page_scaffold.dart';
 import 'package:invoix/utils/invoice_data_service.dart';
 
 
@@ -23,7 +23,7 @@ class InvoicePage extends ConsumerWidget {
           ref.read(invoiceProvider.notifier).toggleSelectionMode();
         }
       },
-      child: SelectionMode(
+      child: ListPageScaffold(
           selectionProvider: invoiceProvider,
           title: "InvoiX\n",
           type: ListType.invoice,

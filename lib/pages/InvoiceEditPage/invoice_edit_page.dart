@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:blur_detector_image/blur_detector_dart.dart';
 import 'package:cross_file/cross_file.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -40,6 +41,7 @@ class InvoiceEditPage extends StatefulWidget {
 
 class _InvoiceEditPageState extends State<InvoiceEditPage>
     with _InvoiceEditPageMixin {
+
   @override
   Widget build(final BuildContext context) {
     return SafeArea(
@@ -49,10 +51,12 @@ class _InvoiceEditPageState extends State<InvoiceEditPage>
         endDrawer: NavigationDrawer(
           children: [
             CompanyList(
-              onTap: (final item) {
+              onTap: (String item) {
                 _scaffoldKey.currentState!.closeEndDrawer();
+                item = item.replaceAll(companyRegex, "");
                 setState(() {
                   companyTextController.text = item;
+                  companySuffix = companyTypeFinder(item);
                 });
               },
             )
@@ -155,15 +159,60 @@ class _InvoiceEditPageState extends State<InvoiceEditPage>
                                   TextFormField(
                                     maxLength: 100,
                                     controller: companyTextController,
-                                    decoration: const InputDecoration(
+                                    decoration: InputDecoration(
                                         labelText: "Company name:",
-                                        suffixIcon: WarnIcon(
-                                            message:
-                                                "You must enter a valid company name.\nNeed include 'LTD., ŞTİ., A.Ş., LLC, PLC, INC, GMBH'")),
+                                        suffixIcon: Row(
+                                          mainAxisSize: MainAxisSize.min,
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.end,
+                                          children: [
+                                            SizedBox(
+                                              width: 70,
+                                              height: 35,
+                                              child: DropdownButtonFormField<
+                                                  CompanyType>(
+                                                value: companySuffix,
+                                                alignment: Alignment.center,
+                                                menuMaxHeight: 225,
+                                                hint: const Text("Type"),
+                                                iconSize: 0,
+                                                items: CompanyType.values.map(
+                                                    (final CompanyType value) {
+                                                  return DropdownMenuItem<
+                                                      CompanyType>(
+                                                    value: value,
+                                                    alignment: Alignment.center,
+                                                    child: Text(value.name),
+                                                  );
+                                                }).toList(),
+                                                onChanged:
+                                                    (final CompanyType? value) {
+                                                  companySuffix = value!;
+                                                },
+                                                decoration: const InputDecoration(
+                                                  contentPadding: EdgeInsets.symmetric(vertical: 4, horizontal: 12),
+                                                  filled: true,
+                                                ),
+                                                validator: (final value) {
+                                                  if (value == null) {
+                                                    return 'Please select company type.';
+                                                  }
+                                                  return null;
+                                                },
+                                              ),
+
+                                            ),
+                                            const Padding(
+                                              padding: EdgeInsets.only(right: 12.0, left: 4.0),
+                                              child: WarnIcon(
+                                                  message:
+                                                      "You must choose a company type."),
+                                            ),
+                                          ],
+                                        )),
                                     validator: (final value) {
                                       if (value == null ||
-                                          value.isEmpty ||
-                                          !companyRegex.hasMatch(value)) {
+                                          value.isEmpty) {
                                         return 'Please enter some text';
                                       }
                                       return null;
@@ -184,44 +233,92 @@ class _InvoiceEditPageState extends State<InvoiceEditPage>
                                       return null;
                                     },
                                   ),
-                                  TextFormField(
-                                    maxLength: 50,
-                                    controller: dateTextController,
-                                    readOnly: true,
-                                    decoration: const InputDecoration(
-                                        labelText: "Date:",
-                                        suffixIcon: WarnIcon(
-                                            message:
-                                                "You must enter a valid date.")),
-                                    onTap: () async {
-                                      final DateTime today = DateTime.now();
-                                      final DateTime? pickedDate =
-                                          await showDatePicker(
-                                              context: context,
-                                              initialDate: today,
-                                              //get today's date
-                                              firstDate: DateTime(1900),
-                                              //DateTime.now() - not to allow to choose before today.
-                                              lastDate: DateTime(today.year,
-                                                  today.month, today.day));
+                                  Row(
+                                    mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Flexible(
+                                        child: TextFormField(
+                                          maxLength: 50,
+                                          controller: dateTextController,
+                                          readOnly: true,
+                                          decoration: const InputDecoration(
+                                              labelText: "Date:",
+                                              suffixIcon: WarnIcon(
+                                                  message:
+                                                      "You must enter a valid date.")),
+                                          onTap: () async {
+                                            final DateTime today = DateTime.now();
+                                            final DateTime? pickedDate =
+                                                await showDatePicker(
+                                                    context: context,
+                                                    initialDate: today,
+                                                    //get today's date
+                                                    firstDate: DateTime(1900),
+                                                    //DateTime.now() - not to allow to choose before today.
+                                                    lastDate: DateTime(today.year,
+                                                        today.month, today.day));
 
-                                      if (pickedDate != null) {
-                                        final String formattedDate =
-                                            dateFormat.format(
-                                                pickedDate); // format date in required form here we use yyyy-MM-dd that means time is removed
+                                            if (pickedDate != null) {
+                                              final String formattedDate =
+                                                  dateFormat.format(
+                                                      pickedDate); // format date in required form here we use yyyy-MM-dd that means time is removed
 
-                                        setState(() {
-                                          dateTextController.text =
-                                              formattedDate; //set formatted date to TextField value.
-                                        });
-                                      }
-                                    },
-                                    validator: (final value) {
-                                      if (value == null || value.isEmpty) {
-                                        return "";
-                                      }
-                                      return null;
-                                    },
+                                              setState(() {
+                                                dateTextController.text =
+                                                    formattedDate; //set formatted date to TextField value.
+                                              });
+                                            }
+                                          },
+                                          validator: (final value) {
+                                            if (value == null || value.isEmpty) {
+                                              return "";
+                                            }
+                                            return null;
+                                          },
+                                        ),
+                                      ),
+                                      const SizedBox(width: 16),
+                                      Flexible(
+                                        child: DropdownButtonFormField<
+                                            InvoiceCategory>(
+                                          value: invoiceCategory,
+                                          alignment: Alignment.centerRight,
+                                          menuMaxHeight: 225,
+                                          hint: const Text("Type"),
+                                          iconSize: 0,
+                                          items: InvoiceCategory.values.map(
+                                                  (final InvoiceCategory value) {
+                                                return DropdownMenuItem<
+                                                    InvoiceCategory>(
+                                                  value: value,
+                                                  child: Text(value.name),
+                                                );
+                                              }).toList(),
+                                          onChanged:
+                                              (final InvoiceCategory? value) {
+                                                invoiceCategory = value!;
+                                          },
+                                          decoration: const InputDecoration(
+                                            isDense: true,
+                                            contentPadding: EdgeInsets.symmetric(horizontal: -4.0),
+                                            suffixIcon: WarnIcon(
+                                                message:
+                                                "You must choose a invoice category."),
+                                            filled: true,
+
+                                          ),
+
+                                          validator: (final value) {
+                                            if (value == null) {
+                                              return 'Please select invoice category.';
+                                            }
+                                            return null;
+                                          },
+                                        ),
+                                      ),
+                                    ],
                                   ),
                                   Row(
                                     mainAxisSize: MainAxisSize.min,
@@ -293,9 +390,9 @@ class _InvoiceEditPageState extends State<InvoiceEditPage>
                           ),
                           ValueListenableBuilder(
                             valueListenable: _saveButtonState,
-                            builder: (BuildContext context, bool value,
-                                    Widget? child) =>
-                                value == false
+                            builder: (final BuildContext context,
+                                    final bool value, final Widget? child) =>
+                                value == true
                                     ? ElevatedButton(
                                         onPressed: saveInvoice,
                                         child:

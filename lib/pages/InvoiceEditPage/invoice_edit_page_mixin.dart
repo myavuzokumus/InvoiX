@@ -2,12 +2,15 @@ part of 'invoice_edit_page.dart';
 
 mixin _InvoiceEditPageMixin on State<InvoiceEditPage> {
 
-  late final ValueNotifier<bool> _saveButtonState;
+  final ValueNotifier<bool> _saveButtonState = ValueNotifier(true);
 
   late bool _isFileSaved;
 
   late final XFile imageFile;
   late ReadMode? readMode;
+
+  late CompanyType companySuffix;
+  late InvoiceCategory? invoiceCategory;
 
   //TextLabelControllers
   late final TextEditingController companyTextController;
@@ -24,7 +27,7 @@ mixin _InvoiceEditPageMixin on State<InvoiceEditPage> {
   @override
   void initState() {
 
-    _saveButtonState = ValueNotifier(true);
+    _saveButtonState.value = true;
     _isFileSaved = false;
 
     imageFile = widget.imageFile;
@@ -60,16 +63,22 @@ mixin _InvoiceEditPageMixin on State<InvoiceEditPage> {
     super.dispose();
   }
 
-  Future<void> collectReadData() async {
+  Future<void> collectReadData([final String? error]) async {
+
+    if (error == null) {
+      final variance = await readImageFile(imageFile.path);
+      if (variance[0] < 1700) {
+        Toast(context, text: "The image is not clear enough.\nIt may not be read properly.", color: Colors.redAccent);
+      }
+      await imageFilter(imageFile);
+    }
 
     if( readMode == ReadMode.legacy) {
-      await imageFilter(imageFile);
       getInvoiceData(await getScannedText(imageFile));
-      await Future.delayed(const Duration(seconds: 2));
+      //await Future.delayed(const Duration(seconds: 2));
     }
     else if ( readMode == ReadMode.ai) {
       try {
-        await imageFilter(imageFile);
         await fetchInvoiceData(await GeminiAPI().describeImage(imgFile: File(imageFile.path), prompt: identifyInvoicePrompt));
       } catch (e) {
         if (await isInternetConnected()) {
@@ -85,8 +94,9 @@ mixin _InvoiceEditPageMixin on State<InvoiceEditPage> {
                   "Switching to Legacy Mode...",
               color: Colors.redAccent);
         }
+      } finally {
         readMode = ReadMode.legacy;
-        _future = collectReadData();
+        await collectReadData("error");
       }
     }
 
@@ -94,6 +104,7 @@ mixin _InvoiceEditPageMixin on State<InvoiceEditPage> {
 
   // Get Invoice Data from scanned text with Regex
   void getInvoiceData(final List listText) {
+
     companyTextController.text = listText[0];
 
     String invoiceNo = "";
@@ -107,6 +118,9 @@ mixin _InvoiceEditPageMixin on State<InvoiceEditPage> {
         if (i.contains(RegExp("A.S.", caseSensitive: false))) {
           i = i.replaceAll(RegExp("A.S.", caseSensitive: false), "A.Ş.");
         }
+
+        i = i.replaceAll(companyRegex, "");
+
         companyTextController.text = i;
       }
       // Text if match with DateRegex
@@ -132,7 +146,7 @@ mixin _InvoiceEditPageMixin on State<InvoiceEditPage> {
 
       }
       // Text if match with AmountRegex
-      else if (amountRegex.hasMatch(i) && !RegExp(r"[a-z]", caseSensitive: false).hasMatch(i)) {
+      else if (amountRegex.hasMatch(i.replaceAll(" ", "")) && !RegExp(r"[a-z]", caseSensitive: false).hasMatch(i)) {
         // Set text to AmountTextController.text
         String tax = listText.elementAt(listText.indexOf(i) - 1);
 
@@ -140,7 +154,8 @@ mixin _InvoiceEditPageMixin on State<InvoiceEditPage> {
         tax = tax.replaceAll(" ", "").replaceAll(RegExp(r'[^0-9.,]'), "").replaceAll(",", ".");
 
         totalAmountTextController.text = double.parse(i).toString();
-        taxAmountTextController.text = double.parse(tax).toString();
+
+        taxAmountTextController.text = double.tryParse(tax).toString();
       }
 
       if (i.toUpperCase().contains("NO")) {
@@ -158,6 +173,10 @@ mixin _InvoiceEditPageMixin on State<InvoiceEditPage> {
     if (invoiceNoTextController.text.isEmpty) {
       invoiceNoTextController.text = invoiceNo;
     }
+
+    invoiceCategory = InvoiceCategory.Others;
+    companySuffix = companyTypeFinder(companyTextController.text);
+
   }
 
   Future<void> fetchInvoiceData([final String? aioutput]) async {
@@ -168,12 +187,13 @@ mixin _InvoiceEditPageMixin on State<InvoiceEditPage> {
       item = InvoiceDataService().getInvoiceData(widget.invoiceData!)!;
     }
     else {
-      //For test
-      print(aioutput);
+      //print(aioutput);
       item = InvoiceData.fromJson(jsonDecode(aioutput!));
     }
 
-    companyTextController.text = item.companyName;
+    companySuffix = companyTypeFinder(item.companyName);
+    invoiceCategory = InvoiceCategory.values.firstWhere((final InvoiceCategory e) => item.category == e.name, orElse: () => InvoiceCategory.Others);
+    companyTextController.text = item.companyName.replaceAll(companyRegex, "");
     invoiceNoTextController.text = item.invoiceNo;
     dateTextController.text = dateFormat.format(item.date);
     totalAmountTextController.text = item.totalAmount.toString();
@@ -244,9 +264,7 @@ mixin _InvoiceEditPageMixin on State<InvoiceEditPage> {
             color: Colors.yellowAccent);
       }
 
-      if (companyTextController.text.contains("A.S.")) {
-        companyTextController.text = companyTextController.text.replaceAll(RegExp("A.S.", caseSensitive: false), "A.Ş.");
-      }
+      companyTextController.text = companyTextController.text.replaceAll(companyRegex, "") + companySuffix.name;
 
       try {
         final data = InvoiceData(
@@ -256,6 +274,7 @@ mixin _InvoiceEditPageMixin on State<InvoiceEditPage> {
             date: dateFormat.parse(dateTextController.text),
             totalAmount: double.parse(totalAmountTextController.text),
             taxAmount: double.parse(taxAmountTextController.text),
+            category: invoiceCategory!.name,
             id: widget.invoiceData?.id);
 
         await InvoiceDataService().saveInvoiceData(data);
@@ -280,4 +299,18 @@ mixin _InvoiceEditPageMixin on State<InvoiceEditPage> {
       }
     }
   }
+
+  CompanyType companyTypeFinder(final String companyName) {
+    return CompanyType.values.firstWhere((final CompanyType e) {
+
+      final List matchList = companyRegex.allMatches(companyName).toList();
+      final RegExpMatch? pairedType = matchList.isNotEmpty ? matchList.last : null;
+      if (pairedType == null) {
+        return false;
+      }
+      return companyName.substring(pairedType.start, pairedType.end).similarityTo(e.name) > 0.3;},
+        orElse: () => CompanyType.LTD);
+
+  }
+
 }

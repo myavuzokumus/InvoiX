@@ -5,7 +5,11 @@ import 'package:invoix/utils/invoice_data_service.dart';
 import 'package:invoix/widgets/toast.dart';
 
 class DeletionDialog extends ConsumerStatefulWidget {
-  const DeletionDialog({super.key, required this.type, this.companyName, required this.selectionProvider})
+  const DeletionDialog(
+      {super.key,
+      required this.type,
+      this.companyName,
+      required this.selectionProvider})
       : assert(
             type != ListType.invoice ||
                 (type == ListType.invoice && companyName != null),
@@ -13,14 +17,14 @@ class DeletionDialog extends ConsumerStatefulWidget {
 
   final ListType type;
   final String? companyName;
-  final AutoDisposeStateNotifierProvider<SelectionNotifier, SelectionState> selectionProvider;
+  final AutoDisposeStateNotifierProvider<SelectionNotifier, SelectionState>
+      selectionProvider;
 
   @override
   ConsumerState<DeletionDialog> createState() => _DeletionDialogState();
 }
 
 class _DeletionDialogState extends ConsumerState<DeletionDialog> {
-
   bool _isDeleting = false;
   late final selectedItems;
 
@@ -32,7 +36,6 @@ class _DeletionDialogState extends ConsumerState<DeletionDialog> {
 
   @override
   Widget build(final BuildContext context) {
-
     return AlertDialog(
       title: Text("Delete ${widget.type.name}(s)"),
       content: widget.type == ListType.company
@@ -47,45 +50,52 @@ class _DeletionDialogState extends ConsumerState<DeletionDialog> {
           },
           child: const Text("Cancel"),
         ),
-        _isDeleting ? const CircularProgressIndicator() : TextButton(
-          onPressed: () async {
-            setState(() {
-              _isDeleting = true;
-            });
-            switch (widget.type) {
-              case ListType.company:
-                var companyList = List.from(selectedItems.keys);
-                for (final String company in companyList) {
-                  await InvoiceDataService().deleteCompany(company);
-                  selectedItems.remove(company);
-                }
+        _isDeleting
+            ? const CircularProgressIndicator()
+            : TextButton(
+                onPressed: () async {
+                  setState(() {
+                    _isDeleting = true;
+                  });
 
-                // If the company list is empty, exit selection mode
-                if ((await InvoiceDataService().getCompanyList()).isEmpty) {
-                  ref.read(companyProvider.notifier).toggleSelectionMode();
-                }
-              case ListType.invoice:
-                await InvoiceDataService()
-                    .deleteInvoiceData(selectedItems[widget.companyName]!);
-                if ((await InvoiceDataService()
-                        .getInvoiceList(widget.companyName!))
-                    .isEmpty) {
+                  Toast(
+                    context,
+                    text:
+                        "${selectedItems.length.toString()} ${widget.type.name}(s) deleted successfully!",
+                    color: Colors.green,
+                  );
+
+                  switch (widget.type) {
+                    case ListType.company:
+                      final companyList = List.from(selectedItems.keys);
+                      for (final String company in companyList) {
+                        await InvoiceDataService().deleteCompany(company);
+                        selectedItems.remove(company);
+                      }
+
+                      // If the company list is empty, exit selection mode
+                      if ((await InvoiceDataService().getCompanyList())
+                          .isEmpty) {
+                        ref
+                            .read(companyProvider.notifier)
+                            .toggleSelectionMode();
+                      }
+                    case ListType.invoice:
+                      await InvoiceDataService().deleteInvoiceData(
+                          selectedItems[widget.companyName]!);
+                      if ((await InvoiceDataService()
+                              .getInvoiceList(widget.companyName!))
+                          .isEmpty) {
+                        Navigator.pop(context);
+                      }
+                  }
                   Navigator.pop(context);
-                }
-            }
-            Navigator.pop(context);
-            setState(() {
-              _isDeleting = false;
-            });
-            Toast(
-              context,
-              text:
-              "${selectedItems.length.toString()} ${widget.type.name}(s) deleted successfully!",
-              color: Colors.green,
-            );
-          },
-          child: const Text("Delete"),
-        ),
+                  setState(() {
+                    _isDeleting = false;
+                  });
+                },
+                child: const Text("Delete"),
+              ),
       ],
     );
   }
