@@ -20,6 +20,8 @@ class InvoiceData extends HiveObject {
   final double totalAmount;
   @HiveField(6, defaultValue: 0.0)
   final double taxAmount;
+  @HiveField(7, defaultValue: "Others")
+  final String category;
 
   String get id => _id;
 
@@ -30,6 +32,7 @@ class InvoiceData extends HiveObject {
       required this.date,
       required this.totalAmount,
       required this.taxAmount,
+      required this.category,
       final String? id}) {
     id != null ? _id = id : _id = const Uuid().v4();
   }
@@ -38,9 +41,10 @@ class InvoiceData extends HiveObject {
       : imagePath = json["ImagePath"] ?? "",
         companyName = json["companyName"] ?? "",
         invoiceNo = json["invoiceNo"] ?? "",
-        date = DateParser(json["date"]),
-        totalAmount = double.parse(json["totalAmount"].replaceAll(",", ".")),
-        taxAmount = double.parse(json["taxAmount"].replaceAll(",", ".")),
+        date = DateParser(json["date"] ?? "01-01-2000"),
+        totalAmount = double.parse((json["totalAmount"] ?? "0").replaceAll(",", ".")),
+        taxAmount = double.parse((json["taxAmount"] ?? "0").replaceAll(",", ".")),
+        category = json["category"] ?? "",
         _id = const Uuid().v4();
 
   InvoiceData copyWith({
@@ -50,6 +54,7 @@ class InvoiceData extends HiveObject {
     final DateTime? date,
     final double? totalAmount,
     final double? taxAmount,
+    final String? category,
     final String? id,
   }) {
     return InvoiceData(
@@ -59,6 +64,7 @@ class InvoiceData extends HiveObject {
       date: date ?? this.date,
       totalAmount: totalAmount ?? this.totalAmount,
       taxAmount: taxAmount ?? this.taxAmount,
+      category: category ?? this.category,
       id: id ?? _id,
     );
   }

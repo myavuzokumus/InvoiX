@@ -37,6 +37,7 @@ extension CompanyTypeExtension on CompanyType {
   }
 }
 
+enum InvoiceCategory { Food, Clothing, Electronics, Health, Education, Transportation, Entertainment, Others }
 
 final Box<InvoiceData> invoiceDataBox = Hive.box<InvoiceData>('InvoiceData');
 
