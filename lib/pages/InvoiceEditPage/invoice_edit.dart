@@ -56,7 +56,7 @@ class _InvoiceEditPageState extends State<InvoiceEditPage>
                 item = item.replaceAll(companyRegex, "");
                 setState(() {
                   companyTextController.text = item;
-                  companySuffix = companyTypeFinder(item);
+                  companySuffix = InvoiceDataService().companyTypeFinder(item);
                 });
               },
             )

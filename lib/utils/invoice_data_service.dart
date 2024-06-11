@@ -1,5 +1,7 @@
 import 'package:hive/hive.dart';
 import 'package:invoix/models/invoice_data.dart';
+import 'package:invoix/utils/text_to_invoicedata_regex.dart';
+import 'package:string_similarity/string_similarity.dart';
 
 enum ListType { company, invoice }
 
@@ -78,6 +80,20 @@ class InvoiceDataService {
     final Iterable<InvoiceData> savedList = invoiceDataBox.values.cast<InvoiceData>();
     return savedList.map((final item) => item.companyName).toSet().toList();
   }
+
+  CompanyType companyTypeFinder(final String companyName) {
+    return CompanyType.values.firstWhere((final CompanyType e) {
+
+      final List matchList = companyRegex.allMatches(companyName).toList();
+      final RegExpMatch? pairedType = matchList.isNotEmpty ? matchList.last : null;
+      if (pairedType == null) {
+        return false;
+      }
+      return companyName.substring(pairedType.start, pairedType.end).similarityTo(e.name) > 0.3;},
+        orElse: () => CompanyType.LTD);
+
+  }
+
 }
 
 

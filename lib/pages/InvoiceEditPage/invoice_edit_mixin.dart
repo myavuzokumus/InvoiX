@@ -172,7 +172,7 @@ mixin _InvoiceEditPageMixin on State<InvoiceEditPage> {
     }
 
     invoiceCategory = InvoiceCategory.Others;
-    companySuffix = companyTypeFinder(companyTextController.text);
+    companySuffix = InvoiceDataService().companyTypeFinder(companyTextController.text);
 
   }
 
@@ -188,7 +188,7 @@ mixin _InvoiceEditPageMixin on State<InvoiceEditPage> {
       item = InvoiceData.fromJson(jsonDecode(aioutput!));
     }
 
-    companySuffix = companyTypeFinder(item.companyName);
+    companySuffix = InvoiceDataService().companyTypeFinder(item.companyName);
     invoiceCategory = InvoiceCategory.values.firstWhere((final InvoiceCategory e) => item.category.contains(e.name), orElse: () => InvoiceCategory.Others);
     companyTextController.text = item.companyName.replaceAll(companyRegex, "");
     invoiceNoTextController.text = item.invoiceNo;
@@ -208,12 +208,8 @@ mixin _InvoiceEditPageMixin on State<InvoiceEditPage> {
 
       final List<String> companyList = await InvoiceDataService().getCompanyList();
 
-      final List matchList = companyRegex.allMatches((companyTextController.text)).toList();
-      final RegExpMatch? pairedType = matchList.isNotEmpty ? matchList.last : null;
-      if (pairedType != null) {
-        companyTextController.text = (companyTextController.text).substring(0, matchList.last-1);
-      }
-
+      companyTextController.text = (companyTextController.text).replaceAll(companyRegex, "");
+      companyTextController.text = (companyTextController.text).trimRight() + " ";
       companyTextController.text += companySuffix.name;
 
       if (readMode != null) {
@@ -301,19 +297,6 @@ mixin _InvoiceEditPageMixin on State<InvoiceEditPage> {
         });
       }
     }
-  }
-
-  CompanyType companyTypeFinder(final String companyName) {
-    return CompanyType.values.firstWhere((final CompanyType e) {
-
-      final List matchList = companyRegex.allMatches(companyName).toList();
-      final RegExpMatch? pairedType = matchList.isNotEmpty ? matchList.last : null;
-      if (pairedType == null) {
-        return false;
-      }
-      return companyName.substring(pairedType.start, pairedType.end).similarityTo(e.name) > 0.3;},
-        orElse: () => CompanyType.LTD);
-
   }
 
 }
