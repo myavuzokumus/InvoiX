@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
 import 'package:invoix/models/invoice_data.dart';
 import 'package:invoix/utils/text_to_invoicedata_regex.dart';
@@ -41,6 +42,29 @@ extension CompanyTypeExtension on CompanyType {
 
 enum InvoiceCategory { Food, Clothing, Electronics, Health, Education, Transportation, Entertainment, Others }
 
+extension InvoiceCategoryExtension on InvoiceCategory {
+  Color get color {
+    switch (this) {
+      case InvoiceCategory.Food:
+        return Colors.yellow;
+      case InvoiceCategory.Clothing:
+        return Colors.blue;
+      case InvoiceCategory.Electronics:
+        return Colors.greenAccent;
+      case InvoiceCategory.Health:
+        return Colors.red;
+      case InvoiceCategory.Education:
+        return Colors.purple;
+      case InvoiceCategory.Transportation:
+        return Colors.orange;
+      case InvoiceCategory.Entertainment:
+        return Colors.pink;
+      case InvoiceCategory.Others:
+        return Colors.grey;
+    }
+  }
+}
+
 final Box<InvoiceData> invoiceDataBox = Hive.box<InvoiceData>('InvoiceData');
 
 class InvoiceDataService {
@@ -81,6 +105,10 @@ class InvoiceDataService {
     return savedList.map((final item) => item.companyName).toSet().toList();
   }
 
+  Future<List<InvoiceData>> getAllInvoices() async {
+    return invoiceDataBox.values.cast<InvoiceData>().toList();
+  }
+
   CompanyType companyTypeFinder(final String companyName) {
     return CompanyType.values.firstWhere((final CompanyType e) {
 
@@ -94,18 +122,10 @@ class InvoiceDataService {
 
   }
 
+  // Filter invoices by date range
+  Future<List<InvoiceData>> getInvoicesBetweenDates(final DateTime startDate, final DateTime endDate) async {
+    final List<InvoiceData> allInvoices = await InvoiceDataService().getAllInvoices();
+    return allInvoices.where((final invoice) => invoice.date.isAfter(startDate) && (invoice.date.isBefore(endDate) || invoice.date.isAtSameMomentAs(endDate))).toList();
+  }
+
 }
-
-
-//  static Future<List<InvoiceData>> getCompanyList() async {
-//
-//     final Iterable<InvoiceData> savedList = invoiceDataBox.values.cast<InvoiceData>();
-//     List<InvoiceData> returnList = [];
-//
-//     for (final element in savedList) {
-//       if (!returnList.any((final item) => item.companyName == element.companyName)) {
-//         returnList.add(element);
-//       }
-//     }
-//     return returnList;
-//   }
