@@ -21,6 +21,8 @@ class _InvoiceListState extends ConsumerState<InvoiceList> {
   late Future<List<InvoiceData>> invoicesFuture;
   final ValueNotifier<bool> datePicker = ValueNotifier(false);
   late DateTimeRange initialDateTime;
+  late DateTime startDate;
+  late DateTime endDate;
 
   @override
   void initState() {
@@ -29,7 +31,9 @@ class _InvoiceListState extends ConsumerState<InvoiceList> {
       start: today.subtract(const Duration(days: 30)),
       end: today,
     );
-    invoicesFuture = retrieveInvoicesAccordingDate(DateTime(1900), today, widget.companyName);
+    startDate = DateTime(1900);
+    endDate = today;
+    invoicesFuture = retrieveInvoicesAccordingDate(startDate, today, widget.companyName);
     super.initState();
   }
 
@@ -51,6 +55,8 @@ class _InvoiceListState extends ConsumerState<InvoiceList> {
             initialTimeRange: datePicker.value ? initialDateTime : null,
             onDateRangeChanged: (final DateTime startDate, final DateTime endDate) {
               setState(() {
+                this.startDate = startDate;
+                this.endDate = endDate;
                 initialDateTime = DateTimeRange(
                   start: startDate,
                   end: endDate,
@@ -68,12 +74,13 @@ class _InvoiceListState extends ConsumerState<InvoiceList> {
             valueListenable: invoiceDataBox.listenable(),
             builder: (final BuildContext context, final Box<dynamic> value,
                 final Widget? child) {
-              print("a");
+                invoicesFuture =
+                    retrieveInvoicesAccordingDate(startDate, endDate, widget.companyName);
               return FutureBuilder<List<InvoiceData>>(
                   future: invoicesFuture,
                   builder: (final BuildContext context,
                       final AsyncSnapshot<List<InvoiceData>> invoice) {
-          
+
                     if (invoice.connectionState == ConnectionState.done) {
                       if (invoice.hasData) {
           

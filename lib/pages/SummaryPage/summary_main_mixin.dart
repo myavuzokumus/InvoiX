@@ -2,11 +2,13 @@ part of 'summary_main.dart';
 
 mixin _SummaryMainMixin on State<SummaryMain> {
 
-  int touchedIndex = -1;
+  final ValueNotifier<int> touchedIndexNotifier = ValueNotifier<int>(-1);
 
   late DateTimeRange initialDateTime;
   late List<InvoiceData> top5Invoices;
   late Future<Map<InvoiceCategory, double>> topCategoriesFuture;
+  late DateTime startDate;
+  late DateTime endDate;
 
   @override
   void initState() {
@@ -15,6 +17,8 @@ mixin _SummaryMainMixin on State<SummaryMain> {
       start: today.subtract(const Duration(days: 30)),
       end: today,
     );
+    startDate = DateTime(1900);
+    endDate = today;
     topCategoriesFuture = calculateTopCategories(today.subtract(const Duration(days: 30)), today);
     super.initState();
   }

@@ -1,5 +1,6 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 import 'package:invoix/models/invoice_data.dart';
 import 'package:invoix/pages/InvoicesPage/invoice_card.dart';
 import 'package:invoix/pages/SummaryPage/indicator.dart';
@@ -22,6 +23,7 @@ class _SummaryMainState extends State<SummaryMain> with _SummaryMainMixin {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Summary'),
+        centerTitle: true,
       ),
       body: Column(
         children: [
@@ -33,6 +35,8 @@ class _SummaryMainState extends State<SummaryMain> with _SummaryMainMixin {
               onDateRangeChanged: (final DateTime startDate,
                   final DateTime endDate) {
                 setState(() {
+                  this.startDate = startDate;
+                  this.endDate = endDate;
                   initialDateTime = DateTimeRange(
                     start: startDate,
                     end: endDate,
@@ -44,91 +48,100 @@ class _SummaryMainState extends State<SummaryMain> with _SummaryMainMixin {
             ),
           ),
           Expanded(
-            child: FutureBuilder<Map<InvoiceCategory, double>>(
-                future: topCategoriesFuture,
-                builder: (final BuildContext context,
-                    final AsyncSnapshot<Map<InvoiceCategory, double>> snapshot) {
-                  if (snapshot.connectionState == ConnectionState.done) {
-                    if (snapshot.hasError || snapshot.data!.isEmpty) {
-                      return Center(
-                          child: Column(
-                        children: [
-                          const Text("Invoice data couldn't be found."),
-                          ElevatedButton(
-                              onPressed: () {
-                                setState(() {
-                                  topCategoriesFuture = calculateTopCategories(
-                                      DateTime.now()
-                                          .subtract(const Duration(days: 30)),
-                                      DateTime.now());
-                                });
-                              },
-                              child: const Text('Retry'))
-                        ],
-                      ));
-                    } else if (snapshot.hasData) {
-                      return Column(
-                        children: <Widget>[
-                          AspectRatio(
-                            aspectRatio: 1.6,
-                            child: PieChart(
-                              PieChartData(
-                                pieTouchData: PieTouchData(
-                                  touchCallback: (final FlTouchEvent event,
-                                      final pieTouchResponse) {
-                                    setState(() {
-                                      if (!event.isInterestedForInteractions ||
-                                          pieTouchResponse == null ||
-                                          pieTouchResponse.touchedSection == null) {
-                                        touchedIndex = -1;
-                                        return;
-                                      }
-                                      touchedIndex = pieTouchResponse
-                                          .touchedSection!.touchedSectionIndex;
-                                    });
-                                  },
+            child: ValueListenableBuilder<Box>(
+              valueListenable: invoiceDataBox.listenable(),
+              builder: (final BuildContext context, final value, final Widget? child) {
+                  topCategoriesFuture =
+                      calculateTopCategories(startDate, endDate);
+                return FutureBuilder<Map<InvoiceCategory, double>>(
+                  future: topCategoriesFuture,
+                  builder: (final BuildContext context,
+                      final AsyncSnapshot<Map<InvoiceCategory, double>> snapshot) {
+                    if (snapshot.connectionState == ConnectionState.done) {
+                      if (snapshot.hasError || snapshot.data!.isEmpty) {
+                        return Center(
+                            child: Column(
+                          children: [
+                            const Text("Invoice data couldn't be found."),
+                            ElevatedButton(
+                                onPressed: () {
+                                  setState(() {
+                                    topCategoriesFuture = calculateTopCategories(
+                                        DateTime.now()
+                                            .subtract(const Duration(days: 30)),
+                                        DateTime.now());
+                                  });
+                                },
+                                child: const Text('Retry'))
+                          ],
+                        ));
+                      } else if (snapshot.hasData) {
+                        return Column(
+                          children: <Widget>[
+                            AspectRatio(
+                              aspectRatio: 1.6,
+                              child: ValueListenableBuilder<int>(
+                                valueListenable: touchedIndexNotifier,
+                                builder: (final BuildContext context, final int touchedIndex, final Widget? child) {
+                                  return PieChart(
+                                    PieChartData(
+                                      pieTouchData: PieTouchData(
+                                        touchCallback: (final FlTouchEvent event,
+                                            final pieTouchResponse) {
+                                          if (!event.isInterestedForInteractions ||
+                                              pieTouchResponse == null ||
+                                              pieTouchResponse.touchedSection == null) {
+                                            touchedIndexNotifier.value = -1;
+                                            return;
+                                          }
+                                          touchedIndexNotifier.value = pieTouchResponse
+                                              .touchedSection!.touchedSectionIndex;
+                                        },
+                                      ),
+                                      centerSpaceRadius: 40,
+                                      sections: showingSections(snapshot.data!, touchedIndex),
+                                    ),
+                                  );
+                                },
+                              ),
+                            ),
+                            Wrap(
+                                spacing: 8.0, // gap between adjacent chips
+                                runSpacing: 4.0, // gap between lines
+                                children: getIndicators(snapshot.data!)),
+                            const Divider(),
+                            Text("Top 5 Invoices",
+                                style: Theme.of(context).textTheme.titleLarge),
+                            const Divider(),
+                            Expanded(
+                              child: GridView.builder(
+                                padding: const EdgeInsets.only(left: 20, right: 20),
+                                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                                  crossAxisCount: MediaQuery.of(context).orientation ==
+                                          Orientation.landscape
+                                      ? 2
+                                      : 1,
+                                  mainAxisSpacing: 15,
+                                  crossAxisSpacing: 15,
+                                  childAspectRatio: 2.60,
                                 ),
-                                centerSpaceRadius: 40,
-                                sections: showingSections(snapshot.data!),
-                              ),
-                            ),
-                          ),
-                          Wrap(
-                              spacing: 8.0, // gap between adjacent chips
-                              runSpacing: 4.0, // gap between lines
-                              children: getIndicators(snapshot.data!)),
-                          const Divider(),
-                          Text("Top 5 Invoices",
-                              style: Theme.of(context).textTheme.titleLarge),
-                          const Divider(),
-                          Expanded(
-                            child: GridView.builder(
-                              padding: const EdgeInsets.only(left: 20, right: 20),
-                              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                                crossAxisCount: MediaQuery.of(context).orientation ==
-                                        Orientation.landscape
-                                    ? 2
-                                    : 1,
-                                mainAxisSpacing: 15,
-                                crossAxisSpacing: 15,
-                                childAspectRatio: 2.60,
-                              ),
-                              itemCount: top5Invoices.length,
-                              itemBuilder:
-                                  (final BuildContext context, final int index) {
-                                final invoiceData = top5Invoices.elementAt(index);
-            
-                                return InvoiceCard(invoiceData: invoiceData);
-                              },
-                            ),
-                          ),
-                        ],
-                      );
-                    }
-                  }
-                  return const LoadingAnimation();
+                                itemCount: top5Invoices.length,
+                                itemBuilder:
+                                    (final BuildContext context, final int index) {
+                                  final invoiceData = top5Invoices.elementAt(index);
 
-                }),
+                                  return InvoiceCard(invoiceData: invoiceData);
+                                },
+                              ),
+                            ),
+                          ],
+                        );
+                      }
+                    }
+                    return const LoadingAnimation();
+
+                  });}
+            ),
           ),
         ],
       ),
@@ -136,7 +149,7 @@ class _SummaryMainState extends State<SummaryMain> with _SummaryMainMixin {
   }
 
   List<PieChartSectionData> showingSections(
-      final Map<InvoiceCategory, double> categoryTotals) {
+      final Map<InvoiceCategory, double> categoryTotals, final int touchedIndex) {
     // Calculate total amount
     final double totalAmount =
         categoryTotals.values.reduce((final a, final b) => a + b);
