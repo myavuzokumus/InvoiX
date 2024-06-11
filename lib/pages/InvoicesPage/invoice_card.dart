@@ -6,7 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:invoix/models/invoice_data.dart';
 import 'package:invoix/models/selection_state.dart';
-import 'package:invoix/pages/InvoiceEditPage/invoice_edit_page.dart';
+import 'package:invoix/pages/InvoiceEditPage/invoice_edit.dart';
 import 'package:invoix/pages/InvoicesPage/ai_button.dart';
 
 class InvoiceCard extends ConsumerWidget {

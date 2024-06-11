@@ -8,7 +8,7 @@ import 'package:hive/hive.dart';
 import 'package:invoix/models/selection_state.dart';
 import 'package:invoix/pages/CompaniesPage/company_list.dart';
 import 'package:invoix/pages/CompaniesPage/mode_selection.dart';
-import 'package:invoix/pages/InvoiceEditPage/invoice_edit_page.dart';
+import 'package:invoix/pages/InvoiceEditPage/invoice_edit.dart';
 import 'package:invoix/pages/list_page_scaffold.dart';
 import 'package:invoix/utils/document_scanner.dart';
 import 'package:invoix/utils/invoice_data_service.dart';

@@ -1,4 +1,4 @@
-part of 'invoice_edit_page.dart';
+part of 'invoice_edit.dart';
 
 mixin _InvoiceEditPageMixin on State<InvoiceEditPage> {
 

@@ -25,7 +25,7 @@ import '../../utils/text_to_invoicedata_regex.dart';
 import '../../widgets/toast.dart';
 import '../../widgets/warn_icon.dart';
 
-part 'invoice_edit_page_mixin.dart';
+part 'invoice_edit_mixin.dart';
 
 class InvoiceEditPage extends StatefulWidget {
   const InvoiceEditPage(
