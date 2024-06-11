@@ -66,9 +66,7 @@ mixin _InvoiceEditPageMixin on State<InvoiceEditPage> {
   Future<void> collectReadData([final String? error]) async {
 
     if (error == null) {
-      final variance = await readImageFile(imageFile.path);
-      print(variance);
-      if (variance[0] < 1700) {
+      if (await blurDetection(imageFile.path, 10) && mounted) {
         Toast(context, text: "The image is not clear enough.\nIt may not be read properly.", color: Colors.redAccent);
       }
       await imageFilter(imageFile);
@@ -83,7 +81,6 @@ mixin _InvoiceEditPageMixin on State<InvoiceEditPage> {
         await fetchInvoiceData(await GeminiAPI().describeImage(imgFile: File(imageFile.path), prompt: identifyInvoicePrompt));
       } catch (e) {
         if (await isInternetConnected()) {
-          print(e);
           Toast(context,
               text: "Something went wrong.\n"
                   "$e\n"
@@ -211,6 +208,14 @@ mixin _InvoiceEditPageMixin on State<InvoiceEditPage> {
 
       final List<String> companyList = await InvoiceDataService().getCompanyList();
 
+      final List matchList = companyRegex.allMatches((companyTextController.text)).toList();
+      final RegExpMatch? pairedType = matchList.isNotEmpty ? matchList.last : null;
+      if (pairedType != null) {
+        companyTextController.text = (companyTextController.text).substring(0, matchList.last-1);
+      }
+
+      companyTextController.text += companySuffix.name;
+
       if (readMode != null) {
         for (final companyName in companyList) {
 
@@ -263,8 +268,6 @@ mixin _InvoiceEditPageMixin on State<InvoiceEditPage> {
             text: "Processing Data...",
             color: Colors.yellowAccent);
       }
-
-      companyTextController.text = companyTextController.text.replaceAll(companyRegex, "") + companySuffix.name;
 
       try {
         final data = InvoiceData(

@@ -2,7 +2,6 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:blur_detector_image/blur_detector_dart.dart';
 import 'package:cross_file/cross_file.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -13,6 +12,7 @@ import 'package:invoix/pages/CompaniesPage/mode_selection.dart';
 import 'package:invoix/pages/InvoiceEditPage/date_format.dart';
 import 'package:invoix/utils/ai/gemini_api.dart';
 import 'package:invoix/utils/ai/prompts.dart';
+import 'package:invoix/utils/blur_detector.dart';
 import 'package:invoix/utils/date_parser.dart';
 import 'package:invoix/utils/image_filter.dart';
 import 'package:invoix/utils/network_check.dart';
@@ -298,7 +298,7 @@ class _InvoiceEditPageState extends State<InvoiceEditPage>
                                               }).toList(),
                                           onChanged:
                                               (final InvoiceCategory? value) {
-                                                invoiceCategory = value!;
+                                                invoiceCategory = value;
                                           },
                                           decoration: const InputDecoration(
                                             isDense: true,
