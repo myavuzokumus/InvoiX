@@ -1,4 +1,4 @@
-part of 'invoice_edit_page.dart';
+part of 'invoice_edit.dart';
 
 mixin _InvoiceEditPageMixin on State<InvoiceEditPage> {
 
@@ -66,14 +66,13 @@ mixin _InvoiceEditPageMixin on State<InvoiceEditPage> {
   Future<void> collectReadData([final String? error]) async {
 
     if (error == null) {
-      final variance = await readImageFile(imageFile.path);
-      if (variance[0] < 1700) {
+      if (await blurDetection(imageFile.path, 10) && mounted) {
         Toast(context, text: "The image is not clear enough.\nIt may not be read properly.", color: Colors.redAccent);
       }
       await imageFilter(imageFile);
     }
 
-    if( readMode == ReadMode.legacy) {
+    if(readMode == ReadMode.legacy) {
       getInvoiceData(await getScannedText(imageFile));
       //await Future.delayed(const Duration(seconds: 2));
     }
@@ -82,7 +81,6 @@ mixin _InvoiceEditPageMixin on State<InvoiceEditPage> {
         await fetchInvoiceData(await GeminiAPI().describeImage(imgFile: File(imageFile.path), prompt: identifyInvoicePrompt));
       } catch (e) {
         if (await isInternetConnected()) {
-          print(e);
           Toast(context,
               text: "Something went wrong.\n"
                   "$e\n"
@@ -93,10 +91,9 @@ mixin _InvoiceEditPageMixin on State<InvoiceEditPage> {
               text: "No Internet Connection\n"
                   "Switching to Legacy Mode...",
               color: Colors.redAccent);
+          readMode = ReadMode.legacy;
+          await collectReadData("error");
         }
-      } finally {
-        readMode = ReadMode.legacy;
-        await collectReadData("error");
       }
     }
 
@@ -175,7 +172,7 @@ mixin _InvoiceEditPageMixin on State<InvoiceEditPage> {
     }
 
     invoiceCategory = InvoiceCategory.Others;
-    companySuffix = companyTypeFinder(companyTextController.text);
+    companySuffix = InvoiceDataService().companyTypeFinder(companyTextController.text);
 
   }
 
@@ -191,8 +188,8 @@ mixin _InvoiceEditPageMixin on State<InvoiceEditPage> {
       item = InvoiceData.fromJson(jsonDecode(aioutput!));
     }
 
-    companySuffix = companyTypeFinder(item.companyName);
-    invoiceCategory = InvoiceCategory.values.firstWhere((final InvoiceCategory e) => item.category == e.name, orElse: () => InvoiceCategory.Others);
+    companySuffix = InvoiceDataService().companyTypeFinder(item.companyName);
+    invoiceCategory = InvoiceCategory.values.firstWhere((final InvoiceCategory e) => item.category.contains(e.name), orElse: () => InvoiceCategory.Others);
     companyTextController.text = item.companyName.replaceAll(companyRegex, "");
     invoiceNoTextController.text = item.invoiceNo;
     dateTextController.text = dateFormat.format(item.date);
@@ -210,6 +207,16 @@ mixin _InvoiceEditPageMixin on State<InvoiceEditPage> {
       // you'd often call a server or save the information in a database.
 
       final List<String> companyList = await InvoiceDataService().getCompanyList();
+
+      final List matchList = companyRegex.allMatches((companyTextController.text)).toList();
+      final RegExpMatch? pairedType = matchList.isNotEmpty ? matchList.first : null;
+      if (pairedType != null) {
+        companyTextController.text = (companyTextController.text).substring(0, pairedType.start-1);
+      }
+
+      companyTextController.text = (companyTextController.text).replaceAll(companyRegex, "");
+      companyTextController.text = (companyTextController.text).trimRight() + " ";
+      companyTextController.text += companySuffix.name;
 
       if (readMode != null) {
         for (final companyName in companyList) {
@@ -264,8 +271,6 @@ mixin _InvoiceEditPageMixin on State<InvoiceEditPage> {
             color: Colors.yellowAccent);
       }
 
-      companyTextController.text = companyTextController.text.replaceAll(companyRegex, "") + companySuffix.name;
-
       try {
         final data = InvoiceData(
             imagePath: imageFile.path,
@@ -298,19 +303,6 @@ mixin _InvoiceEditPageMixin on State<InvoiceEditPage> {
         });
       }
     }
-  }
-
-  CompanyType companyTypeFinder(final String companyName) {
-    return CompanyType.values.firstWhere((final CompanyType e) {
-
-      final List matchList = companyRegex.allMatches(companyName).toList();
-      final RegExpMatch? pairedType = matchList.isNotEmpty ? matchList.last : null;
-      if (pairedType == null) {
-        return false;
-      }
-      return companyName.substring(pairedType.start, pairedType.end).similarityTo(e.name) > 0.3;},
-        orElse: () => CompanyType.LTD);
-
   }
 
 }

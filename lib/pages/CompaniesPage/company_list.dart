@@ -121,7 +121,7 @@ class _CompanyListState extends ConsumerState<CompanyList> with _CompanyListMixi
                                             return changeCompanyNameDialog(
                                                 companyListName);
                                           }));
-                                      return false; // Kaydırma işlemi sonrasında widget'ın kaybolmamasını sağlar
+                                      return false; // Make it visible after swipe process
                                     },
                                     child: ListTile(
                                       title: Text(
@@ -205,6 +205,10 @@ class _CompanyListState extends ConsumerState<CompanyList> with _CompanyListMixi
   }
 
   AlertDialog changeCompanyNameDialog(final String companyListName) {
+
+    CompanyType companySuffix = InvoiceDataService().companyTypeFinder(companyListName);
+    companyNameTextController.clear();
+
     return AlertDialog(
       title: Text(companyListName),
       content: Column(
@@ -218,17 +222,62 @@ class _CompanyListState extends ConsumerState<CompanyList> with _CompanyListMixi
             child: TextFormField(
               maxLength: 100,
               controller: companyNameTextController,
-              decoration: const InputDecoration(
-                  labelText: "New company name:",
-                  labelStyle: TextStyle(fontSize: 16),
+              decoration: InputDecoration(
+                  labelText: "New Company name:",
+                  labelStyle: const TextStyle(fontSize: 16),
                   hintText: "Enter new company name",
-                  suffixIcon: WarnIcon(
-                      message:
-                      "You must enter a valid company name.\nNeed include 'LTD., ŞTİ., A.Ş., LLC, PLC, INC, GMBH'")),
+                  suffixIcon: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    mainAxisAlignment:
+                    MainAxisAlignment.end,
+                    children: [
+                      SizedBox(
+                        width: 70,
+                        height: 35,
+                        child: DropdownButtonFormField<
+                            CompanyType>(
+                          value: companySuffix,
+                          alignment: Alignment.center,
+                          menuMaxHeight: 225,
+                          hint: const Text("Type"),
+                          iconSize: 0,
+                          items: CompanyType.values.map(
+                                  (final CompanyType value) {
+                                return DropdownMenuItem<
+                                    CompanyType>(
+                                  value: value,
+                                  alignment: Alignment.center,
+                                  child: Text(value.name),
+                                );
+                              }).toList(),
+                          onChanged:
+                              (final CompanyType? value) {
+                            companySuffix = value!;
+                          },
+                          decoration: const InputDecoration(
+                            contentPadding: EdgeInsets.symmetric(vertical: 4, horizontal: 12),
+                            filled: true,
+                          ),
+                          validator: (final value) {
+                            if (value == null) {
+                              return 'Please select company type.';
+                            }
+                            return null;
+                          },
+                        ),
+
+                      ),
+                      const Padding(
+                        padding: EdgeInsets.only(right: 12.0, left: 4.0),
+                        child: WarnIcon(
+                            message:
+                            "You must choose a company type."),
+                      ),
+                    ],
+                  )),
               validator: (final value) {
                 if (value == null ||
-                    value.isEmpty ||
-                    !companyRegex.hasMatch(value)) {
+                    value.isEmpty) {
                   return 'Please enter some text';
                 }
                 return null;
@@ -247,6 +296,17 @@ class _CompanyListState extends ConsumerState<CompanyList> with _CompanyListMixi
         TextButton(
           onPressed: () async {
             if (_companyNameformKey.currentState!.validate()) {
+
+              final List matchList = companyRegex.allMatches((companyNameTextController.text)).toList();
+              final RegExpMatch? pairedType = matchList.isNotEmpty ? matchList.first : null;
+              if (pairedType != null) {
+                companyNameTextController.text = (companyNameTextController.text).substring(0, pairedType.start-1);
+              }
+
+              companyNameTextController.text = (companyNameTextController.text).replaceAll(companyRegex, "");
+              companyNameTextController.text = (companyNameTextController.text).trimRight() + " ";
+              companyNameTextController.text += companySuffix.name;
+
               for (final InvoiceData element
               in await InvoiceDataService().getInvoiceList(companyListName)) {
                 await InvoiceDataService().saveInvoiceData(element.copyWith(
@@ -259,7 +319,7 @@ class _CompanyListState extends ConsumerState<CompanyList> with _CompanyListMixi
                   color: Colors.greenAccent);
             } else {
               Toast(context,
-                  text: "Please enter a valid company name.\nNeed include 'LTD., ŞTİ., A.Ş., LLC, PLC, INC, GMBH'",
+                  text: "Please enter a valid company name.",
                   color: Colors.redAccent
               );
             }
