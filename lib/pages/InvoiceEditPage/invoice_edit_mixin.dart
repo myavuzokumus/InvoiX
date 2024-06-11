@@ -208,6 +208,12 @@ mixin _InvoiceEditPageMixin on State<InvoiceEditPage> {
 
       final List<String> companyList = await InvoiceDataService().getCompanyList();
 
+      final List matchList = companyRegex.allMatches((companyTextController.text)).toList();
+      final RegExpMatch? pairedType = matchList.isNotEmpty ? matchList.first : null;
+      if (pairedType != null) {
+        companyTextController.text = (companyTextController.text).substring(0, pairedType.start-1);
+      }
+
       companyTextController.text = (companyTextController.text).replaceAll(companyRegex, "");
       companyTextController.text = (companyTextController.text).trimRight() + " ";
       companyTextController.text += companySuffix.name;

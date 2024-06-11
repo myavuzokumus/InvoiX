@@ -297,6 +297,12 @@ class _CompanyListState extends ConsumerState<CompanyList> with _CompanyListMixi
           onPressed: () async {
             if (_companyNameformKey.currentState!.validate()) {
 
+              final List matchList = companyRegex.allMatches((companyNameTextController.text)).toList();
+              final RegExpMatch? pairedType = matchList.isNotEmpty ? matchList.first : null;
+              if (pairedType != null) {
+                companyNameTextController.text = (companyNameTextController.text).substring(0, pairedType.start-1);
+              }
+
               companyNameTextController.text = (companyNameTextController.text).replaceAll(companyRegex, "");
               companyNameTextController.text = (companyNameTextController.text).trimRight() + " ";
               companyNameTextController.text += companySuffix.name;
