@@ -67,13 +67,14 @@ mixin _InvoiceEditPageMixin on State<InvoiceEditPage> {
 
     if (error == null) {
       final variance = await readImageFile(imageFile.path);
+      print(variance);
       if (variance[0] < 1700) {
         Toast(context, text: "The image is not clear enough.\nIt may not be read properly.", color: Colors.redAccent);
       }
       await imageFilter(imageFile);
     }
 
-    if( readMode == ReadMode.legacy) {
+    if(readMode == ReadMode.legacy) {
       getInvoiceData(await getScannedText(imageFile));
       //await Future.delayed(const Duration(seconds: 2));
     }
@@ -93,10 +94,9 @@ mixin _InvoiceEditPageMixin on State<InvoiceEditPage> {
               text: "No Internet Connection\n"
                   "Switching to Legacy Mode...",
               color: Colors.redAccent);
+          readMode = ReadMode.legacy;
+          await collectReadData("error");
         }
-      } finally {
-        readMode = ReadMode.legacy;
-        await collectReadData("error");
       }
     }
 
@@ -192,7 +192,7 @@ mixin _InvoiceEditPageMixin on State<InvoiceEditPage> {
     }
 
     companySuffix = companyTypeFinder(item.companyName);
-    invoiceCategory = InvoiceCategory.values.firstWhere((final InvoiceCategory e) => item.category == e.name, orElse: () => InvoiceCategory.Others);
+    invoiceCategory = InvoiceCategory.values.firstWhere((final InvoiceCategory e) => item.category.contains(e.name), orElse: () => InvoiceCategory.Others);
     companyTextController.text = item.companyName.replaceAll(companyRegex, "");
     invoiceNoTextController.text = item.invoiceNo;
     dateTextController.text = dateFormat.format(item.date);
