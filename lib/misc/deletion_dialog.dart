@@ -86,7 +86,6 @@ class _DeletionDialogState extends ConsumerState<DeletionDialog> {
                       if ((await InvoiceDataService()
                               .getInvoiceList(widget.companyName!))
                           .isEmpty) {
-                        Navigator.pop(context);
                       }
                   }
                   Navigator.pop(context);

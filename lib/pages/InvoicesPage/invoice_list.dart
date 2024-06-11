@@ -28,7 +28,11 @@ class InvoiceList extends ConsumerWidget {
                 final List<InvoiceData> invoiceList = List.from(invoice.data!);
 
                 if (invoiceList.isEmpty) {
-                  Navigator.pop(context);
+                  WidgetsBinding.instance.addPostFrameCallback((_) {
+                    if (Navigator.canPop(context)) {
+                      Navigator.pop(context);
+                    }
+                  });
                 }
 
                 return Column(
