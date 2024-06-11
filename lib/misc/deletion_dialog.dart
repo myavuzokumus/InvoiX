@@ -30,7 +30,9 @@ class _DeletionDialogState extends ConsumerState<DeletionDialog> {
 
   @override
   void initState() {
-    selectedItems = ref.read(widget.selectionProvider).selectedItems;
+    selectedItems = widget.type == ListType.company
+        ? ref.read(widget.selectionProvider).selectedItems
+        : ref.read(widget.selectionProvider).selectedItems[widget.companyName];
     super.initState();
   }
 
@@ -38,11 +40,7 @@ class _DeletionDialogState extends ConsumerState<DeletionDialog> {
   Widget build(final BuildContext context) {
     return AlertDialog(
       title: Text("Delete ${widget.type.name}(s)"),
-      content: widget.type == ListType.company
-          ? Text(
-              "Are you sure you want to delete ${selectedItems.length.toString()} ${widget.type.name}(s)?")
-          : Text(
-              "Are you sure you want to delete ${selectedItems[widget.companyName].length.toString()} ${widget.type.name}(s)?"),
+      content: Text("Are you sure you want to delete ${selectedItems.length.toString()} ${widget.type.name}(s)?"),
       actions: [
         TextButton(
           onPressed: () {
@@ -82,7 +80,7 @@ class _DeletionDialogState extends ConsumerState<DeletionDialog> {
                       }
                     case ListType.invoice:
                       await InvoiceDataService().deleteInvoiceData(
-                          selectedItems[widget.companyName]!);
+                          selectedItems);
                       if ((await InvoiceDataService()
                               .getInvoiceList(widget.companyName!))
                           .isEmpty) {
