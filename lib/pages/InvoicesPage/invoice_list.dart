@@ -27,6 +27,10 @@ class InvoiceList extends ConsumerWidget {
 
                 final List<InvoiceData> invoiceList = List.from(invoice.data!);
 
+                if (invoiceList.isEmpty) {
+                  Navigator.pop(context);
+                }
+
                 return Column(
                   children: [
                     Padding(
