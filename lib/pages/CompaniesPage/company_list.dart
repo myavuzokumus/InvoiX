@@ -56,7 +56,7 @@ class _CompanyListState extends ConsumerState<CompanyList> with _CompanyListMixi
                   if (company.hasData) {
                     // Create a list of companies with copy of company data
 
-                    final List<String> companyList = search_query(query, company);
+                    final List<String> companyList = searchQuery(query, company);
 
                     final List<Widget> filterlist = filterList(company.data!);
 
@@ -128,9 +128,11 @@ class _CompanyListState extends ConsumerState<CompanyList> with _CompanyListMixi
                                         companyListName,
                                       ),
                                       onLongPress: () {
-                                        if (ModalRoute.of(context)?.settings.name == null) return;
+                                        if (ModalRoute.of(context)?.settings.name == null) {
+                                          return;
+                                        }
                                         if (!selectionState.isSelectionMode) {
-                                          ref.read(companyProvider).isSelectionMode = !ref.read(companyProvider).isSelectionMode;
+                                          selectionState.isSelectionMode = !selectionState.isSelectionMode;
                                           ref.read(companyProvider.notifier).toggleItemSelection(company: companyListName);
                                         }
                                       },
@@ -304,7 +306,7 @@ class _CompanyListState extends ConsumerState<CompanyList> with _CompanyListMixi
               }
 
               companyNameTextController.text = (companyNameTextController.text).replaceAll(companyRegex, "");
-              companyNameTextController.text = (companyNameTextController.text).trimRight() + " ";
+              companyNameTextController.text = "${(companyNameTextController.text).trimRight()} ";
               companyNameTextController.text += companySuffix.name;
 
               for (final InvoiceData element
@@ -312,7 +314,9 @@ class _CompanyListState extends ConsumerState<CompanyList> with _CompanyListMixi
                 await InvoiceDataService().saveInvoiceData(element.copyWith(
                     companyName: companyNameTextController.text));
               }
-              if (!mounted) return;
+              if (!mounted) {
+                return;
+              }
               Navigator.pop(context);
               Toast(context,
                   text: "Company name has been changed successfully.",

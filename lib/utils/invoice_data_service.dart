@@ -125,7 +125,18 @@ class InvoiceDataService {
   // Filter invoices by date range
   Future<List<InvoiceData>> getInvoicesBetweenDates(final DateTime startDate, final DateTime endDate) async {
     final List<InvoiceData> allInvoices = await InvoiceDataService().getAllInvoices();
-    return allInvoices.where((final invoice) => invoice.date.isAfter(startDate) && (invoice.date.isBefore(endDate) || invoice.date.isAtSameMomentAs(endDate))).toList();
+    return allInvoices.where((final invoice) => isInvoiceBetweenDates(invoice, startDate, endDate)).toList();
+  }
+
+  bool isInvoiceBetweenDates(final InvoiceData invoice, final DateTime startDate, final DateTime endDate) {
+    return (invoice.date.isAfter(startDate) &&
+        (invoice.date.isBefore(endDate) ||
+            invoice.date.isAtSameMomentAs(
+                endDate)));
+  }
+
+  bool isSameInvoice(final InvoiceData invoiceData1, final InvoiceData invoiceData2) {
+    return invoiceData1 == invoiceData2;
   }
 
 }

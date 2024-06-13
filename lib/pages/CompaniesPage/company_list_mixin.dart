@@ -20,7 +20,7 @@ mixin _CompanyListMixin on ConsumerState<CompanyList> {
     super.dispose();
   }
 
-  List<String> search_query(final String query, final AsyncSnapshot<List<String>> company) {
+  List<String> searchQuery(final String query, final AsyncSnapshot<List<String>> company) {
     if (query.isNotEmpty) {
       company.data!.removeWhere((String element) {
         element = element.toLowerCase();

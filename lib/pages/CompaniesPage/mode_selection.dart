@@ -28,7 +28,7 @@ class _ModeSelectionState extends State<ModeSelection> {
 
   Future<void> changeModelData(final ReadMode? value) async {
     final box = await Hive.openBox('modeBox');
-    if (value! == ReadMode.ai && !(await isInternetConnected())) {
+    if (value! == ReadMode.ai && !(await isInternetConnected()) && mounted) {
       Toast(context,
           text: "You need to connect to the internet to use AI mode.",
           color: Colors.redAccent);

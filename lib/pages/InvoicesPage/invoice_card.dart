@@ -34,7 +34,7 @@ class InvoiceCard extends ConsumerWidget {
         child: InkWell(
           onLongPress: () {
             if (!selectionState.isSelectionMode) {
-              ref.read(invoiceProvider).isSelectionMode = !ref.read(invoiceProvider).isSelectionMode;
+              selectionState.isSelectionMode = !selectionState.isSelectionMode;
               ref.read(invoiceProvider.notifier).toggleItemSelection(company: invoiceData.companyName, invoiceData: invoiceData);
             }
           },

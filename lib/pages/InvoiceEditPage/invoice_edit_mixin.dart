@@ -129,7 +129,7 @@ mixin _InvoiceEditPageMixin on State<InvoiceEditPage> {
           i = i.substring(matchedDate.start, matchedDate.end);
         }
 
-        dateTextController.text = dateFormat.format(DateParser(i));
+        dateTextController.text = dateFormat.format(dateParser(i));
       }
       // If text length is 16
       else if (invoiceNoRegex.hasMatch(i)) {
@@ -215,7 +215,7 @@ mixin _InvoiceEditPageMixin on State<InvoiceEditPage> {
       }
 
       companyTextController.text = (companyTextController.text).replaceAll(companyRegex, "");
-      companyTextController.text = (companyTextController.text).trimRight() + " ";
+      companyTextController.text = "${(companyTextController.text).trimRight()} ";
       companyTextController.text += companySuffix.name;
 
       if (readMode != null) {
@@ -229,7 +229,9 @@ mixin _InvoiceEditPageMixin on State<InvoiceEditPage> {
           (companyTextController.text).similarityTo(companyName);
 
           if (similarity >= 0.4) {
-            if (!mounted) return;
+            if (!mounted) {
+              return;
+            }
             await showDialog<bool>(
               barrierDismissible: false,
               context: context,
@@ -254,7 +256,7 @@ mixin _InvoiceEditPageMixin on State<InvoiceEditPage> {
                 ],
               ),
             ).then((final value) {
-              if (value == true) {
+              if (value != null && value) {
                 setState(() {
                   companyTextController.text = companyName;
                 });
@@ -283,6 +285,7 @@ mixin _InvoiceEditPageMixin on State<InvoiceEditPage> {
             id: widget.invoiceData?.id);
 
         await InvoiceDataService().saveInvoiceData(data);
+
         _isFileSaved = true;
 
         if (mounted) {
@@ -293,7 +296,6 @@ mixin _InvoiceEditPageMixin on State<InvoiceEditPage> {
           Navigator.pop(context);
         }
       } catch (e) {
-        if (mounted) return;
         Toast(context,
             text: "Something went wrong.\n$e",
             color: Colors.redAccent);

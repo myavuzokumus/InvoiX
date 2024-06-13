@@ -11,3 +11,4 @@ class MainPage extends StatelessWidget {
 }
 
 //I made this page so it would be easier to manage if I added anything in the future.
+//I will also add a navigation bar to navigate between these pages.

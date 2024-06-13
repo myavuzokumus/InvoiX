@@ -16,7 +16,7 @@ class Indicator extends StatelessWidget {
   final Color? textColor;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: <Widget>[
