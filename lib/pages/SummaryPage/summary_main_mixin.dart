@@ -2,7 +2,7 @@ part of 'summary_main.dart';
 
 mixin _SummaryMainMixin on State<SummaryMain> {
 
-  final ValueNotifier<int> touchedIndexNotifier = ValueNotifier<int>(-1);
+  final ValueNotifier<double> touchedIndexNotifier = ValueNotifier<double>(-1);
 
   late DateTimeRange initialDateTime;
   late List<InvoiceData> top5Invoices;
@@ -22,7 +22,8 @@ mixin _SummaryMainMixin on State<SummaryMain> {
     topCategoriesFuture = calculateTopCategories(today.subtract(const Duration(days: 30)), today);
     super.initState();
   }
-// Calculate total amounts on filtered invoices and find the 5 invoice categories with the highest amounts
+
+  // Calculate total amounts on filtered invoices and find the 5 invoice categories with the highest amounts
   Future<Map<InvoiceCategory, double>> calculateTopCategories(final DateTime startDate,
       final DateTime endDate) async {
     final List<InvoiceData> invoices = await InvoiceDataService().getInvoicesBetweenDates(
@@ -49,21 +50,22 @@ mixin _SummaryMainMixin on State<SummaryMain> {
   }
 
   List<Widget> getIndicators(final Map<InvoiceCategory, double> categoryTotals) {
-    // Toplam tutarı hesapla
+
+    // Calculate total amount
     final double totalAmount = categoryTotals.values.reduce((final a, final b) => a + b);
 
-    // Her bir kategori için bir Indicator widget'ı oluştur
+    // Create indicator for each category
     final List<Widget> indicators = [];
     categoryTotals.forEach((final category, final amount) {
       final double percentage = (amount / totalAmount) * 100;
       indicators.add(Indicator(
-        color: category.color, // Burada her bir kategori için farklı bir renk belirleyebilirsiniz
+        color: category.color,
         text: '${category.name}: ${percentage.toStringAsFixed(2)}%',
         isSquare: true,
       ));
     });
 
-    // Yüzde oranına göre azalan sıralama için indicators listesini sırala
+    // Sort the list of indicators for descending sorting by percentage
     indicators.sort((final a, final b) {
       final aPercentage = double.parse((a as Indicator).text.split(': ')[1].replaceAll('%', ''));
       final bPercentage = double.parse((b as Indicator).text.split(': ')[1].replaceAll('%', ''));
