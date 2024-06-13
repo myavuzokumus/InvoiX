@@ -2,7 +2,7 @@ part of 'summary_main.dart';
 
 mixin _SummaryMainMixin on State<SummaryMain> {
 
-  final ValueNotifier<double> touchedIndexNotifier = ValueNotifier<double>(-1);
+  final ValueNotifier<double> touchedPercentageNotifier = ValueNotifier<double>(-1);
 
   late DateTimeRange initialDateTime;
   late List<InvoiceData> top5Invoices;
@@ -52,15 +52,15 @@ mixin _SummaryMainMixin on State<SummaryMain> {
   List<Widget> getIndicators(final Map<InvoiceCategory, double> categoryTotals) {
 
     // Calculate total amount
-    final double totalAmount = categoryTotals.values.reduce((final a, final b) => a + b);
+    //final double totalAmount = categoryTotals.values.reduce((final a, final b) => a + b);
 
     // Create indicator for each category
     final List<Widget> indicators = [];
     categoryTotals.forEach((final category, final amount) {
-      final double percentage = (amount / totalAmount) * 100;
+      //final double percentage = (amount / totalAmount) * 100;
       indicators.add(Indicator(
         color: category.color,
-        text: '${category.name}: ${percentage.toStringAsFixed(2)}%',
+        text: '${category.name}: ${amount.toStringAsFixed(2)}',
         isSquare: true,
       ));
     });
