@@ -25,7 +25,7 @@ class ToastContent extends StatefulWidget {
   const ToastContent({super.key, required this.text, required this.duration});
 
   @override
-  _ToastContentState createState() => _ToastContentState();
+  State<ToastContent> createState() => _ToastContentState();
 }
 
 class _ToastContentState extends State<ToastContent> with SingleTickerProviderStateMixin {

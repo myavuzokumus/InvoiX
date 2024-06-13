@@ -41,7 +41,7 @@ mixin _SummaryMainMixin on State<SummaryMain> {
     }
 
     final List<InvoiceData> sortedInvoices = invoices
-      ..sort((a, b) => b.totalAmount.compareTo(a.totalAmount));
+      ..sort((final a, final b) => b.totalAmount.compareTo(a.totalAmount));
 
     top5Invoices = sortedInvoices.take(5).toList();
 

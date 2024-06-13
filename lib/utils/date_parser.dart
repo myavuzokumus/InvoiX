@@ -3,7 +3,7 @@ import 'package:intl/intl.dart';
 
 DateFormat dateFormat = DateFormat("dd-MM-yyyy");
 
-DateTime DateParser(final String date) {
+DateTime dateParser(final String date) {
   final List<DateFormat> dateFormats = [
     DateFormat("dd-MM-yyyy"),
     DateFormat("dd/MM/yyyy"),

@@ -44,4 +44,3 @@ Category types: Food, Clothing, Electronics, Health, Education, Transportation, 
  "taxAmount": "",
  "category": ""
 }""";
-
