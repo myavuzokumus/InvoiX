@@ -51,8 +51,8 @@ class _SummaryMainState extends State<SummaryMain> with _SummaryMainMixin {
             child: ValueListenableBuilder<Box>(
               valueListenable: invoiceDataBox.listenable(),
               builder: (final BuildContext context, final value, final Widget? child) {
-                  topCategoriesFuture =
-                      calculateTopCategories(startDate, endDate);
+                topCategoriesFuture =
+                    calculateTopCategories(startDate, endDate);
                 return FutureBuilder<Map<InvoiceCategory, double>>(
                   future: topCategoriesFuture,
                   builder: (final BuildContext context,
@@ -66,75 +66,18 @@ class _SummaryMainState extends State<SummaryMain> with _SummaryMainMixin {
                             ElevatedButton(
                                 onPressed: () {
                                   setState(() {
-                                    topCategoriesFuture = calculateTopCategories(
-                                        DateTime.now()
-                                            .subtract(const Duration(days: 30)),
-                                        DateTime.now());
+                                    topCategoriesFuture =
+                                        calculateTopCategories(startDate, endDate);
                                   });
                                 },
                                 child: const Text('Retry'))
                           ],
                         ));
                       } else if (snapshot.hasData) {
-                        return Column(
-                          children: <Widget>[
-                            AspectRatio(
-                              aspectRatio: 1.6,
-                              child: ValueListenableBuilder<double>(
-                                valueListenable: touchedIndexNotifier,
-                                builder: (final BuildContext context, final double touchedIndex, final Widget? child) {
-                                  return PieChart(
-                                    PieChartData(
-                                      pieTouchData: PieTouchData(
-                                        touchCallback: (final FlTouchEvent event,
-                                            final pieTouchResponse) {
-                                          if (!event.isInterestedForInteractions ||
-                                              pieTouchResponse == null ||
-                                              pieTouchResponse.touchedSection == null) {
-                                            touchedIndexNotifier.value = -1;
-                                            return;
-                                          }
-                                          touchedIndexNotifier.value = pieTouchResponse.touchedSection!.touchedSection!.value;
-                                        },
-                                      ),
-                                      centerSpaceRadius: 40,
-                                      sections: showingSections(snapshot.data!, touchedIndex),
-                                    ),
-                                  );
-                                },
-                              ),
-                            ),
-                            Wrap(
-                                spacing: 8.0, // gap between adjacent chips
-                                runSpacing: 4.0, // gap between lines
-                                children: getIndicators(snapshot.data!)),
-                            const Divider(),
-                            Text("Top 5 Invoices",
-                                style: Theme.of(context).textTheme.titleLarge),
-                            const Divider(),
-                            Expanded(
-                              child: GridView.builder(
-                                padding: const EdgeInsets.only(left: 20, right: 20),
-                                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                                  crossAxisCount: MediaQuery.of(context).orientation ==
-                                          Orientation.landscape
-                                      ? 2
-                                      : 1,
-                                  mainAxisSpacing: 15,
-                                  crossAxisSpacing: 15,
-                                  childAspectRatio: 2.60,
-                                ),
-                                itemCount: top5Invoices.length,
-                                itemBuilder:
-                                    (final BuildContext context, final int index) {
-                                  final invoiceData = top5Invoices.elementAt(index);
 
-                                  return InvoiceCard(invoiceData: invoiceData);
-                                },
-                              ),
-                            ),
-                          ],
-                        );
+                        bool isLandscape = MediaQuery.of(context).orientation == Orientation.landscape;
+                        bool shouldScroll = isLandscape || MediaQuery.of(context).size.height < 600; // Adjust the width as needed
+                        return shouldScroll ? SingleChildScrollView(child: buildContent(context, isLandscape, snapshot.data!)) : buildContent(context, isLandscape, snapshot.data!);
                       }
                     }
                     return const LoadingAnimation();
@@ -145,6 +88,80 @@ class _SummaryMainState extends State<SummaryMain> with _SummaryMainMixin {
         ],
       ),
     );
+  }
+
+  Widget buildContent(final BuildContext context, final bool isLandscape, final Map<InvoiceCategory, double> categoryTotals) {
+    return SizedBox(
+      height: MediaQuery.of(context).size.height * 1.15,
+      child: Column(
+        children: <Widget>[
+          chartSection(context, categoryTotals),
+          const Divider(),
+          Text("Top 5 Invoices", style: Theme.of(context).textTheme.titleLarge),
+          const Divider(),
+          Expanded(
+            child: GridView.builder(
+              padding: const EdgeInsets.only(left: 20, right: 20),
+              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: isLandscape ?
+                2 : 1,
+                mainAxisSpacing: 15,
+                crossAxisSpacing: 15,
+                childAspectRatio: 2.60,
+              ),
+              itemCount: top5Invoices.length,
+              itemBuilder: (final BuildContext context, final int index) {
+                final invoiceData = top5Invoices.elementAt(index);
+                return InvoiceCard(invoiceData: invoiceData);
+              },
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Row chartSection(final BuildContext context, final Map<InvoiceCategory, double> categoryTotals) {
+    return Row(
+          children: [
+            Flexible(
+              child: AspectRatio(
+                aspectRatio: MediaQuery.of(context).size.height < 600 ? 2 : 0.9,
+                child: ValueListenableBuilder<double>(
+                  valueListenable: touchedPercentageNotifier,
+                  builder: (final BuildContext context, final double touchedIndex, final Widget? child) {
+                    return PieChart(
+                      PieChartData(
+                        pieTouchData: PieTouchData(
+                          touchCallback: (final FlTouchEvent event, final pieTouchResponse) {
+                            if (!event.isInterestedForInteractions ||
+                                pieTouchResponse == null ||
+                                pieTouchResponse.touchedSection == null ||
+                                pieTouchResponse.touchedSection!.touchedSection == null) {
+                              touchedPercentageNotifier.value = -1;
+                              return;
+                            }
+                            touchedPercentageNotifier.value = pieTouchResponse.touchedSection!.touchedSection!.value;
+                          },
+                        ),
+                        centerSpaceRadius: MediaQuery.of(context).size.height * 0.025,
+                        sections: showingSections(categoryTotals, touchedIndex),
+                      ),
+                    );
+                  },
+                ),
+              ),
+            ),
+            const SizedBox(width: 20),
+            Flexible(
+              child: Wrap(
+                spacing: 12.0, // gap between adjacent chips
+                runSpacing: 12.0, // gap between lines
+                children: getIndicators(categoryTotals),
+              ),
+            ),
+          ],
+        );
   }
 
   List<PieChartSectionData> showingSections(
