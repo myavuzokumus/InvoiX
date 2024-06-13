@@ -80,9 +80,9 @@ class _SummaryMainState extends State<SummaryMain> with _SummaryMainMixin {
                           children: <Widget>[
                             AspectRatio(
                               aspectRatio: 1.6,
-                              child: ValueListenableBuilder<int>(
+                              child: ValueListenableBuilder<double>(
                                 valueListenable: touchedIndexNotifier,
-                                builder: (final BuildContext context, final int touchedIndex, final Widget? child) {
+                                builder: (final BuildContext context, final double touchedIndex, final Widget? child) {
                                   return PieChart(
                                     PieChartData(
                                       pieTouchData: PieTouchData(
@@ -94,8 +94,7 @@ class _SummaryMainState extends State<SummaryMain> with _SummaryMainMixin {
                                             touchedIndexNotifier.value = -1;
                                             return;
                                           }
-                                          touchedIndexNotifier.value = pieTouchResponse
-                                              .touchedSection!.touchedSectionIndex;
+                                          touchedIndexNotifier.value = pieTouchResponse.touchedSection!.touchedSection!.value;
                                         },
                                       ),
                                       centerSpaceRadius: 40,
@@ -149,7 +148,7 @@ class _SummaryMainState extends State<SummaryMain> with _SummaryMainMixin {
   }
 
   List<PieChartSectionData> showingSections(
-      final Map<InvoiceCategory, double> categoryTotals, final int touchedIndex) {
+      final Map<InvoiceCategory, double> categoryTotals, final double touchedIndex) {
     // Calculate total amount
     final double totalAmount =
         categoryTotals.values.reduce((final a, final b) => a + b);
@@ -158,9 +157,11 @@ class _SummaryMainState extends State<SummaryMain> with _SummaryMainMixin {
     final List<PieChartSectionData> sections = [];
     categoryTotals.forEach((final category, final amount) {
       final double percentage = (amount / totalAmount) * 100;
-      final isTouched = category.index == touchedIndex;
+
+      final isTouched = percentage == touchedIndex;
       final fontSize = isTouched ? 25.0 : 16.0;
       final radius = isTouched ? 60.0 : 50.0;
+
       sections.add(PieChartSectionData(
         color: category.color,
         value: percentage,
