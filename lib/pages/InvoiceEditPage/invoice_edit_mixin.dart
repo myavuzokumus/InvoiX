@@ -111,10 +111,7 @@ mixin _InvoiceEditPageMixin on State<InvoiceEditPage> {
       // Text if match with CompanyRegex
       if (companyRegex.hasMatch(i)) {
 
-        // Set text to CompanyTextController.text
-        if (i.contains(RegExp("A.S.", caseSensitive: false))) {
-          i = i.replaceAll(RegExp("A.S.", caseSensitive: false), "A.Ş.");
-        }
+        //TODO TYPE SUFFIX
 
         i = i.replaceAll(companyRegex, "");
 
@@ -201,6 +198,7 @@ mixin _InvoiceEditPageMixin on State<InvoiceEditPage> {
   Future<void> saveInvoice() async {
     // Validate returns true if the form is valid, or false otherwise.
     if (_formKey.currentState!.validate()) {
+      try {
       _saveButtonState.value = true;
 
       // If the form is valid, display a snack bar. In the real world,
@@ -208,15 +206,9 @@ mixin _InvoiceEditPageMixin on State<InvoiceEditPage> {
 
       final List<String> companyList = await InvoiceDataService().getCompanyList();
 
-      final List matchList = companyRegex.allMatches((companyTextController.text)).toList();
-      final RegExpMatch? pairedType = matchList.isNotEmpty ? matchList.first : null;
-      if (pairedType != null) {
-        companyTextController.text = (companyTextController.text).substring(0, pairedType.start-1);
-      }
-
-      companyTextController.text = (companyTextController.text).replaceAll(companyRegex, "");
-      companyTextController.text = "${(companyTextController.text).trimRight()} ";
-      companyTextController.text += companySuffix.name;
+      companyTextController.text =
+          InvoiceDataService().companyTypeExtractor(
+              companyTextController.text, companySuffix.name);
 
       if (readMode != null) {
         for (final companyName in companyList) {
@@ -273,7 +265,7 @@ mixin _InvoiceEditPageMixin on State<InvoiceEditPage> {
             color: Colors.yellowAccent);
       }
 
-      try {
+
         final data = InvoiceData(
             imagePath: imageFile.path,
             companyName: companyTextController.text,
