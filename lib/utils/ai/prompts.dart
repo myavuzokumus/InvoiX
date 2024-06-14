@@ -35,6 +35,7 @@ Read the invoice in the picture. Identify the company name with company type, in
 Do not include any description, just provide an RFC8259 compliant JSON response that conforms to this format.
 
 Category types: Food, Clothing, Electronics, Health, Education, Transportation, Entertainment, Others
+Company types: SP, LTD, LLC, PLC, INC, GMBH, CORP, JSC
 
 {
  "companyName": "",
