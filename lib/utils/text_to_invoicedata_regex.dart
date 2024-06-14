@@ -9,7 +9,7 @@
 // So I wanna make my own parser or reader for the best use of Google ML Text Recognition.
 
 final RegExp companyRegex =
-    RegExp(r"(?:LTD\.|ŞTİ\.|(A\.Ş\.|A\.S\.)|LLC|PLC|INC|GMBH)", caseSensitive: false);
+    RegExp(r"(?:LTD|SP|JSC|CORP|LLC|PLC|INC|GMBH)", caseSensitive: false);
 
 final RegExp invoiceNoRegex = RegExp(r'NO\s*:\s*(\S+)', caseSensitive: false);
 
