@@ -1,0 +1,1 @@
+enum ReadMode { legacy, ai }
