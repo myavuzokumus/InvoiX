@@ -80,6 +80,4 @@ class _CompanyPageState extends ConsumerState<CompanyPage> with _CompanyPageMixi
       ),
     );
   }
-
-
 }
