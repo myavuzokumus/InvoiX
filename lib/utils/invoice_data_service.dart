@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
 import 'package:invoix/models/invoice_data.dart';
-import 'package:invoix/utils/text_to_invoicedata_regex.dart';
+import 'package:invoix/utils/legacy_mode/text_to_invoicedata_regex.dart';
 import 'package:string_similarity/string_similarity.dart';
 
 enum ListType { company, invoice }

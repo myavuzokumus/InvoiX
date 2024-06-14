@@ -8,20 +8,21 @@ import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import 'package:invoix/models/invoice_data.dart';
 import 'package:invoix/pages/CompaniesPage/company_list.dart';
-import 'package:invoix/pages/CompaniesPage/mode_selection.dart';
 import 'package:invoix/pages/InvoiceEditPage/date_format.dart';
-import 'package:invoix/utils/ai/gemini_api.dart';
-import 'package:invoix/utils/ai/prompts.dart';
+import 'package:invoix/utils/ai_mode/gemini_api.dart';
+import 'package:invoix/utils/ai_mode/prompts.dart';
 import 'package:invoix/utils/blur_detector.dart';
 import 'package:invoix/utils/date_parser.dart';
 import 'package:invoix/utils/image_filter.dart';
+import 'package:invoix/utils/legacy_mode/invoice_parser.dart';
+import 'package:invoix/utils/legacy_mode/text_extraction.dart';
 import 'package:invoix/utils/network_check.dart';
-import 'package:invoix/utils/text_extraction.dart';
+import 'package:invoix/utils/read_mode.dart';
 import 'package:invoix/widgets/loading_animation.dart';
 import 'package:string_similarity/string_similarity.dart';
 
 import '../../utils/invoice_data_service.dart';
-import '../../utils/text_to_invoicedata_regex.dart';
+import '../../utils/legacy_mode/text_to_invoicedata_regex.dart';
 import '../../widgets/toast.dart';
 import '../../widgets/warn_icon.dart';
 
@@ -108,7 +109,7 @@ class _InvoiceEditPageState extends State<InvoiceEditPage>
                               onPressed: () {
                                 setState(() {
                                   _future = readMode != null
-                                      ? collectReadData()
+                                      ? analyzeNewData()
                                       : fetchInvoiceData();
                                 });
                               },
