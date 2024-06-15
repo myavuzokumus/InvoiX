@@ -25,6 +25,14 @@ class _AmountRangeSliderState extends State<AmountRangeSlider> {
   }
 
   @override
+  void didUpdateWidget(final AmountRangeSlider oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.minAmount != widget.minAmount || oldWidget.maxAmount != widget.maxAmount) {
+      _currentRangeValues = RangeValues(widget.minAmount, widget.maxAmount);
+    }
+  }
+
+  @override
   Widget build(final BuildContext context) {
     return RangeSlider(
       values: _currentRangeValues,
