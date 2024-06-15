@@ -2,13 +2,16 @@ part of 'invoice_list.dart';
 
 mixin _InvoiceListMixin on State<InvoiceList>{
 
-  late Future<List<InvoiceData>> invoicesFuture;
+  late Future<List<InvoiceData>> originalInvoicesFuture;
+  late Future<List<InvoiceData>> filteredInvoicesFuture;
+
   DateTimeRange? initialDateTime;
   late DateTime startDate;
   late DateTime endDate;
   late final InvoiceDataService invoiceDataService;
-  double minAmount = double.infinity;
-  double maxAmount = double.negativeInfinity;
+
+  double minAmount = 0;
+  double maxAmount = 0;
 
   @override
   void initState() {
@@ -17,8 +20,10 @@ mixin _InvoiceListMixin on State<InvoiceList>{
     endDate = DateTime.now();
     startDate = DateTime(1900);
 
-    invoicesFuture =
+    originalInvoicesFuture =
         retrieveInvoicesAccordingDate(startDate, endDate, widget.companyName);
+
+    filteredInvoicesFuture = originalInvoicesFuture;
 
     super.initState();
   }
@@ -39,6 +44,9 @@ mixin _InvoiceListMixin on State<InvoiceList>{
 
   void calculateMinMaxAmounts(final List<InvoiceData> invoices) {
 
+    minAmount = invoices[0].totalAmount;
+    maxAmount = invoices[0].totalAmount+100;
+
     for (final invoice in invoices) {
       final double totalAmount = invoice.totalAmount;
       if (totalAmount < minAmount) {
@@ -48,21 +56,6 @@ mixin _InvoiceListMixin on State<InvoiceList>{
         maxAmount = totalAmount;
       }
     }
-  }
-
-  //This method is used to check if the invoice list is empty or not. If yes, then page will be pop.
-  List<InvoiceData> invoiceListChecker(
-      final AsyncSnapshot<List<InvoiceData>> invoice) {
-    final List<InvoiceData> invoiceList = List.from(invoice.data!);
-
-    if (invoiceList.isEmpty) {
-      WidgetsBinding.instance.addPostFrameCallback((final _) {
-        if (Navigator.canPop(context)) {
-          Navigator.pop(context);
-        }
-      });
-    }
-    return invoiceList;
   }
 
 }

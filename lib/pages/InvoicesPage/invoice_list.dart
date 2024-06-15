@@ -38,8 +38,9 @@ class _InvoiceListState extends ConsumerState<InvoiceList> with _InvoiceListMixi
                   start: startDate,
                   end: endDate,
                 );
-                invoicesFuture = retrieveInvoicesAccordingDate(
+                originalInvoicesFuture = retrieveInvoicesAccordingDate(
                     startDate, endDate, widget.companyName);
+                filteredInvoicesFuture = originalInvoicesFuture;
               });
             },
           ),
@@ -49,16 +50,16 @@ class _InvoiceListState extends ConsumerState<InvoiceList> with _InvoiceListMixi
           maxAmount: maxAmount,
           onAmountRangeChanged: (final double minAmount, final double maxAmount) {
             setState(() {
-              invoicesFuture = invoicesFuture.then((final List<InvoiceData> invoices) =>
+              filteredInvoicesFuture = originalInvoicesFuture.then((final List<InvoiceData> invoices) =>
                   invoices.where((final invoice) {
-                    return !(invoice.totalAmount < minAmount || invoice.totalAmount > maxAmount);
+                    return (invoice.totalAmount >= minAmount && invoice.totalAmount <= maxAmount);
                   }).toList());
             });
           },
         ),
         Expanded(
           child: FutureBuilder<List<InvoiceData>>(
-              future: invoicesFuture,
+              future: filteredInvoicesFuture,
               builder: (final BuildContext context,
                       final AsyncSnapshot<List<InvoiceData>> invoice) =>
                   futureInvoiceList(invoice)),
@@ -68,9 +69,13 @@ class _InvoiceListState extends ConsumerState<InvoiceList> with _InvoiceListMixi
   }
 
   Widget futureInvoiceList(final AsyncSnapshot<List<InvoiceData>> invoice) {
-    if (invoice.connectionState == ConnectionState.done) {
-      if (invoice.hasData) {
-        final List<InvoiceData> invoiceList = invoiceListChecker(invoice);
+    if (invoice.connectionState == ConnectionState.done && invoice.hasData) {
+        final List<InvoiceData> invoiceList = invoice.data!;
+        if (invoiceList.isEmpty) {
+          return const Center(
+            child: Text('No invoices found.'),
+          );
+        }
         return Column(
           children: [
             Padding(
@@ -106,8 +111,9 @@ class _InvoiceListState extends ConsumerState<InvoiceList> with _InvoiceListMixi
                           invoiceData, startDate, endDate)) {
                         WidgetsBinding.instance.addPostFrameCallback((final _) {
                           setState(() {
-                            invoicesFuture = retrieveInvoicesAccordingDate(
+                            originalInvoicesFuture = retrieveInvoicesAccordingDate(
                                 startDate, endDate, widget.companyName);
+                            filteredInvoicesFuture = originalInvoicesFuture;
                           });
                         });
                       }
@@ -122,7 +128,6 @@ class _InvoiceListState extends ConsumerState<InvoiceList> with _InvoiceListMixi
             )),
           ],
         );
-      }
     }
     return const LoadingAnimation();
   }
