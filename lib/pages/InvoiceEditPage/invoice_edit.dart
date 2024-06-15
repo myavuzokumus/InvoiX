@@ -42,7 +42,6 @@ class InvoiceEditPage extends StatefulWidget {
 
 class _InvoiceEditPageState extends State<InvoiceEditPage>
     with _InvoiceEditPageMixin {
-
   @override
   Widget build(final BuildContext context) {
     return SafeArea(
@@ -93,32 +92,15 @@ class _InvoiceEditPageState extends State<InvoiceEditPage>
             ),
             SliverToBoxAdapter(
               child: FutureBuilder(
-                future: _future,
-                builder: (final BuildContext context,
-                    final AsyncSnapshot<dynamic> snapshot) {
-                  if (snapshot.connectionState == ConnectionState.done) {
-                    if (snapshot.hasError) {
-                      return Center(
-                        child: Column(
-                          children: [
-                            const Divider(),
-                            Text("Error:\n${snapshot.error}",
-                                textAlign: TextAlign.center,
-                                style: const TextStyle(fontSize: 18)),
-                            FilledButton.tonal(
-                              onPressed: () {
-                                setState(() {
-                                  _future = readMode != null
-                                      ? analyzeNewData()
-                                      : fetchInvoiceData();
-                                });
-                              },
-                              child: const Text("Retry"),
-                            ),
-                          ],
-                        ),
-                      );
-                    } else {
+                  future: _future,
+                  builder: (final BuildContext context,
+                      final AsyncSnapshot<dynamic> snapshot) {
+                    if (snapshot.connectionState == ConnectionState.done) {
+
+                      if (snapshot.hasError) {
+                        Toast(context, text: snapshot.error.toString(), color: Colors.red);
+                      }
+
                       return Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         mainAxisSize: MainAxisSize.min,
@@ -190,8 +172,12 @@ class _InvoiceEditPageState extends State<InvoiceEditPage>
                                                     (final CompanyType? value) {
                                                   companySuffix = value!;
                                                 },
-                                                decoration: const InputDecoration(
-                                                  contentPadding: EdgeInsets.symmetric(vertical: 4, horizontal: 12),
+                                                decoration:
+                                                    const InputDecoration(
+                                                  contentPadding:
+                                                      EdgeInsets.symmetric(
+                                                          vertical: 4,
+                                                          horizontal: 12),
                                                   filled: true,
                                                 ),
                                                 validator: (final value) {
@@ -201,10 +187,10 @@ class _InvoiceEditPageState extends State<InvoiceEditPage>
                                                   return null;
                                                 },
                                               ),
-
                                             ),
                                             const Padding(
-                                              padding: EdgeInsets.only(right: 12.0, left: 4.0),
+                                              padding: EdgeInsets.only(
+                                                  right: 12.0, left: 4.0),
                                               child: WarnIcon(
                                                   message:
                                                       "You must choose a company type."),
@@ -212,8 +198,7 @@ class _InvoiceEditPageState extends State<InvoiceEditPage>
                                           ],
                                         )),
                                     validator: (final value) {
-                                      if (value == null ||
-                                          value.isEmpty) {
+                                      if (value == null || value.isEmpty) {
                                         return 'Please enter some text';
                                       }
                                       return null;
@@ -236,8 +221,9 @@ class _InvoiceEditPageState extends State<InvoiceEditPage>
                                   ),
                                   Row(
                                     mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                        MainAxisAlignment.spaceBetween,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
                                     children: [
                                       Flexible(
                                         child: TextFormField(
@@ -250,7 +236,8 @@ class _InvoiceEditPageState extends State<InvoiceEditPage>
                                                   message:
                                                       "You must enter a valid date.")),
                                           onTap: () async {
-                                            final DateTime today = DateTime.now();
+                                            final DateTime today =
+                                                DateTime.now();
                                             final DateTime? pickedDate =
                                                 await showDatePicker(
                                                     context: context,
@@ -258,8 +245,10 @@ class _InvoiceEditPageState extends State<InvoiceEditPage>
                                                     //get today's date
                                                     firstDate: DateTime(1900),
                                                     //DateTime.now() - not to allow to choose before today.
-                                                    lastDate: DateTime(today.year,
-                                                        today.month, today.day));
+                                                    lastDate: DateTime(
+                                                        today.year,
+                                                        today.month,
+                                                        today.day));
 
                                             if (pickedDate != null) {
                                               final String formattedDate =
@@ -273,7 +262,8 @@ class _InvoiceEditPageState extends State<InvoiceEditPage>
                                             }
                                           },
                                           validator: (final value) {
-                                            if (value == null || value.isEmpty) {
+                                            if (value == null ||
+                                                value.isEmpty) {
                                               return "";
                                             }
                                             return null;
@@ -290,27 +280,27 @@ class _InvoiceEditPageState extends State<InvoiceEditPage>
                                           hint: const Text("Type"),
                                           iconSize: 0,
                                           items: InvoiceCategory.values.map(
-                                                  (final InvoiceCategory value) {
-                                                return DropdownMenuItem<
-                                                    InvoiceCategory>(
-                                                  value: value,
-                                                  child: Text(value.name),
-                                                );
-                                              }).toList(),
+                                              (final InvoiceCategory value) {
+                                            return DropdownMenuItem<
+                                                InvoiceCategory>(
+                                              value: value,
+                                              child: Text(value.name),
+                                            );
+                                          }).toList(),
                                           onChanged:
                                               (final InvoiceCategory? value) {
-                                                invoiceCategory = value;
+                                            invoiceCategory = value;
                                           },
                                           decoration: const InputDecoration(
                                             isDense: true,
-                                            contentPadding: EdgeInsets.symmetric(horizontal: -4.0),
+                                            contentPadding:
+                                                EdgeInsets.symmetric(
+                                                    horizontal: -4.0),
                                             suffixIcon: WarnIcon(
                                                 message:
-                                                "You must choose a invoice category."),
+                                                    "You must choose a invoice category."),
                                             filled: true,
-
                                           ),
-
                                           validator: (final value) {
                                             if (value == null) {
                                               return 'Please select invoice category.';
@@ -403,12 +393,10 @@ class _InvoiceEditPageState extends State<InvoiceEditPage>
                         ],
                       );
                     }
-                  } else {
+
                     return LoadingAnimation(
                         customHeight: MediaQuery.of(context).size.height - 350);
-                  }
-                },
-              ),
+                  }),
             ),
           ]),
         ),
