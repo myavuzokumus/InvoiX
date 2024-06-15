@@ -103,9 +103,7 @@ mixin _InvoiceEditPageMixin on State<InvoiceEditPage> {
     }
 
     companySuffix = invoiceDataService.companyTypeFinder(item.companyName);
-    invoiceCategory = InvoiceCategory.values.firstWhere(
-        (final InvoiceCategory e) => item.category.contains(e.name),
-        orElse: () => InvoiceCategory.Others);
+    invoiceCategory = InvoiceCategory.parse(item.category);
     companyTextController.text = invoiceDataService.companyTypeExtractor(item.companyName);
     invoiceNoTextController.text = item.invoiceNo;
     dateTextController.text = dateFormat.format(item.date);

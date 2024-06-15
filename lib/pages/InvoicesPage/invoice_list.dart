@@ -87,6 +87,7 @@ class _InvoiceListState extends ConsumerState<InvoiceList> with _InvoiceListMixi
             ),
             Expanded(
                 child: GridView.builder(
+                  physics: const NeverScrollableScrollPhysics(),
               padding: const EdgeInsets.only(left: 20, right: 20),
               gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                 crossAxisCount:
@@ -95,7 +96,7 @@ class _InvoiceListState extends ConsumerState<InvoiceList> with _InvoiceListMixi
                         : 1,
                 mainAxisSpacing: 15,
                 crossAxisSpacing: 15,
-                childAspectRatio: 2.60,
+                childAspectRatio: 2.5,
               ),
               itemCount: invoiceList.length,
               itemBuilder: (final BuildContext context, final int index) {
