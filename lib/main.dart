@@ -5,7 +5,7 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:invoix/models/invoice_data.dart';
-import 'package:invoix/pages/CompaniesPage/company_main.dart';
+import 'package:invoix/pages/main_page.dart';
 
 import 'theme.dart';
 
@@ -69,7 +69,7 @@ class InvoixMain extends StatelessWidget {
           ),
         ),
       ),
-      home: const CompanyPage(),
+      home: const MainPage(),
     );
   }
 }
