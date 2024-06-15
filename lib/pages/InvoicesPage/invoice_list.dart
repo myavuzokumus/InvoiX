@@ -4,8 +4,11 @@ import 'package:hive_flutter/hive_flutter.dart';
 import 'package:invoix/models/invoice_data.dart';
 import 'package:invoix/pages/InvoicesPage/invoice_card.dart';
 import 'package:invoix/utils/invoice_data_service.dart';
+import 'package:invoix/widgets/amount_range_slider.dart';
 import 'package:invoix/widgets/date_range_picker.dart';
 import 'package:invoix/widgets/loading_animation.dart';
+
+part 'invoice_list_mixin.dart';
 
 class InvoiceList extends ConsumerStatefulWidget {
   const InvoiceList({super.key, required this.companyName});
@@ -16,35 +19,7 @@ class InvoiceList extends ConsumerStatefulWidget {
   ConsumerState<InvoiceList> createState() => _InvoiceListState();
 }
 
-class _InvoiceListState extends ConsumerState<InvoiceList> {
-  late Future<List<InvoiceData>> invoicesFuture;
-  DateTimeRange? initialDateTime;
-  late DateTime startDate;
-  late DateTime endDate;
-  late final InvoiceDataService invoiceDataService;
-
-  @override
-  void initState() {
-    invoiceDataService = InvoiceDataService();
-
-    endDate = DateTime.now();
-    startDate = DateTime(1900);
-
-    invoicesFuture =
-        retrieveInvoicesAccordingDate(startDate, endDate, widget.companyName);
-
-    super.initState();
-  }
-
-  Future<List<InvoiceData>> retrieveInvoicesAccordingDate(
-      final DateTime startDate,
-      final DateTime endDate,
-      final String companyName) async {
-    return (await InvoiceDataService()
-            .getInvoicesBetweenDates(startDate, endDate))
-        .where((final invoice) => invoice.companyName == companyName)
-        .toList();
-  }
+class _InvoiceListState extends ConsumerState<InvoiceList> with _InvoiceListMixin{
 
   @override
   Widget build(final BuildContext context) {
@@ -69,6 +44,18 @@ class _InvoiceListState extends ConsumerState<InvoiceList> {
             },
           ),
         ),
+        AmountRangeSlider(
+          minAmount: minAmount,
+          maxAmount: maxAmount,
+          onAmountRangeChanged: (final double minAmount, final double maxAmount) {
+            setState(() {
+              invoicesFuture = invoicesFuture.then((final List<InvoiceData> invoices) =>
+                  invoices.where((final invoice) {
+                    return !(invoice.totalAmount < minAmount || invoice.totalAmount > maxAmount);
+                  }).toList());
+            });
+          },
+        ),
         Expanded(
           child: FutureBuilder<List<InvoiceData>>(
               future: invoicesFuture,
@@ -83,7 +70,7 @@ class _InvoiceListState extends ConsumerState<InvoiceList> {
   Widget futureInvoiceList(final AsyncSnapshot<List<InvoiceData>> invoice) {
     if (invoice.connectionState == ConnectionState.done) {
       if (invoice.hasData) {
-        final List<InvoiceData> invoiceList = filteredInvoices(invoice);
+        final List<InvoiceData> invoiceList = invoiceListChecker(invoice);
         return Column(
           children: [
             Padding(
@@ -140,17 +127,5 @@ class _InvoiceListState extends ConsumerState<InvoiceList> {
     return const LoadingAnimation();
   }
 
-  List<InvoiceData> filteredInvoices(
-      final AsyncSnapshot<List<InvoiceData>> invoice) {
-    final List<InvoiceData> invoiceList = List.from(invoice.data!);
 
-    if (invoiceList.isEmpty) {
-      WidgetsBinding.instance.addPostFrameCallback((final _) {
-        if (Navigator.canPop(context)) {
-          Navigator.pop(context);
-        }
-      });
-    }
-    return invoiceList;
-  }
 }

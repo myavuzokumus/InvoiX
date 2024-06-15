@@ -82,7 +82,7 @@ mixin _InvoiceEditPageMixin on State<InvoiceEditPage> {
           error = "No Internet Connection!";
         }
 
-        ProviderContainer().read(errorProvider.notifier).state = "${error}\nSwitching to Legacy Mode...";
+        ProviderContainer().read(errorProvider.notifier).state = "$error\nSwitching to Legacy Mode...";
 
         await fetchInvoiceData(
             outPut: parseInvoiceData(await getScannedText(imageFile)));
