@@ -112,7 +112,7 @@ class _SummaryMainState extends State<SummaryMain> with _SummaryMainMixin {
               itemCount: top5Invoices.length,
               itemBuilder: (final BuildContext context, final int index) {
                 final invoiceData = top5Invoices.elementAt(index);
-                return InvoiceCard(invoiceData: invoiceData);
+                return InvoiceCard(invoiceData: invoiceData, selectionMode: false);
               },
             ),
           ),
