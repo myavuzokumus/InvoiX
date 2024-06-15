@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
 import 'package:invoix/models/invoice_data.dart';
-import 'package:invoix/utils/text_to_invoicedata_regex.dart';
+import 'package:invoix/utils/legacy_mode/text_to_invoicedata_regex.dart';
 import 'package:string_similarity/string_similarity.dart';
 
 enum ListType { company, invoice }
@@ -17,17 +17,15 @@ extension ListTypeExtension on ListType {
   }
 }
 
-enum CompanyType { AS, LTD, STI, LLC, PLC, INC, GMBH }
+enum CompanyType {SP, LTD, LLC, PLC, INC, GMBH, CORP, JSC}
 
 extension CompanyTypeExtension on CompanyType {
   String get name {
     switch (this) {
-      case CompanyType.AS:
-        return 'A.Ş.';
-      case CompanyType.LTD:
-        return 'Ltd.';
-      case CompanyType.STI:
-        return 'Şti.';
+      case CompanyType.SP:
+        return 'SP.';
+      case CompanyType.CORP:
+        return 'Corp';
       case CompanyType.LLC:
         return 'LLC';
       case CompanyType.PLC:
@@ -36,6 +34,12 @@ extension CompanyTypeExtension on CompanyType {
         return 'INC';
       case CompanyType.GMBH:
         return 'GmbH';
+      case CompanyType.JSC:
+        return 'JSC';
+      case CompanyType.LTD:
+        return 'LTD';
+      case CompanyType.CORP:
+        return 'CORP';
     }
   }
 }
@@ -112,11 +116,12 @@ class InvoiceDataService {
   CompanyType companyTypeFinder(final String companyName) {
     return CompanyType.values.firstWhere((final CompanyType e) {
 
-      final List matchList = companyRegex.allMatches(companyName).toList();
+      final List matchList = companyRegex.allMatches(companyName.replaceAll(" ", "")).toList();
       final RegExpMatch? pairedType = matchList.isNotEmpty ? matchList.last : null;
       if (pairedType == null) {
         return false;
       }
+
       return companyName.substring(pairedType.start, pairedType.end).similarityTo(e.name) > 0.3;},
         orElse: () => CompanyType.LTD);
 
@@ -137,6 +142,26 @@ class InvoiceDataService {
 
   bool isSameInvoice(final InvoiceData invoiceData1, final InvoiceData invoiceData2) {
     return invoiceData1 == invoiceData2;
+  }
+
+  String companyTypeExtractor(String text) {
+    text = text.replaceAll(companyRegex, "");
+    List matchList = companyRegex.allMatches(text).toList();
+    RegExpMatch? pairedType = matchList.isNotEmpty ? matchList.first : null;
+    if (pairedType == null) {
+      matchList =  companyRegex.allMatches(text.replaceAll(" ", "")).toList();
+      pairedType = matchList.isNotEmpty ? matchList.first : null;
+    }
+    if (pairedType != null) {
+      text = text.substring(0, pairedType.start - 1);
+    }
+
+    text = text.trim();
+    if (text.isEmpty) {
+      throw "Company name cannot be empty.";
+    }
+
+    return text;
   }
 
 }

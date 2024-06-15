@@ -8,7 +8,6 @@ import 'package:invoix/models/search_state.dart';
 import 'package:invoix/models/selection_state.dart';
 import 'package:invoix/pages/InvoicesPage/invoice_main.dart';
 import 'package:invoix/utils/invoice_data_service.dart';
-import 'package:invoix/utils/text_to_invoicedata_regex.dart';
 import 'package:invoix/widgets/loading_animation.dart';
 import 'package:invoix/widgets/toast.dart';
 import 'package:invoix/widgets/warn_icon.dart';
@@ -299,15 +298,16 @@ class _CompanyListState extends ConsumerState<CompanyList> with _CompanyListMixi
           onPressed: () async {
             if (_companyNameformKey.currentState!.validate()) {
 
-              final List matchList = companyRegex.allMatches((companyNameTextController.text)).toList();
-              final RegExpMatch? pairedType = matchList.isNotEmpty ? matchList.first : null;
-              if (pairedType != null) {
-                companyNameTextController.text = (companyNameTextController.text).substring(0, pairedType.start-1);
+              try {
+                companyNameTextController.text =
+                    "${InvoiceDataService().companyTypeExtractor(
+                        companyNameTextController.text)} ${companySuffix.name}";
+              } catch (e) {
+                Toast(context,
+                    text: e.toString(),
+                    color: Colors.redAccent);
+                return;
               }
-
-              companyNameTextController.text = (companyNameTextController.text).replaceAll(companyRegex, "");
-              companyNameTextController.text = "${(companyNameTextController.text).trimRight()} ";
-              companyNameTextController.text += companySuffix.name;
 
               for (final InvoiceData element
               in await InvoiceDataService().getInvoiceList(companyListName)) {

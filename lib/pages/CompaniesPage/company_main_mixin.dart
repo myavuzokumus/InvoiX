@@ -18,12 +18,6 @@ mixin _CompanyPageMixin on ConsumerState<CompanyPage> {
         : readMode = ReadMode.legacy;
   }
 
-  void handleModeChange(final ReadMode mode) {
-    setState(() {
-      readMode = mode;
-    });
-  }
-
   Future<void> nextPage() async {
     _isLoadingNotifier.value = true;
 

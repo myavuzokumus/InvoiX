@@ -7,11 +7,11 @@ import 'package:google_mlkit_document_scanner/google_mlkit_document_scanner.dart
 import 'package:hive/hive.dart';
 import 'package:invoix/models/selection_state.dart';
 import 'package:invoix/pages/CompaniesPage/company_list.dart';
-import 'package:invoix/pages/CompaniesPage/mode_selection.dart';
 import 'package:invoix/pages/InvoiceEditPage/invoice_edit.dart';
 import 'package:invoix/pages/list_page_scaffold.dart';
 import 'package:invoix/utils/document_scanner.dart';
 import 'package:invoix/utils/invoice_data_service.dart';
+import 'package:invoix/utils/read_mode.dart';
 import 'package:invoix/widgets/loading_animation.dart';
 import 'package:invoix/widgets/toast.dart';
 
@@ -63,7 +63,6 @@ class _CompanyPageState extends ConsumerState<CompanyPage> with _CompanyPageMixi
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            ModeSelection(onModeChanged: handleModeChange),
             Padding(
               padding: const EdgeInsets.only(right: 16.0),
               child: Badge(
@@ -81,6 +80,4 @@ class _CompanyPageState extends ConsumerState<CompanyPage> with _CompanyPageMixi
       ),
     );
   }
-
-
 }
