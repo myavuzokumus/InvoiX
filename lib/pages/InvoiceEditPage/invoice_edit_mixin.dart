@@ -81,12 +81,9 @@ mixin _InvoiceEditPageMixin on State<InvoiceEditPage> {
         if (!(await isInternetConnected())) {
           error = "No Internet Connection!";
         }
-        Toast(context,
-            text: "$error\n"
-                "Switching to Legacy Mode...",
-            color: Colors.redAccent);
 
-        readMode = ReadMode.legacy;
+        ProviderContainer().read(errorProvider.notifier).state = "${error}\nSwitching to Legacy Mode...";
+
         await fetchInvoiceData(
             outPut: parseInvoiceData(await getScannedText(imageFile)));
       }
@@ -97,18 +94,19 @@ mixin _InvoiceEditPageMixin on State<InvoiceEditPage> {
 
   Future<void> fetchInvoiceData({final String? outPut}) async {
     final InvoiceData item;
+    final InvoiceDataService invoiceDataService = InvoiceDataService();
 
     if (outPut == null) {
-      item = InvoiceDataService().getInvoiceData(widget.invoiceData!)!;
+      item = invoiceDataService.getInvoiceData(widget.invoiceData!)!;
     } else {
       item = InvoiceData.fromJson(jsonDecode(outPut));
     }
 
-    companySuffix = InvoiceDataService().companyTypeFinder(item.companyName);
+    companySuffix = invoiceDataService.companyTypeFinder(item.companyName);
     invoiceCategory = InvoiceCategory.values.firstWhere(
         (final InvoiceCategory e) => item.category.contains(e.name),
         orElse: () => InvoiceCategory.Others);
-    companyTextController.text = item.companyName.replaceAll(companyRegex, "");
+    companyTextController.text = invoiceDataService.companyTypeExtractor(item.companyName);
     invoiceNoTextController.text = item.invoiceNo;
     dateTextController.text = dateFormat.format(item.date);
     totalAmountTextController.text = item.totalAmount.toString();
@@ -127,8 +125,9 @@ mixin _InvoiceEditPageMixin on State<InvoiceEditPage> {
         final List<String> companyList =
             await InvoiceDataService().getCompanyList();
 
-        companyTextController.text = InvoiceDataService().companyTypeExtractor(
-            companyTextController.text, companySuffix.name);
+        companyTextController.text =
+        "${InvoiceDataService().companyTypeExtractor(
+            companyTextController.text)} ${companySuffix.name}";
 
         if (readMode != null) {
           for (final companyName in companyList) {

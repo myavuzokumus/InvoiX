@@ -5,6 +5,7 @@ import 'dart:io';
 import 'package:cross_file/cross_file.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:invoix/models/invoice_data.dart';
 import 'package:invoix/pages/CompaniesPage/company_list.dart';
@@ -14,17 +15,16 @@ import 'package:invoix/utils/ai_mode/prompts.dart';
 import 'package:invoix/utils/blur_detector.dart';
 import 'package:invoix/utils/date_parser.dart';
 import 'package:invoix/utils/image_filter.dart';
+import 'package:invoix/utils/invoice_data_service.dart';
 import 'package:invoix/utils/legacy_mode/invoice_parser.dart';
 import 'package:invoix/utils/legacy_mode/text_extraction.dart';
+import 'package:invoix/utils/legacy_mode/text_to_invoicedata_regex.dart';
 import 'package:invoix/utils/network_check.dart';
 import 'package:invoix/utils/read_mode.dart';
 import 'package:invoix/widgets/loading_animation.dart';
+import 'package:invoix/widgets/toast.dart';
+import 'package:invoix/widgets/warn_icon.dart';
 import 'package:string_similarity/string_similarity.dart';
-
-import '../../utils/invoice_data_service.dart';
-import '../../utils/legacy_mode/text_to_invoicedata_regex.dart';
-import '../../widgets/toast.dart';
-import '../../widgets/warn_icon.dart';
 
 part 'invoice_edit_mixin.dart';
 

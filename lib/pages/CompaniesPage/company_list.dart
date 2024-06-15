@@ -300,8 +300,8 @@ class _CompanyListState extends ConsumerState<CompanyList> with _CompanyListMixi
 
               try {
                 companyNameTextController.text =
-                    InvoiceDataService().companyTypeExtractor(
-                        companyNameTextController.text, companySuffix.name);
+                    "${InvoiceDataService().companyTypeExtractor(
+                        companyNameTextController.text)} ${companySuffix.name}";
               } catch (e) {
                 Toast(context,
                     text: e.toString(),

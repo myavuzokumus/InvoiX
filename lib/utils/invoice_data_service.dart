@@ -144,7 +144,7 @@ class InvoiceDataService {
     return invoiceData1 == invoiceData2;
   }
 
-  String companyTypeExtractor(String text, final String suffix) {
+  String companyTypeExtractor(String text) {
     text = text.replaceAll(companyRegex, "");
     List matchList = companyRegex.allMatches(text).toList();
     RegExpMatch? pairedType = matchList.isNotEmpty ? matchList.first : null;
@@ -160,8 +160,6 @@ class InvoiceDataService {
     if (text.isEmpty) {
       throw "Company name cannot be empty.";
     }
-    text += " ";
-    text += suffix;
 
     return text;
   }
