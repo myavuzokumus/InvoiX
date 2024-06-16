@@ -188,7 +188,7 @@ class InvoiceDataService {
 
   bool isInvoiceBetweenDates(final InvoiceData invoice,
       final DateTime startDate, final DateTime endDate) {
-    return (invoice.date.isAfter(startDate) &&
+    return ((invoice.date.isAfter(startDate) || invoice.date.isAtSameMomentAs(startDate))&&
         (invoice.date.isBefore(endDate) ||
             invoice.date.isAtSameMomentAs(endDate)));
   }

@@ -37,7 +37,8 @@ class _AmountRangeSliderState extends State<AmountRangeSlider> {
     return Stack(
       alignment: AlignmentDirectional.center,
       children: [
-        const Text("Amount Range", style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold),),
+        const Opacity(opacity: 0.75,
+        child: Text("Amount Range", style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold),)),
         RangeSlider(
         values: _currentRangeValues,
         min: widget.minAmount,

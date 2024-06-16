@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:invoix/models/invoice_data.dart';
+import 'package:invoix/models/list_length_state.dart';
 import 'package:invoix/models/search_state.dart';
 import 'package:invoix/models/selection_state.dart';
 import 'package:invoix/pages/InvoicesPage/invoice_main.dart';
@@ -59,17 +60,14 @@ class _CompanyListState extends ConsumerState<CompanyList> with _CompanyListMixi
 
                     final List<Widget> filterlist = filterList(company.data!);
 
+                    Future(() {
+                      ref.read(companylistLengthProvider.notifier).updateLength(companyList.length);
+                    });
+
                     return SizedBox(
                       height: MediaQuery.of(context).size.height,
                       child: Column(
                         children: [
-                          Padding(
-                            padding: const EdgeInsets.only(bottom: 10, top: 10),
-                            child: FilledButton(
-                              onPressed: () {},
-                              child: Text(companyList.length.toString()),
-                            ),
-                          ),
                           Padding(
                             padding: const EdgeInsets.symmetric(horizontal: 20),
                             child: SingleChildScrollView(

@@ -45,7 +45,7 @@ mixin _InvoiceListMixin on State<InvoiceList>{
   void calculateMinMaxAmounts(final List<InvoiceData> invoices) {
 
     minAmount = invoices[0].totalAmount;
-    maxAmount = invoices[0].totalAmount+100;
+    maxAmount = invoices[0].totalAmount;
 
     for (final invoice in invoices) {
       final double totalAmount = invoice.totalAmount;
@@ -56,6 +56,9 @@ mixin _InvoiceListMixin on State<InvoiceList>{
         maxAmount = totalAmount;
       }
     }
+
+    setState(() {});
+
   }
 
 }
