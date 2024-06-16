@@ -5,7 +5,6 @@ import 'package:downloadsfolder/downloadsfolder.dart';
 import 'package:flutter/foundation.dart';
 import 'package:invoix/models/invoice_data.dart';
 import 'package:invoix/utils/invoice_data_service.dart';
-import 'package:permission_handler/permission_handler.dart';
 import 'package:syncfusion_flutter_xlsio/xlsio.dart';
 
 Future<void> exportToExcel({required final ListType listType, final String? companyName, required final Map<String, List<InvoiceData>> outputList}) async {
