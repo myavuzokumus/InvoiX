@@ -40,7 +40,7 @@ class _MainPageState extends State<MainPage> {
         currentIndex: _currentIndex,
         items: const [
           BottomNavigationBarItem(
-            icon: Icon(Icons.home),
+            icon: Icon(Icons.business),
             label: 'Companies',
           ),
           BottomNavigationBarItem(

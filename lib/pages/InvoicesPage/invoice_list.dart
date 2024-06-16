@@ -99,26 +99,24 @@ class _InvoiceListState extends ConsumerState<InvoiceList>
         ),
         itemCount: invoiceList.length,
         itemBuilder: (final BuildContext context, final int index) {
-          InvoiceData invoiceData = invoiceList.elementAt(index);
+          final InvoiceData invoiceData = invoiceList.elementAt(index);
           return ValueListenableBuilder<Box>(
             valueListenable: invoiceDataBox.listenable(),
             builder: (final BuildContext context, final Box<dynamic> value,
                 final Widget? child) {
-              if (!invoiceDataService.isSameInvoice(
-                  invoiceData, value.get(invoiceData.id))) {
-                invoiceData = value.get(invoiceData.id);
+              final newInvoiceData = value.get(invoiceData.id);
+              if (newInvoiceData == null || !invoiceDataService.isSameInvoice(invoiceData, newInvoiceData)) {
                 WidgetsBinding.instance.addPostFrameCallback((final _) {
                   setState(() {
-                    originalInvoicesFuture = retrieveInvoicesAccordingDate(
-                        startDate, endDate, widget.companyName);
+                    originalInvoicesFuture = retrieveInvoicesAccordingDate(startDate, endDate, widget.companyName);
                     filteredInvoicesFuture = originalInvoicesFuture;
                   });
                 });
-
-                return InvoiceCard(invoiceData: invoiceData);
-              } else {
-                return InvoiceCard(invoiceData: invoiceData);
               }
+
+              // If newInvoiceData is null, use the original invoiceData
+              final displayInvoiceData = newInvoiceData ?? invoiceData;
+              return InvoiceCard(invoiceData: displayInvoiceData);
             },
           );
         },
