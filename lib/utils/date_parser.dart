@@ -21,3 +21,18 @@ DateTime dateParser(final String date) {
   }
   return DateTime.now();
 }
+
+String updateYear(final String date) {
+  final List<String> separators = ["-", ".", "/"];
+
+  for (final sep in separators) {
+    if (date.contains(sep)) {
+      final List<String> parts = date.split(sep);
+      if (parts[2][0] == "0" && parts[2][1] == "0") {
+        parts[2] = '20${parts[2][2]}${parts[2][3]}';
+      }
+      return parts.join(sep);
+    }
+  }
+  return date;
+}

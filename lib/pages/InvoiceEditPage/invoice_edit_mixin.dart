@@ -110,7 +110,7 @@ mixin _InvoiceEditPageMixin on ConsumerState<InvoiceEditPage> {
     companyTextController.text = invoiceDataService.companyTypeExtractor(item.companyName);
     companyTextController.text = invoiceDataService.invalidCompanyTypeExtractor(companyTextController.text);
     invoiceNoTextController.text = item.invoiceNo;
-    dateTextController.text = dateFormat.format(item.date);
+    dateTextController.text = updateYear(dateFormat.format(item.date));
     totalAmountTextController.text = item.totalAmount.toString();
     taxAmountTextController.text = item.taxAmount.toString();
   }
