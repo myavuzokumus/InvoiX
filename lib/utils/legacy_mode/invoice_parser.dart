@@ -2,20 +2,16 @@ import 'dart:convert';
 
 import 'package:invoix/utils/date_parser.dart';
 import 'package:invoix/utils/invoice_data_service.dart';
+import 'package:invoix/utils/legacy_mode/text_to_invoicedata_regex.dart';
 
 String parseInvoiceData(final List<String> listText) {
-  final companyRegex = RegExp(r'your_company_regex_here');
-  final dateRegex = RegExp(r'your_date_regex_here');
-  final invoiceNoRegex = RegExp(r'your_invoice_no_regex_here');
-  final amountRegex = RegExp(r'your_amount_regex_here');
   final alphabetRegex = RegExp(r"[a-z]", caseSensitive: false);
 
-  String? invoiceCompany;
+  String? invoiceCompany = listText[0];
   String? invoiceNo;
   String? invoiceDate;
   double? totalAmount;
   double? taxAmount;
-
 
   for (final String i in listText) {
     if (companyRegex.hasMatch(i)) {
