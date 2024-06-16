@@ -7,15 +7,8 @@ mixin _CompanyPageMixin on ConsumerState<CompanyPage> {
 
   @override
   void initState() {
-    initializeModeData();
+    readMode = ReadMode.ai;
     super.initState();
-  }
-
-  Future<void> initializeModeData() async {
-    final box = await Hive.openBox('modeBox');
-    box.get('isAI') ?? false
-        ? readMode = ReadMode.ai
-        : readMode = ReadMode.legacy;
   }
 
   Future<void> nextPage() async {

@@ -71,7 +71,8 @@ mixin _InvoiceEditPageMixin on ConsumerState<InvoiceEditPage> {
     await imageFilter(imageFile);
 
     if (readMode == ReadMode.legacy) {
-      parseInvoiceData(await getScannedText(imageFile));
+      await fetchInvoiceData(
+          outPut: parseInvoiceData(await getScannedText(imageFile)));
     } else if (readMode == ReadMode.ai) {
       try {
         await fetchInvoiceData(

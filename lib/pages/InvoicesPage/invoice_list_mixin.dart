@@ -18,7 +18,7 @@ mixin _InvoiceListMixin on State<InvoiceList>{
     invoiceDataService = InvoiceDataService();
 
     endDate = DateTime.now();
-    startDate = DateTime(1900);
+    startDate = DateTime(0000);
 
     originalInvoicesFuture =
         retrieveInvoicesAccordingDate(startDate, endDate, widget.companyName);
