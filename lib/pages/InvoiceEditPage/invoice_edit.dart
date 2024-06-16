@@ -28,7 +28,7 @@ import 'package:string_similarity/string_similarity.dart';
 
 part 'invoice_edit_mixin.dart';
 
-class InvoiceEditPage extends StatefulWidget {
+class InvoiceEditPage extends ConsumerStatefulWidget {
   const InvoiceEditPage(
       {super.key, required this.imageFile, this.readMode, this.invoiceData});
 
@@ -37,10 +37,10 @@ class InvoiceEditPage extends StatefulWidget {
   final InvoiceData? invoiceData;
 
   @override
-  State<InvoiceEditPage> createState() => _InvoiceEditPageState();
+  ConsumerState<InvoiceEditPage> createState() => _InvoiceEditPageState();
 }
 
-class _InvoiceEditPageState extends State<InvoiceEditPage>
+class _InvoiceEditPageState extends ConsumerState<InvoiceEditPage>
     with _InvoiceEditPageMixin {
 
   @override
@@ -99,7 +99,7 @@ class _InvoiceEditPageState extends State<InvoiceEditPage>
                     if (snapshot.connectionState == ConnectionState.done) {
 
                       if (snapshot.hasError) {
-                        Toast(context, text: snapshot.error.toString(), color: Colors.red);
+                        Future(() {Toast(context, text: snapshot.error.toString(), color: Colors.red);});
                       }
 
                       return Column(
@@ -290,7 +290,7 @@ class _InvoiceEditPageState extends State<InvoiceEditPage>
                                           }).toList(),
                                           onChanged:
                                               (final InvoiceCategory? value) {
-                                            invoiceCategory = value;
+                                            invoiceCategory = value ?? InvoiceCategory.Others;
                                           },
                                           decoration: const InputDecoration(
                                             isDense: true,
@@ -396,7 +396,7 @@ class _InvoiceEditPageState extends State<InvoiceEditPage>
                     }
 
                     return LoadingAnimation(
-                        customHeight: MediaQuery.of(context).size.height - 350);
+                        customHeight: MediaQuery.of(context).size.height - 350, subsControl: true);
                   }),
             ),
           ]),

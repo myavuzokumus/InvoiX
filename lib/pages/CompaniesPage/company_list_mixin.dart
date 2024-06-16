@@ -3,20 +3,20 @@ part of 'company_list.dart';
 mixin _CompanyListMixin on ConsumerState<CompanyList> {
 
   late Set<String> filters;
-  late final TextEditingController companyNameTextController;
+  late final TextEditingController companyTextController;
   late final GlobalKey<FormState> _companyNameformKey;
 
   @override
   void initState() {
     filters = <String>{};
-    companyNameTextController = TextEditingController();
+    companyTextController = TextEditingController();
     _companyNameformKey = GlobalKey<FormState>();
     super.initState();
   }
 
   @override
   void dispose() {
-    companyNameTextController.dispose();
+    companyTextController.dispose();
     super.dispose();
   }
 

@@ -73,7 +73,8 @@ class _CompanyListState extends ConsumerState<CompanyList> with _CompanyListMixi
                             child: SingleChildScrollView(
                               scrollDirection: Axis.horizontal,
                               child: Wrap(
-                                  spacing: 10.0,
+                                  spacing: filterlist.length > 1 ? 5 : 0,
+                                  runSpacing: filterlist.length > 1 ? 5 : 0,
                                   children: filterlist.length > 1
                                       ? filterlist
                                       : const [SizedBox()]),
@@ -181,32 +182,30 @@ class _CompanyListState extends ConsumerState<CompanyList> with _CompanyListMixi
   }
 
   List<Widget> filterList(final List<String> company) {
-    return CompanyType.values.map((final CompanyType types) {
-      if (company.any((final String element) =>
-          element.toUpperCase().contains(types.name.toUpperCase()))) {
-        return FilterChip(
-          label: Text(types.name),
-          selected: filters.contains(types.name),
-          onSelected: (final bool selected) {
-            setState(() {
-              if (selected) {
-                filters.add(types.name);
-              } else {
-                filters.remove(types.name);
-              }
-            });
-          },
-        );
-      } else {
-        return const SizedBox();
-      }
+    return CompanyType.values.where((final CompanyType types) {
+      return company.any((final String element) =>
+          element.toUpperCase().contains(types.name.toUpperCase()));
+    }).map((final CompanyType types) {
+      return FilterChip(
+        label: Text(types.name),
+        selected: filters.contains(types.name),
+        onSelected: (final bool selected) {
+          setState(() {
+            if (selected) {
+              filters.add(types.name);
+            } else {
+              filters.remove(types.name);
+            }
+          });
+        },
+      );
     }).toList();
   }
 
   AlertDialog changeCompanyNameDialog(final String companyListName) {
 
     CompanyType companySuffix = InvoiceDataService().companyTypeFinder(companyListName);
-    companyNameTextController.clear();
+    companyTextController.clear();
 
     return AlertDialog(
       title: Text(companyListName),
@@ -220,7 +219,7 @@ class _CompanyListState extends ConsumerState<CompanyList> with _CompanyListMixi
             autovalidateMode: AutovalidateMode.onUserInteraction,
             child: TextFormField(
               maxLength: 100,
-              controller: companyNameTextController,
+              controller: companyTextController,
               decoration: InputDecoration(
                   labelText: "New Company name:",
                   labelStyle: const TextStyle(fontSize: 16),
@@ -297,9 +296,15 @@ class _CompanyListState extends ConsumerState<CompanyList> with _CompanyListMixi
             if (_companyNameformKey.currentState!.validate()) {
 
               try {
-                companyNameTextController.text =
-                    "${InvoiceDataService().companyTypeExtractor(
-                        companyNameTextController.text)} ${companySuffix.name}";
+                final InvoiceDataService invoiceDataService = InvoiceDataService();
+
+                companyTextController.text = invoiceDataService.companyTypeExtractor(
+                    companyTextController.text);
+
+                companyTextController.text = invoiceDataService.invalidCompanyTypeExtractor(companyTextController.text);
+
+                companyTextController.text += " ${companySuffix.name}";
+
               } catch (e) {
                 Toast(context,
                     text: e.toString(),
@@ -310,7 +315,7 @@ class _CompanyListState extends ConsumerState<CompanyList> with _CompanyListMixi
               for (final InvoiceData element
               in await InvoiceDataService().getInvoiceList(companyListName)) {
                 await InvoiceDataService().saveInvoiceData(element.copyWith(
-                    companyName: companyNameTextController.text));
+                    companyName: companyTextController.text));
               }
               if (!mounted) {
                 return;

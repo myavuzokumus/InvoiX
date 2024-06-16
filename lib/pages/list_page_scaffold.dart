@@ -38,7 +38,6 @@ class _GeneralPageState extends ConsumerState<ListPageScaffold>
     with _ListPageScaffoldMixin {
   @override
   Widget build(final BuildContext context) {
-
     final selectionState = ref.watch(widget.selectionProvider);
     final listLengthState = ref.watch(invoicelistLengthProvider);
 
@@ -48,67 +47,69 @@ class _GeneralPageState extends ConsumerState<ListPageScaffold>
       },
       child: Scaffold(
         appBar: AppBar(
-          centerTitle: widget.type != ListType.company,
-          title:
-              selectionState.isSelectionMode || widget.type != ListType.company
-                  ? Text(
-                widget.companyName!,
-
-                textAlign: TextAlign.center,
-                style: const TextStyle(
-                    fontSize: 18, fontWeight: FontWeight.normal),
-              )
-
-
-                  : CompanySearchBar(),
-          actions: <Widget>[
-            if (selectionState.isSelectionMode) ...[
-              ValueListenableBuilder(
-                  valueListenable: _excelExportingNotifier,
+            centerTitle: widget.type != ListType.company,
+            title: selectionState.isSelectionMode
+                ? widget.type != ListType.company
+                    ? Text(widget.companyName!,
+                        style: const TextStyle(
+                            fontSize: 18, fontWeight: FontWeight.normal))
+                    : const Text("InvoiX",
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                            fontSize: 28, fontWeight: FontWeight.bold))
+                : widget.type != ListType.company
+                    ? Text(widget.companyName!,
+                        style: const TextStyle(
+                            fontSize: 18, fontWeight: FontWeight.normal))
+                    : CompanySearchBar(),
+            actions: <Widget>[
+              if (selectionState.isSelectionMode) ...[
+                ValueListenableBuilder(
+                    valueListenable: _excelExportingNotifier,
+                    builder: (final BuildContext context, final value,
+                        final Widget? child) {
+                      return IconButton(
+                          icon: value
+                              ? const CircularProgressIndicator()
+                              : const Icon(Icons.table_chart),
+                          tooltip: "Export all data to Excel",
+                          onPressed: value ? null : () => onExcelOutput());
+                    }),
+                ValueListenableBuilder(
+                  valueListenable: _deleteProcessingNotifier,
                   builder: (final BuildContext context, final value,
                       final Widget? child) {
                     return IconButton(
-                        icon: value
-                            ? const CircularProgressIndicator()
-                            : const Icon(Icons.table_chart),
-                        tooltip: "Export all data to Excel",
-                        onPressed: value ? null : () => onExcelOutput());
-                  }),
-              ValueListenableBuilder(
-                valueListenable: _deleteProcessingNotifier,
-                builder: (final BuildContext context, final value,
-                    final Widget? child) {
-                  return IconButton(
-                    icon: value
-                        ? const CircularProgressIndicator()
-                        : const Icon(Icons.restore_from_trash_outlined),
-                    tooltip: "Delete Items",
-                    onPressed: value ? null : () => onDelete(),
-                  );
-                },
-              ),
-              Checkbox(
-                value: selectionState.selectAll,
-                onChanged: (final bool? x) => ref
-                    .read(widget.selectionProvider.notifier)
-                    .selectAll(widget.companyName),
-              ),
-            ]
-            //else add Icons for other actions
-            else ...[
-              if (widget.type != ListType.company)
-            Padding(
-              padding: const EdgeInsets.only(right: 12.0),
-              child: Badge(
-              label: Text(
-              listLengthState.length.toString(),
-                  style: const TextStyle(color: Colors.white, fontSize: 18),
+                      icon: value
+                          ? const CircularProgressIndicator()
+                          : const Icon(Icons.restore_from_trash_outlined),
+                      tooltip: "Delete Items",
+                      onPressed: value ? null : () => onDelete(),
+                    );
+                  },
+                ),
+                Checkbox(
+                  value: selectionState.selectAll,
+                  onChanged: (final bool? x) => ref
+                      .read(widget.selectionProvider.notifier)
+                      .selectAll(widget.companyName),
+                ),
+              ]
+              //else add Icons for other actions
+              else ...[
+                if (widget.type != ListType.company)
+                  Padding(
+                    padding: const EdgeInsets.only(right: 12.0),
+                    child: Badge(
+                        label: Text(
+                          listLengthState.length.toString(),
+                          style: const TextStyle(
+                              color: Colors.white, fontSize: 18),
+                        ),
+                        largeSize: 24),
                   ),
-                  largeSize: 24),
-            ),
-          ],
-  ]
-        ),
+              ],
+            ]),
         body: widget.body,
         floatingActionButton: widget.floatingActionButton,
         floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
