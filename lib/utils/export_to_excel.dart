@@ -10,20 +10,20 @@ import 'package:syncfusion_flutter_xlsio/xlsio.dart';
 
 Future<void> exportToExcel({required final ListType listType, final String? companyName, required final Map<String, List<InvoiceData>> outputList}) async {
 
-  PermissionStatus status = await Permission.storage.status;
-
-  if (status.isPermanentlyDenied) {
-    // The user opted to never again see the permission request dialog for this
-    // app. The only way to change the permission's status now is to let the
-    // user manually enable it in the system settings.
-    unawaited(openAppSettings());
-    throw Exception('Storage permission not granted.');
-  } else if (!status.isGranted) {
-    status = await Permission.storage.request();
-    if (!status.isGranted) {
-      throw Exception('Storage permission not granted.');
-    }
-  }
+  // PermissionStatus status = await Permission.manageExternalStorage.status;
+  //
+  // if (status.isPermanentlyDenied) {
+  //   // The user opted to never again see the permission request dialog for this
+  //   // app. The only way to change the permission's status now is to let the
+  //   // user manually enable it in the system settings.
+  //   unawaited(openAppSettings());
+  //   throw Exception('Storage permission not granted.');
+  // } else if (!status.isGranted) {
+  //   status = await Permission.manageExternalStorage.request();
+  //   if (!status.isGranted) {
+  //     throw Exception('Storage permission not granted.');
+  //   }
+  // }
 
   // Create a new Excel document.
   final Workbook workbook = Workbook();
