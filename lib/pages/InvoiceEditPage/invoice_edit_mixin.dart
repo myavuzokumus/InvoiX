@@ -1,6 +1,6 @@
 part of 'invoice_edit.dart';
 
-mixin _InvoiceEditPageMixin on State<InvoiceEditPage> {
+mixin _InvoiceEditPageMixin on ConsumerState<InvoiceEditPage> {
   final ValueNotifier<bool> _saveButtonState = ValueNotifier(true);
 
   late bool _isFileSaved;
@@ -8,8 +8,8 @@ mixin _InvoiceEditPageMixin on State<InvoiceEditPage> {
   late final XFile imageFile;
   late ReadMode? readMode;
 
-  late CompanyType companySuffix;
-  late InvoiceCategory? invoiceCategory;
+  late CompanyType companySuffix = CompanyType.LTD;
+  late InvoiceCategory invoiceCategory = InvoiceCategory.Others;
 
   //TextLabelControllers
   late final TextEditingController companyTextController;
@@ -25,6 +25,7 @@ mixin _InvoiceEditPageMixin on State<InvoiceEditPage> {
 
   @override
   void initState() {
+
     _saveButtonState.value = true;
     _isFileSaved = false;
 
@@ -82,7 +83,8 @@ mixin _InvoiceEditPageMixin on State<InvoiceEditPage> {
           error = "No Internet Connection!";
         }
 
-        ProviderContainer().read(errorProvider.notifier).state = "$error\nSwitching to Legacy Mode...";
+        ref.read(errorProvider).errorMessage = "$error\nSwitching to Legacy Mode...";
+        await Future.delayed(const Duration(seconds: 2));
 
         await fetchInvoiceData(
             outPut: parseInvoiceData(await getScannedText(imageFile)));
@@ -103,8 +105,9 @@ mixin _InvoiceEditPageMixin on State<InvoiceEditPage> {
     }
 
     companySuffix = invoiceDataService.companyTypeFinder(item.companyName);
-    invoiceCategory = InvoiceCategory.parse(item.category);
+    invoiceCategory = InvoiceCategory.parse(item.category) ?? InvoiceCategory.Others;
     companyTextController.text = invoiceDataService.companyTypeExtractor(item.companyName);
+    companyTextController.text = invoiceDataService.invalidCompanyTypeExtractor(companyTextController.text);
     invoiceNoTextController.text = item.invoiceNo;
     dateTextController.text = dateFormat.format(item.date);
     totalAmountTextController.text = item.totalAmount.toString();
@@ -120,12 +123,17 @@ mixin _InvoiceEditPageMixin on State<InvoiceEditPage> {
         // If the form is valid, display a snack bar. In the real world,
         // you'd often call a server or save the information in a database.
 
-        final List<String> companyList =
-            await InvoiceDataService().getCompanyList();
+        final InvoiceDataService invoiceDataService = InvoiceDataService();
 
-        companyTextController.text =
-        "${InvoiceDataService().companyTypeExtractor(
-            companyTextController.text)} ${companySuffix.name}";
+        final List<String> companyList =
+            await invoiceDataService.getCompanyList();
+
+        companyTextController.text = invoiceDataService.companyTypeExtractor(
+            companyTextController.text);
+
+        companyTextController.text = invoiceDataService.invalidCompanyTypeExtractor(companyTextController.text);
+
+        companyTextController.text += " ${companySuffix.name}";
 
         if (readMode != null) {
           for (final companyName in companyList) {
@@ -204,7 +212,7 @@ mixin _InvoiceEditPageMixin on State<InvoiceEditPage> {
             date: dateFormat.parse(dateTextController.text),
             totalAmount: double.parse(totalAmountTextController.text),
             taxAmount: double.parse(taxAmountTextController.text),
-            category: invoiceCategory!.name,
+            category: invoiceCategory.name,
             id: widget.invoiceData?.id);
 
         await InvoiceDataService().saveInvoiceData(data);

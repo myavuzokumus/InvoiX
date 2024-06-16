@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:invoix/utils/date_parser.dart';
 import 'package:invoix/utils/invoice_data_service.dart';
 
@@ -34,14 +36,16 @@ String parseInvoiceData(final List<String> listText) {
     }
   }
 
-  return {
-    "companyName": invoiceCompany,
+  final Map<String, Object?> value = {
+    "companyName": invoiceCompany ?? "InvoiX",
     "invoiceNo": invoiceNo,
     "date": invoiceDate,
     "totalAmount": totalAmount,
     "taxAmount": taxAmount,
     "category": InvoiceCategory.Others.name
-  }.toString();
+  };
+
+  return jsonEncode(value);
 
 }
 

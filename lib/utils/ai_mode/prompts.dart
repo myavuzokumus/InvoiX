@@ -43,5 +43,5 @@ Company types: SP, LTD, LLC, PLC, INC, GMBH, CORP, JSC
  "date": "",
  "totalAmount": "",
  "taxAmount": "",
- "category": ""
+ "category": "",
 }""";

@@ -11,9 +11,10 @@ import 'package:invoix/pages/InvoicesPage/ai_button.dart';
 import 'package:invoix/utils/invoice_data_service.dart';
 
 class InvoiceCard extends ConsumerWidget {
-  const InvoiceCard({super.key, required this.invoiceData});
+  const InvoiceCard({super.key, required this.invoiceData, this.selectionMode});
 
   final InvoiceData invoiceData;
+  final bool? selectionMode;
 
   @override
   Widget build(final BuildContext context, final WidgetRef ref) {
@@ -28,15 +29,15 @@ class InvoiceCard extends ConsumerWidget {
           gradient: const LinearGradient(
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
-            stops: [0.3, 0.5, 0.7],
-            colors: [Color(0xFF846AFF), Color(0xFF755EE8), Color(0xFF846AFF)],
+            stops: [0.20, 0.5, 0.65],
+            colors: [Color(0xBF614385), Color(0x59C2E9FB), Color(0xBF516395)],
           ),
         ),
         child: Material(
           type: MaterialType.transparency,
           child: InkWell(
             onLongPress: () {
-              if (!selectionState.isSelectionMode) {
+              if (!selectionState.isSelectionMode && selectionMode == null) {
                 selectionState.isSelectionMode = !selectionState.isSelectionMode;
                 ref.read(invoiceProvider.notifier).toggleItemSelection(company: invoiceData.companyName, invoiceData: invoiceData);
               }
@@ -62,6 +63,7 @@ class InvoiceCard extends ConsumerWidget {
                   child: Padding(
                     padding: const EdgeInsets.only(left: 16, right: 16),
                     child: ListView(
+                      physics: const NeverScrollableScrollPhysics(),
                       shrinkWrap: true,
                       children: <Widget>[
                         Text("Invoice No\n${invoiceData.invoiceNo}"),

@@ -23,7 +23,7 @@ extension CompanyTypeExtension on CompanyType {
   String get name {
     switch (this) {
       case CompanyType.SP:
-        return 'SP.';
+        return 'SP';
       case CompanyType.CORP:
         return 'Corp';
       case CompanyType.LLC:
@@ -38,9 +38,7 @@ extension CompanyTypeExtension on CompanyType {
         return 'JSC';
       case CompanyType.LTD:
         return 'LTD';
-      case CompanyType.CORP:
-        return 'CORP';
-    }
+      }
   }
 }
 
@@ -58,7 +56,7 @@ enum InvoiceCategory {
   static InvoiceCategory? parse(final String category) {
     return InvoiceCategory.values.firstWhere(
         (final InvoiceCategory e) => category.contains(e.name), orElse: () {
-      print('Invalid category name: $category');
+      //print('Invalid category name: $category');
       return InvoiceCategory.Others;
     });
   }
@@ -158,10 +156,16 @@ class InvoiceDataService {
     return invoiceDataBox.values.cast<InvoiceData>().toList();
   }
 
-  CompanyType companyTypeFinder(final String companyName) {
+  CompanyType companyTypeFinder(String companyName) {
     return CompanyType.values.firstWhere((final CompanyType e) {
+
+      companyName = companyName.replaceAll(" ", "");
+      if (companyName.contains(invalidCompanyRegex)) {
+        companyName = companyName.replaceAll(invalidCompanyRegex, "JSC");
+      }
+
       final List matchList =
-          companyRegex.allMatches(companyName.replaceAll(" ", "")).toList();
+          companyRegex.allMatches(companyName).toList();
       final RegExpMatch? pairedType =
           matchList.isNotEmpty ? matchList.last : null;
       if (pairedType == null) {
@@ -188,7 +192,7 @@ class InvoiceDataService {
 
   bool isInvoiceBetweenDates(final InvoiceData invoice,
       final DateTime startDate, final DateTime endDate) {
-    return (invoice.date.isAfter(startDate) &&
+    return ((invoice.date.isAfter(startDate) || invoice.date.isAtSameMomentAs(startDate))&&
         (invoice.date.isBefore(endDate) ||
             invoice.date.isAtSameMomentAs(endDate)));
   }
@@ -217,4 +221,25 @@ class InvoiceDataService {
 
     return text;
   }
+
+  String invalidCompanyTypeExtractor(String text) {
+    text = text.replaceAll(invalidCompanyRegex, "");
+    List matchList = invalidCompanyRegex.allMatches(text).toList();
+    RegExpMatch? pairedType = matchList.isNotEmpty ? matchList.first : null;
+    if (pairedType == null) {
+      matchList = invalidCompanyRegex.allMatches(text.replaceAll(" ", "")).toList();
+      pairedType = matchList.isNotEmpty ? matchList.first : null;
+    }
+    if (pairedType != null) {
+      text = text.substring(0, pairedType.start - 1);
+    }
+
+    text = text.trim();
+    if (text.isEmpty) {
+      throw "Company name cannot be empty.";
+    }
+
+    return text;
+  }
+
 }
