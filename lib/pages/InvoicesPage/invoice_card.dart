@@ -66,7 +66,7 @@ class InvoiceCard extends ConsumerWidget {
                       physics: const NeverScrollableScrollPhysics(),
                       shrinkWrap: true,
                       children: <Widget>[
-                        Text("Invoice No\n${invoiceData.invoiceNo}"),
+                        selectionMode == null ? Text("Invoice No\n${invoiceData.invoiceNo}") : Text("Company Name\n${invoiceData.companyName}"),
                         const Divider(height: 2),
                         Text("Date\n${DateFormat("dd-MM-yyyy").format(invoiceData.date)}"),
                         const Divider(height: 2),
