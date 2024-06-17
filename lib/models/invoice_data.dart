@@ -42,8 +42,8 @@ class InvoiceData extends HiveObject {
         companyName = json["companyName"] ?? "",
         invoiceNo = json["invoiceNo"] ?? "",
         date = dateParser(json["date"] ?? DateTime.now().toString()),
-        totalAmount = double.tryParse((json["totalAmount"] ?? "0").toString().replaceAll(",", ".")) ?? 0,
-        taxAmount = double.tryParse((json["taxAmount"] ?? "0").toString().replaceAll(",", ".")) ?? 0,
+        totalAmount = double.tryParse((json["totalAmount"] ?? "0").toString().replaceAll(".","").replaceAll(",", ".")) ?? 0,
+        taxAmount = double.tryParse((json["taxAmount"] ?? "0").toString().replaceAll(".","").replaceAll(",", ".")) ?? 0,
         category = json["category"] ?? "",
         _id = const Uuid().v4();
 
