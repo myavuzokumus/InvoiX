@@ -22,7 +22,7 @@ class _MainPageState extends State<MainPage> {
     });
     // onTap event'inde, PageController'ın animateToPage metodunu çağırın
     _pageController.animateToPage(index,
-        duration: Duration(milliseconds: 500), curve: Curves.easeOutCubic);
+        duration: const Duration(milliseconds: 500), curve: Curves.easeOutCubic);
   }
 
   final PageController _pageController = PageController();

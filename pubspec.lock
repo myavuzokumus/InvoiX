@@ -516,10 +516,10 @@ packages:
     dependency: "direct main"
     description:
       name: opencv_dart
-      sha256: "0547ba72733b350148141838344854c7265d6292d73e577508db0b1c2d5ae9ea"
+      sha256: "9b944a6e533ab81b4eeef79a6ee651ca449946b09d0a1c2ffe4f386fd4b124dc"
       url: "https://pub.dev"
     source: hosted
-    version: "1.0.9"
+    version: "1.0.10"
   package_config:
     dependency: transitive
     description:
@@ -548,10 +548,10 @@ packages:
     dependency: transitive
     description:
       name: path_provider_android
-      sha256: "9c96da072b421e98183f9ea7464898428e764bc0ce5567f27ec8693442e72514"
+      sha256: bca87b0165ffd7cdb9cad8edd22d18d2201e886d9a9f19b4fb3452ea7df3a72a
       url: "https://pub.dev"
     source: hosted
-    version: "2.2.5"
+    version: "2.2.6"
   path_provider_foundation:
     dependency: transitive
     description:
@@ -777,26 +777,26 @@ packages:
     dependency: transitive
     description:
       name: syncfusion_flutter_core
-      sha256: a0825cdba4f580067ded49ca2321dc3fcf2b224d454d00c8f6edead933949a1d
+      sha256: "2cd3a1c59bd9c2863eee96cc5400429ecc7b42cd1e7379f3eb5ccd9fc2e9306b"
       url: "https://pub.dev"
     source: hosted
-    version: "26.1.35"
+    version: "26.1.38"
   syncfusion_flutter_xlsio:
     dependency: "direct main"
     description:
       name: syncfusion_flutter_xlsio
-      sha256: "6480cdcf3d638f69749dcc96be269198a9880f26abc8b22db8659aff4e24c3b2"
+      sha256: f731362cb3a1eea499003e8ab2c9a659d775985ee4118ad2045554bcf9ff55d6
       url: "https://pub.dev"
     source: hosted
-    version: "26.1.35"
+    version: "26.1.38"
   syncfusion_officecore:
     dependency: transitive
     description:
       name: syncfusion_officecore
-      sha256: "84712137dac7c31c9baf687f4f490158b813100ae55246d94f5d5b7ec48f77f6"
+      sha256: d42528710b3c26ea5dedfb149ee8634a6359a30ec42a9cf35656289bf67e6534
       url: "https://pub.dev"
     source: hosted
-    version: "26.1.35"
+    version: "26.1.38"
   term_glyph:
     dependency: transitive
     description:
