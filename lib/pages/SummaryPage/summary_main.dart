@@ -75,8 +75,8 @@ class _SummaryMainState extends State<SummaryMain> with _SummaryMainMixin {
                         ));
                       } else if (snapshot.hasData) {
 
-                        bool isLandscape = MediaQuery.of(context).orientation == Orientation.landscape;
-                        bool shouldScroll = isLandscape || MediaQuery.of(context).size.height < 600; // Adjust the width as needed
+                        final bool isLandscape = MediaQuery.of(context).orientation == Orientation.landscape;
+                        final bool shouldScroll = isLandscape || MediaQuery.of(context).size.height < 600; // Adjust the width as needed
                         return shouldScroll ? SingleChildScrollView(child: buildContent(context, isLandscape, snapshot.data!)) : buildContent(context, isLandscape, snapshot.data!);
                       }
                     }
