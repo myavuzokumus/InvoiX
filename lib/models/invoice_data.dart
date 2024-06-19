@@ -42,10 +42,19 @@ class InvoiceData extends HiveObject {
         companyName = json["companyName"] ?? "",
         invoiceNo = json["invoiceNo"] ?? "",
         date = dateParser(json["date"] ?? DateTime.now().toString()),
-        totalAmount = double.tryParse((json["totalAmount"] ?? "0").toString().replaceAll(".","").replaceAll(",", ".")) ?? 0,
-        taxAmount = double.tryParse((json["taxAmount"] ?? "0").toString().replaceAll(".","").replaceAll(",", ".")) ?? 0,
         category = json["category"] ?? "",
-        _id = const Uuid().v4();
+        _id = const Uuid().v4(),
+    totalAmount = _parseAmount(json["totalAmount"] ?? "0"),
+    taxAmount = _parseAmount(json["taxAmount"] ?? "0");
+
+  static double _parseAmount(String amount) {
+    if (amount[amount.length - 3] == ".") {
+      final List<String> charList = amount.split('');
+      charList[charList.length - 3] = ",";
+      amount = charList.join();
+    }
+    return double.tryParse(amount.replaceAll(".", "").replaceAll(",", ".")) ?? 0;
+  }
 
   InvoiceData copyWith({
     final String? imagePath,
