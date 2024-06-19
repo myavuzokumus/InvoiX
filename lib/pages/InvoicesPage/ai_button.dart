@@ -52,6 +52,7 @@ class AIButton extends StatelessWidget {
                     builder: (final BuildContext context,
                         final BoxConstraints constraints) {
                       return Card(
+                          color: const Color(0xff442a22),
                           elevation: 16,
                           child: Padding(
                             padding: const EdgeInsets.all(12.0),
@@ -63,9 +64,7 @@ class AIButton extends StatelessWidget {
                                   final AsyncSnapshot<String> snapshot) {
                                 if (snapshot.hasData) {
                                   final Map<String, dynamic> decodedData =
-                                      jsonDecode(snapshot.data!
-                                          .replaceAll("```", "")
-                                          .replaceFirst("json", ""));
+                                      jsonDecode(snapshot.data!);
                                   final InvoiceAnalysis invoiceAnalysis =
                                       InvoiceAnalysis.fromJson(decodedData);
 
@@ -91,7 +90,7 @@ class AIButton extends StatelessWidget {
                                         customHeight:
                                             constraints.maxHeight - 72),
                                     const Text(
-                                        'Your invoice is being analyzed...',
+                                        'The invoice is being analyzed...',
                                         textAlign: TextAlign.center, style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
                                   ],
                                 );

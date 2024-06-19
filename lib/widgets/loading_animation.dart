@@ -11,23 +11,40 @@ class LoadingAnimation extends ConsumerWidget {
   Widget build(final BuildContext context, final WidgetRef ref) {
 
     final errorState = ref.watch(errorProvider);
+    final bool isLandScape = MediaQuery.of(context).orientation == Orientation.landscape;
 
     return SizedBox(
         height: customHeight ?? double.maxFinite,
-        child: Column(
+        child: isLandScape ? SingleChildScrollView(child: NewWidget(errorState: errorState, subsControl: subsControl)) : NewWidget(errorState: errorState, subsControl: subsControl));
+  }
+}
+
+class NewWidget extends StatelessWidget {
+  const NewWidget({
+    super.key,
+    required this.errorState,
+    required this.subsControl,
+  });
+
+  final ErrorState errorState;
+  final bool subsControl;
+
+  @override
+  Widget build(final BuildContext context) {
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        const LinearProgressIndicator(),
+        Image.asset("assets/loading/InvoiceReadLoading.gif"),
+        Column(
           children: [
-            const LinearProgressIndicator(),
-            Expanded(child: Center(child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Image.asset("assets/loading/InvoiceReadLoading.gif"),
-                Text(errorState.errorMessage, style: const TextStyle(color: Colors.red), textAlign: TextAlign.center),
-                if (!errorState.subs && subsControl) const Text("Please check your subscription status!", style: TextStyle(color: Colors.red), textAlign: TextAlign.center),
-              ],
-            ))),
+            Text(errorState.errorMessage, style: const TextStyle(color: Colors.red), textAlign: TextAlign.center),
+            if (!errorState.subs && subsControl) const Text("Please check your subscription status!", style: TextStyle(color: Colors.red), textAlign: TextAlign.center),
+          ],
+        ),
 
       ],
-    ));
+    );
   }
 }
 
