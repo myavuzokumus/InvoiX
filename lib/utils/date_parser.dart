@@ -4,6 +4,7 @@ import 'package:intl/intl.dart';
 DateFormat dateFormat = DateFormat("dd-MM-yyyy");
 
 DateTime dateParser(final String date) {
+
   final List<DateFormat> dateFormats = [
     DateFormat("dd-MM-yyyy"),
     DateFormat("dd/MM/yyyy"),
@@ -14,7 +15,8 @@ DateTime dateParser(final String date) {
   ];
   for (final DateFormat format in dateFormats) {
     try {
-      return format.parse(date);
+      final DateTime newDate = format.parse(date);
+      return newDate.isAfter(DateTime.now()) ? DateTime.now() : newDate;
     } catch (e) {
       print('Failed to parse date with format $format');
     }
