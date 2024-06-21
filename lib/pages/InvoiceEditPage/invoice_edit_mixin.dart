@@ -25,7 +25,6 @@ mixin _InvoiceEditPageMixin on ConsumerState<InvoiceEditPage> {
 
   @override
   void initState() {
-
     _saveButtonState.value = true;
     _isFileSaved = false;
 
@@ -84,7 +83,8 @@ mixin _InvoiceEditPageMixin on ConsumerState<InvoiceEditPage> {
           error = "No Internet Connection!";
         }
 
-        ref.read(errorProvider).errorMessage = "$error\nSwitching to Legacy Mode...";
+        ref.read(errorProvider).errorMessage =
+            "$error\nSwitching to Legacy Mode...";
         await Future.delayed(const Duration(seconds: 2));
 
         await fetchInvoiceData(
@@ -106,9 +106,12 @@ mixin _InvoiceEditPageMixin on ConsumerState<InvoiceEditPage> {
     }
 
     companySuffix = invoiceDataService.companyTypeFinder(item.companyName);
-    invoiceCategory = InvoiceCategory.parse(item.category) ?? InvoiceCategory.Others;
-    companyTextController.text = invoiceDataService.companyTypeExtractor(item.companyName);
-    companyTextController.text = invoiceDataService.invalidCompanyTypeExtractor(companyTextController.text);
+    invoiceCategory =
+        InvoiceCategory.parse(item.category) ?? InvoiceCategory.Others;
+    companyTextController.text =
+        invoiceDataService.companyTypeExtractor(item.companyName);
+    companyTextController.text = invoiceDataService
+        .invalidCompanyTypeExtractor(companyTextController.text);
     invoiceNoTextController.text = item.invoiceNo;
     dateTextController.text = updateYear(dateFormat.format(item.date));
     totalAmountTextController.text = item.totalAmount.toString();
@@ -129,10 +132,11 @@ mixin _InvoiceEditPageMixin on ConsumerState<InvoiceEditPage> {
         final List<String> companyList =
             await invoiceDataService.getCompanyList();
 
-        companyTextController.text = invoiceDataService.companyTypeExtractor(
-            companyTextController.text);
+        companyTextController.text =
+            invoiceDataService.companyTypeExtractor(companyTextController.text);
 
-        companyTextController.text = invoiceDataService.invalidCompanyTypeExtractor(companyTextController.text);
+        companyTextController.text = invoiceDataService
+            .invalidCompanyTypeExtractor(companyTextController.text);
 
         companyTextController.text += " ${companySuffix.name}";
 
@@ -157,26 +161,24 @@ mixin _InvoiceEditPageMixin on ConsumerState<InvoiceEditPage> {
                     'Similar Company Found!',
                     style: TextStyle(color: Colors.redAccent),
                   ),
-                  content: Column(
-                    children: [
-                      const Text(
-                        'Do you want to merge with it?'
-                      ),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        children: [
-                          OutlinedButton(
-                            onPressed: () => Navigator.pop(context, false),
-                            child: Text(companyTextController.text),
-                          ),
-                          const Text("-->"),
-                          OutlinedButton(
-                            onPressed: () => Navigator.pop(context, true),
-                            child: Text(companyName),
-                          ),
-                        ],
-                        )
-                    ],
+                  content: SingleChildScrollView(
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        const Text('Do you want to merge with it?', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                        FilledButton(
+                          onPressed: () {},
+                          child: Text(companyTextController.text),
+                        ),
+                        const Text("↓", style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold)),
+                        FilledButton(
+                          onPressed: () {},
+                          child:
+                              Text(companyName),
+                        ),
+                      ],
+                    ),
                   ),
                   actions: <Widget>[
                     TextButton(
