@@ -17,7 +17,7 @@ String parseInvoiceData(final List<String> listText) {
     if (companyRegex.hasMatch(i)) {
       invoiceCompany = assignCompany(i);
     } else if (dateRegex.hasMatch(i.replaceAll(" ", ""))) {
-      invoiceDate = assignDate(i.replaceAll(" ", ""), dateRegex);
+      invoiceDate = assignDate(i.replaceAll(" ", ""));
     } else if (invoiceNoRegex.hasMatch(i)) {
       invoiceNo = assignInvoiceNo(i);
     } else if (amountRegex.hasMatch(i.replaceAll(" ", "")) && !alphabetRegex.hasMatch(i)) {
@@ -36,8 +36,8 @@ String parseInvoiceData(final List<String> listText) {
     "companyName": invoiceCompany ?? "InvoiX",
     "invoiceNo": invoiceNo,
     "date": invoiceDate,
-    "totalAmount": totalAmount,
-    "taxAmount": taxAmount,
+    "totalAmount": totalAmount.toString(),
+    "taxAmount": taxAmount.toString(),
     "category": InvoiceCategory.Others.name
   };
 
@@ -49,8 +49,9 @@ String assignCompany(final String text) {
   return text;
 }
 
-String assignDate(String date, final RegExp dateRegex) {
+String assignDate(String date) {
   final RegExpMatch? matchedDate = dateRegex.firstMatch(date);
+
   if (matchedDate != null) {
     date = date.substring(matchedDate.start, matchedDate.end);
   }

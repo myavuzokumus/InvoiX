@@ -44,8 +44,8 @@ class InvoiceData extends HiveObject {
         date = dateParser(json["date"] ?? DateTime.now().toString()),
         category = json["category"] ?? "",
         _id = const Uuid().v4(),
-    totalAmount = _parseAmount(json["totalAmount"] ?? "0"),
-    taxAmount = _parseAmount(json["taxAmount"] ?? "0");
+        totalAmount = _parseAmount(json["totalAmount"] ?? "0"),
+        taxAmount = _parseAmount(json["taxAmount"] ?? "0");
 
   static double _parseAmount(String amount) {
     if (amount[amount.length - 3] == ".") {

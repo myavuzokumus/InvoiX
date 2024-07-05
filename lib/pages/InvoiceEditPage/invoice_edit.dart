@@ -116,6 +116,9 @@ class _InvoiceEditPageState extends ConsumerState<InvoiceEditPage>
                                   },
                                   icon: const Icon(Icons.search)),
                               DateFormatSegmented(onChange: (final value) {
+                                if (dateTextController.text == "") {
+                                  return;
+                                }
                                 if (value == DateFormatSegment.uk) {
                                   dateTextController.text =
                                       DateFormat("dd-MM-yyyy").format(

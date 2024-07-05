@@ -85,6 +85,9 @@ mixin _InvoiceEditPageMixin on ConsumerState<InvoiceEditPage> {
 
         ref.read(errorProvider).errorMessage =
             "$error\nSwitching to Legacy Mode...";
+
+        print("Error: $error");
+
         await Future.delayed(const Duration(seconds: 2));
 
         await fetchInvoiceData(
