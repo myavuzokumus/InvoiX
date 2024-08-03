@@ -40,7 +40,7 @@ class NewWidget extends StatelessWidget {
         Column(
           children: [
             Text(errorState.errorMessage, style: const TextStyle(color: Colors.red), textAlign: TextAlign.center),
-            if (!errorState.subs && subsControl) const Text("Please check your subscription status!", style: TextStyle(color: Colors.red), textAlign: TextAlign.center),
+            if (!errorState.subs && subsControl) const Text("Please check your subscription status!", style: TextStyle(color: Colors.red, fontSize: 32, fontWeight: FontWeight.bold), textAlign: TextAlign.center),
           ],
         ),
 
