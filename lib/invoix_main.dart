@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:invoix/pages/main_page.dart';
 import 'package:invoix/theme.dart';
 
@@ -10,6 +12,26 @@ class InvoixMain extends StatelessWidget {
 
     return MaterialApp(
       title: 'InvoiX',
+      localizationsDelegates: const [
+        AppLocalizations.delegate,
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
+      supportedLocales: const [
+        Locale('en', ''), // İngilizce
+        Locale('tr', ''), // Türkçe
+        // Diğer desteklenen diller buraya eklenebilir
+      ],
+      localeResolutionCallback: (final locale, final supportedLocales) {
+        for (final supportedLocale in supportedLocales) {
+          if (supportedLocale.languageCode == locale?.languageCode) {
+            //return Locale('tr', '');
+            return supportedLocale;
+          }
+        }
+        return supportedLocales.first;
+      },
       theme: const MaterialTheme(TextTheme()).dark().copyWith(
 
         inputDecorationTheme: InputDecorationTheme(
