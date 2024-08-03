@@ -42,12 +42,15 @@ dependencies:
   cross_file: ^0.3.4+1
   image: ^4.2.0
   downloadsfolder: ^1.1.0
-  google_generative_ai: ^0.4.3
-  flutter_dotenv: ^5.1.0
   flutter_riverpod: ^2.5.1
   google_mlkit_document_scanner: ^0.2.0
   opencv_dart: ^1.0.9
   fl_chart: ^0.68.0
+  firebase_core: ^3.1.1
+  firebase_vertexai: ^0.2.2+1
+  firebase_app_check: ^0.3.0+2
+  #google_generative_ai: ^0.4.3
+  #flutter_dotenv: ^5.1.0
   #shared_preferences: ^2.2.2
 
 dev_dependencies:

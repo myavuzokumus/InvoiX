@@ -1,15 +1,17 @@
 import 'dart:async';
 
+import 'package:firebase_app_check/firebase_app_check.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive_flutter/hive_flutter.dart';
+import 'package:invoix/firebase_options.dart';
+import 'package:invoix/invoix_main.dart';
 import 'package:invoix/models/invoice_data.dart';
-import 'package:invoix/pages/main_page.dart';
-
-import 'theme.dart';
 
 void main() async {
+
   WidgetsFlutterBinding.ensureInitialized();
 
   await Hive.initFlutter();
@@ -17,7 +19,23 @@ void main() async {
   await Hive.openBox<InvoiceData>('InvoiceData');
   await Hive.openBox<int>('remainingTimeBox');
 
-  await dotenv.load(fileName: ".env");
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
+
+  if(!kDebugMode) {
+    await FirebaseAppCheck.instance.activate(
+      androidProvider: AndroidProvider.playIntegrity,
+      appleProvider: AppleProvider.appAttest,
+      //webProvider: ReCaptchaV3Provider('recaptcha-v3-site-key'),
+    );
+  } else {
+    await FirebaseAppCheck.instance.activate(
+      androidProvider: AndroidProvider.debug,
+      appleProvider: AppleProvider.debug,
+      //webProvider: ReCaptchaV3Provider('recaptcha-v3-site-key'),
+    );
+  }
 
   runApp(const ProviderScope(child: InvoixMain()));
 
@@ -35,41 +53,5 @@ void main() async {
         await box.put(key, remainingTime);
       });
     }
-  }
-}
-
-class InvoixMain extends StatelessWidget {
-  const InvoixMain({super.key});
-
-  @override
-  Widget build(final BuildContext context) {
-
-    return MaterialApp(
-      title: 'InvoiX',
-      theme: const MaterialTheme(TextTheme()).dark().copyWith(
-
-      inputDecorationTheme: InputDecorationTheme(
-             labelStyle: const TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
-             border: OutlineInputBorder(
-               borderRadius: BorderRadius.circular(150),
-             ),
-             isDense: true,
-             counterStyle: const TextStyle(fontSize: 0),
-             errorStyle: const TextStyle(fontSize: 0),
-         ),
-        listTileTheme: const ListTileThemeData(
-          shape: Border.symmetric(
-            vertical: BorderSide(color: Colors.white, width: 2.5),
-          ),
-          titleTextStyle: TextStyle(fontSize: 24),
-        ),
-        expansionTileTheme: const ExpansionTileThemeData(
-          shape: Border.symmetric(
-            vertical: BorderSide.none,
-          ),
-        ),
-      ),
-      home: const MainPage(),
-    );
   }
 }
