@@ -11,6 +11,7 @@
 migrate_working_dir/
 .env
 *.env
+lib/firebase_options.dart
 
 # IntelliJ related
 *.iml
@@ -47,3 +48,5 @@ app.*.map.json
 
 # IDX
 monospace.json
+/firebase.json
+/android/app/google-services.json

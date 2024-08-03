@@ -1,15 +1,19 @@
 import 'dart:io';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:google_generative_ai/google_generative_ai.dart';
+
+import 'package:firebase_app_check/firebase_app_check.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_vertexai/firebase_vertexai.dart';
 
 class GeminiAPI {
-  final model = GenerativeModel(
-      model: 'gemini-1.5-flash-latest',
-      apiKey: dotenv.env['GEMINI_API_KEY']!,
-      generationConfig: GenerationConfig(responseMimeType: 'application/json'),
-  );
 
   Future<String> describeImage({required final File imgFile, required final String prompt}) async {
+
+    final model =  FirebaseVertexAI.instanceFor(
+      appCheck: FirebaseAppCheck.instanceFor(app: Firebase.app()),
+    ).generativeModel(
+      model: 'gemini-1.5-flash',
+      generationConfig: GenerationConfig(responseMimeType: 'application/json'),
+    );
 
     final response = await (model.generateContent([
           Content.multi([

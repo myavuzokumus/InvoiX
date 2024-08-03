@@ -83,8 +83,9 @@ mixin _InvoiceEditPageMixin on ConsumerState<InvoiceEditPage> {
           error = "No Internet Connection!";
         }
 
-        ref.read(errorProvider).errorMessage =
-            "$error\nSwitching to Legacy Mode...";
+        ref.read(errorProvider.notifier).state =
+            ref.read(errorProvider).copyWith(errorMessage: "$error\nSwitching to Legacy Mode...");
+
         await Future.delayed(const Duration(seconds: 2));
 
         await fetchInvoiceData(
