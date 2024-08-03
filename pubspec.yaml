@@ -30,25 +30,41 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  flutter_localizations:
+    sdk: flutter
 
-  syncfusion_flutter_xlsio: ^26.1.35
   intl: ^0.19.0
+  #Mapping
+  #flutter_localization: ^0.2.1
   uuid: ^4.4.0
   hive: ^2.2.3
   hive_flutter: ^1.1.0
-  google_mlkit_text_recognition: ^0.13.0
+
   permission_handler: ^11.3.1
   string_similarity: ^2.0.0
   cross_file: ^0.3.4+1
   image: ^4.2.0
   downloadsfolder: ^1.1.0
   flutter_riverpod: ^2.5.1
-  google_mlkit_document_scanner: ^0.2.0
   opencv_dart: ^1.0.9
+
+  #ML
+  google_mlkit_document_scanner: ^0.2.0
+  google_mlkit_text_recognition: ^0.13.0
+
+  #Chart
   fl_chart: ^0.68.0
+
+  #Excel
+  syncfusion_flutter_xlsio: ^26.1.35
+
+  #Firebase things
   firebase_core: ^3.1.1
   firebase_vertexai: ^0.2.2+1
   firebase_app_check: ^0.3.0+2
+
+
+  #No longer use
   #google_generative_ai: ^0.4.3
   #flutter_dotenv: ^5.1.0
   #shared_preferences: ^2.2.2
@@ -87,6 +103,7 @@ dev_dependencies:
 
 # The following section is specific to Flutter packages.
 flutter:
+  generate: true
 
   # The following line ensures that the Material Icons font is
   # included with your application, so that you can use the icons in

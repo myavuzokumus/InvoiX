@@ -1,0 +1,80 @@
+{
+  "@@locale": "tr",
+
+  "apiErrorUserNotFound": "Kullanıcı bulunamadı.",
+  "apiErrorWrongPassword": "Yanlış şifre.",
+  "apiErrorUserDisabled": "Kullanıcı hesabı devre dışı bırakılmış.",
+  "apiErrorInvalidEmail": "Geçersiz mail türü.",
+  "apiErrorChannelError": "Kanal hatası.",
+  "apiErrorWeakPassword": "Zayıf şifre, en az 6 karakter içermeli.",
+  "apiErrorEmailAlreadyInUse": "Bu e-posta adresi zaten kullanımda.",
+  "apiErrorUsernameAlreadyInUse": "Bu kullanıcı adı zaten kullanımda.",
+  "apiErrorInvalidCredential": "Geçersiz kimlik bilgisi.",
+
+  "signUp": "Kayıt Ol",
+  "enterUsername": "Kullanıcı adınızı giriniz",
+  "enterEmail": "E-posta adresinizi giriniz",
+  "enterPassword": "Şifrenizi giriniz",
+  "confirmPassword": "Şifrenizi onaylayınız",
+  "passwordsDoNotMatch": "Şifreler eşleşmiyor",
+  "registrationSuccessful": "Kayıt başarılı: {email}",
+  "@registrationSuccessful": {
+    "placeholders": {
+      "email": {
+        "type": "String"
+      }
+    }
+  },
+  "registrationError": "Kayıt hatası: {error}",
+  "@registrationError": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "alreadyHaveAccount": "Zaten bir hesabınız var mı?",
+  "login": "Giriş Yap",
+  "email": "E-posta",
+  "password": "Şifre",
+  "forgotPassword": "Şifremi Unuttum?",
+  "dontHaveAccount": "Hesabınız yok mu?",
+  "pleaseEnterYourEmail": "Lütfen e-posta adresinizi giriniz",
+  "pleaseEnterYourPassword": "Lütfen şifrenizi giriniz",
+  "loginSuccessful": "Giriş başarılı: {email}",
+  "@loginSuccessful": {
+    "placeholders": {
+      "email": {
+        "type": "String"
+      }
+    }
+  },
+  "loginError": "Giriş hatası: {error}",
+  "@loginError": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "send": "Gönder",
+  "passwordResetEmailSent": "{email} adresine şifre sıfırlama e-postası gönderildi.",
+  "@passwordResetEmailSent": {
+    "placeholders": {
+      "email": {
+        "type": "String"
+      }
+    }
+  },
+  "error": "Hata: {error}",
+  "@error": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "username": "Kullanıcı Adı",
+  "pleaseEnterYourUsername": "Lütfen kullanıcı adınızı giriniz",
+  "pleaseConfirmYourPassword": "Lütfen şifrenizi onaylayınız"
+}

@@ -28,8 +28,7 @@ flutter run
 ```
 
 > [!IMPORTANT]
-> You need to create `.env` file in root directory. And add that following things:
-> - GEMINI_API_KEY= ""
+> You need to link your firebase account and create firebase_options.dart file in the lib folder.
 
 ## Solution areas covered 🌍
 - **Goal 9 | Industry, Innovation and Infrastructure:**

@@ -3,6 +3,7 @@ import 'package:intl/intl.dart';
 import 'package:invoix/utils/date_parser.dart';
 
 enum DateFormatSegment { uk, us }
+
 DateFormatSegment dateFormatView = DateFormatSegment.uk;
 
 class DateFormatSegmented extends StatefulWidget {
