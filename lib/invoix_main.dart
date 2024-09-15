@@ -19,9 +19,9 @@ class InvoixMain extends StatelessWidget {
         GlobalCupertinoLocalizations.delegate,
       ],
       supportedLocales: const [
-        Locale('en', ''), // İngilizce
-        Locale('tr', ''), // Türkçe
-        // Diğer desteklenen diller buraya eklenebilir
+        Locale('en', ''), // English
+        Locale('tr', ''), // Turkish
+        // Other supported languages can be added here
       ],
       localeResolutionCallback: (final locale, final supportedLocales) {
         for (final supportedLocale in supportedLocales) {

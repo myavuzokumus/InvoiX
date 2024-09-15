@@ -12,8 +12,7 @@ class LoadingAnimation extends ConsumerWidget {
 
     final errorState = ref.watch(errorProvider);
     final bool isLandScape = MediaQuery.of(context).orientation == Orientation.landscape;
-
-    print("Loading Animation: ${errorState.errorMessage}");
+    
     return SizedBox(
         height: customHeight ?? double.maxFinite,
         child: isLandScape ? SingleChildScrollView(child: NewWidget(errorState: errorState, subsControl: subsControl)) : NewWidget(errorState: errorState, subsControl: subsControl));

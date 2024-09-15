@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:invoix/misc/deletion_dialog.dart';
@@ -5,7 +6,9 @@ import 'package:invoix/models/list_length_state.dart';
 import 'package:invoix/models/selection_state.dart';
 import 'package:invoix/utils/export_to_excel.dart';
 import 'package:invoix/utils/invoice_data_service.dart';
+import 'package:invoix/widgets/loading_animation.dart';
 import 'package:invoix/widgets/search_bar.dart';
+import 'package:invoix/widgets/sub_status.dart';
 import 'package:invoix/widgets/toast.dart';
 
 part 'list_page_scaffold_mixin.dart';
@@ -110,7 +113,15 @@ class _GeneralPageState extends ConsumerState<ListPageScaffold>
                   ),
               ],
             ]),
-        body: widget.body,
+        body: Column(
+          children: [
+            SubStatus(
+              errorState: ref.watch(errorProvider),
+              subsControl: true,
+            ),
+            Expanded(child: widget.body),
+          ],
+        ),
         floatingActionButton: widget.floatingActionButton,
         floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       ),

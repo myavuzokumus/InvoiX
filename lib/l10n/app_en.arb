@@ -1,0 +1,22 @@
+{
+  "@@locale": "en",
+
+  "selectPlan": "Select Your Plan",
+  "individualUser": "Individual User",
+  "advancedUser": "Advanced User",
+  "corporateUser": "Corporate User",
+  "subscribe": "Subscribe",
+  "contactUs": "Contact Us",
+  "individualPrice": "3€ / Monthly",
+  "advancedPrice": "15€ / Monthly",
+  "corporatePrice": "??? / Monthly",
+  "individualFeatures_1": "1000 AI invoice scans",
+  "individualFeatures_2": "1000 AI invoice analyses",
+  "individualFeatures_3": "Personalized stock tracking",
+  "advancedFeatures_1": "10000 AI invoice scans",
+  "advancedFeatures_2": "10000 AI invoice analyses",
+  "advancedFeatures_3": "Personalized stock tracking",
+  "corporateFeatures": "Usage-based pricing",
+  "newUserOffer": "New User Offer",
+  "newUserOfferDetails": "30 AI invoice scans and 10 AI invoice analyses free for first-time use!"
+}

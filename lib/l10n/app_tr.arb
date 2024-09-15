@@ -76,5 +76,27 @@
   },
   "username": "Kullanıcı Adı",
   "pleaseEnterYourUsername": "Lütfen kullanıcı adınızı giriniz",
-  "pleaseConfirmYourPassword": "Lütfen şifrenizi onaylayınız"
+  "pleaseConfirmYourPassword": "Lütfen şifrenizi onaylayınız",
+
+  "selectPlan": "Planını Seç",
+  "individualUser": "Bireysel Kullanıcı",
+  "advancedUser": "İleri Kullanıcı",
+  "corporateUser": "Kurumsal Kullanıcı",
+  "subscribe": "Abone Ol",
+  "contactUs": "İletişime Geç",
+  "individualPrice": "3€ / Aylık",
+  "advancedPrice": "15€ / Aylık",
+  "corporatePrice": "??? / Aylık",
+  "individualFeatures_1": "1000 AI fatura okutma",
+  "individualFeatures_2": "1000 AI fatura analizi yapma",
+  "individualFeatures_3": "Kişiselleştirilmiş Stok takibi",
+  "advancedFeatures_1": "10000 AI Fatura Okutma",
+  "advancedFeatures_2": "10000 AI fatura analizi yapma",
+  "advancedFeatures_3": "Kişiselleştirilmiş stok takibi",
+  "corporateFeatures": "Kullanımına bağlı fiyatlandırma",
+  "newUserOffer": "Yeni Kullanıcı Teklifi",
+  "newUserOfferDetails": "İlk kullanıma özel 30 AI Fatura okutma ve 10 AI fatura analizi ücretsiz!"
+
+
+
 }

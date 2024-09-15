@@ -31,7 +31,7 @@ void main() async {
       webProvider: ReCaptchaV3Provider('recaptcha-v3-site-key'),
     );
   } else {
-    await FirebaseAppCheck.instanceFor(app: Firebase.app()).activate(
+    await FirebaseAppCheck.instanceFor(app: Firebase.app("invoix")).activate(
       androidProvider: AndroidProvider.debug,
       appleProvider: AppleProvider.debug,
       webProvider: ReCaptchaV3Provider('recaptcha-v3-site-key'),
