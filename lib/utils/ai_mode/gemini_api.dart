@@ -7,13 +7,12 @@ import 'package:firebase_vertexai/firebase_vertexai.dart';
 class GeminiAPI {
 
   Future<String> describeImage({required final File imgFile, required final String prompt}) async {
-
     final model =  FirebaseVertexAI.instanceFor(
-      appCheck: FirebaseAppCheck.instanceFor(app: Firebase.app()),
-    ).generativeModel(
-      model: 'gemini-1.5-flash',
-      generationConfig: GenerationConfig(responseMimeType: 'application/json'),
-    );
+        appCheck: FirebaseAppCheck.instanceFor(app: Firebase.app("invoix")),
+      ).generativeModel(
+        model: 'gemini-1.5-flash',
+        generationConfig: GenerationConfig(responseMimeType: 'application/json'),
+      );
 
     final response = await (model.generateContent([
           Content.multi([

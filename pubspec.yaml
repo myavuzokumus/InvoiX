@@ -36,17 +36,17 @@ dependencies:
   intl: ^0.19.0
   #Mapping
   #flutter_localization: ^0.2.1
-  uuid: ^4.4.0
+  uuid: ^4.4.2
   hive: ^2.2.3
   hive_flutter: ^1.1.0
 
   permission_handler: ^11.3.1
-  string_similarity: ^2.0.0
-  cross_file: ^0.3.4+1
+  string_similarity: ^2.1.1
+  cross_file: ^0.3.4+2
   image: ^4.2.0
   downloadsfolder: ^1.1.0
   flutter_riverpod: ^2.5.1
-  opencv_dart: ^1.0.9
+  opencv_dart: ^1.2.1
 
   #ML
   google_mlkit_document_scanner: ^0.2.0
@@ -56,12 +56,12 @@ dependencies:
   fl_chart: ^0.68.0
 
   #Excel
-  syncfusion_flutter_xlsio: ^26.1.35
+  syncfusion_flutter_xlsio: ^26.2.9
 
   #Firebase things
-  firebase_core: ^3.1.1
-  firebase_vertexai: ^0.2.2+1
-  firebase_app_check: ^0.3.0+2
+  firebase_core: ^3.3.0
+  firebase_vertexai: ^0.2.2+4
+  firebase_app_check: ^0.3.0+4
 
 
   #No longer use
