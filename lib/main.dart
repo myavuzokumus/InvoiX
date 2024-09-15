@@ -20,20 +20,21 @@ void main() async {
   await Hive.openBox<int>('remainingTimeBox');
 
   await Firebase.initializeApp(
+    name: "invoix",
     options: DefaultFirebaseOptions.currentPlatform,
   );
 
   if(!kDebugMode) {
-    await FirebaseAppCheck.instance.activate(
+    await FirebaseAppCheck.instanceFor(app: Firebase.app("invoix")).activate(
       androidProvider: AndroidProvider.playIntegrity,
       appleProvider: AppleProvider.appAttest,
-      //webProvider: ReCaptchaV3Provider('recaptcha-v3-site-key'),
+      webProvider: ReCaptchaV3Provider('recaptcha-v3-site-key'),
     );
   } else {
-    await FirebaseAppCheck.instance.activate(
+    await FirebaseAppCheck.instanceFor(app: Firebase.app()).activate(
       androidProvider: AndroidProvider.debug,
       appleProvider: AppleProvider.debug,
-      //webProvider: ReCaptchaV3Provider('recaptcha-v3-site-key'),
+      webProvider: ReCaptchaV3Provider('recaptcha-v3-site-key'),
     );
   }
 
