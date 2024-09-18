@@ -1,6 +1,7 @@
 {
   "@@locale": "en",
 
+
   "selectPlan": "Select Your Plan",
   "individualUser": "Individual User",
   "advancedUser": "Advanced User",
@@ -18,5 +19,16 @@
   "advancedFeatures_3": "Personalized stock tracking",
   "corporateFeatures": "Usage-based pricing",
   "newUserOffer": "New User Offer",
-  "newUserOfferDetails": "30 AI invoice scans and 10 AI invoice analyses free for first-time use!"
+  "newUserOfferDetails": "30 AI invoice scans and 10 AI invoice analyses free for first-time use!",
+
+  "loginToUseAI": "Sign in to access AI features.",
+  "logOut": "Log Out",
+
+  "remainingInvoiceReads": "Remaining Invoice Reads",
+  "remainingInvoiceAnalyses": "Remaining Invoice Analyses",
+  "invoiceReads": "Invoice Reads",
+   "invoiceAnalyses": "Invoice Analyses",
+  "subscriptionExpiryDate": "Subscription Expiry Date",
+  "subscriptionStatus": "Subscription Status",
+  "plans": "Plans"
 }

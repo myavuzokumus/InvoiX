@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:invoix/pages/SubscriptionPage/glowing_container.dart';
+import 'package:invoix/widgets/glowing_container.dart';
 
 class SubscriptionCard extends StatelessWidget {
   final String title;
@@ -8,6 +8,7 @@ class SubscriptionCard extends StatelessWidget {
   final String buttonText;
   final IconData icon;
   final Color glowColor;
+  final VoidCallback onPressed;
 
   const SubscriptionCard({
     super.key,
@@ -17,6 +18,7 @@ class SubscriptionCard extends StatelessWidget {
     required this.buttonText,
     required this.icon,
     this.glowColor = Colors.blue,
+    required this.onPressed,
   });
 
   @override
@@ -30,24 +32,22 @@ class SubscriptionCard extends StatelessWidget {
         ),
         child: Padding(
           padding: const EdgeInsets.all(24.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                children: [
-                  Icon(icon, size: 32, color: Colors.white),
-                  const SizedBox(width: 16),
-                  Text(title, style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.white)),
-                ],
-              ),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          child: SingleChildScrollView(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
                   children: [
-                    Text(price, style: const TextStyle(fontSize: 32, fontWeight: FontWeight.bold, color: Colors.white)),
-                    Column(
-                      children: [
+                    Icon(icon, size: 32, color: Colors.white),
+                    const SizedBox(width: 16),
+                    Text(title, style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.white)),
+                  ],
+                ),
+                const SizedBox(height: 16),
+                Text(price, style: const TextStyle(fontSize: 32, fontWeight: FontWeight.bold, color: Colors.white)),
+                const SizedBox(height: 16),
+                Column(
+                  children: [
                     ...features.map((final feature) => Padding(
                       padding: const EdgeInsets.only(bottom: 16.0),
                       child: Row(
@@ -57,26 +57,24 @@ class SubscriptionCard extends StatelessWidget {
                           Expanded(child: Text(feature, style: const TextStyle(color: Colors.white, fontSize: 16))),
                         ],
                       ),
-                    )),],
-                    ),
-                    ElevatedButton(
-                      onPressed: () {},
-                      style: ElevatedButton.styleFrom(
-                        foregroundColor: glowColor,
-                        padding: const EdgeInsets.symmetric(vertical: 16),
-                        minimumSize: const Size(double.infinity, 50),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                      ),
-                      child: Text(buttonText, style: const TextStyle(fontSize: 18)),
-                    ),
+                    )),
                   ],
                 ),
-              ),
-
-
-            ],
+                const SizedBox(height: 16),
+                ElevatedButton(
+                  onPressed: onPressed,
+                  style: ElevatedButton.styleFrom(
+                    foregroundColor: glowColor,
+                    padding: const EdgeInsets.symmetric(vertical: 16),
+                    minimumSize: const Size(double.infinity, 50),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                  ),
+                  child: Text(buttonText, style: const TextStyle(fontSize: 18)),
+                ),
+              ],
+            ),
           ),
         ),
       ),

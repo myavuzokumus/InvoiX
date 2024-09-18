@@ -1,13 +1,48 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
-import 'package:invoix/pages/SubscriptionPage/subscription_card.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:invoix/models/firebase_state.dart';
+import 'package:invoix/pages/SubscriptionPage/new_user_offer.dart';
+import 'package:invoix/pages/SubscriptionPage/subscription_tab.dart';
+import 'package:invoix/services/in_app_purchase_service.dart';
+import 'package:invoix/widgets/loading_animation.dart';
 
-class SubscriptionPage extends StatelessWidget {
+class SubscriptionPage extends ConsumerStatefulWidget {
   const SubscriptionPage({super.key});
+
+  @override
+  ConsumerState<SubscriptionPage> createState() => _SubscriptionPageState();
+}
+
+class _SubscriptionPageState extends ConsumerState<SubscriptionPage> {
+  late InAppPurchaseService _inAppPurchaseService;
+  bool _isLoading = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _initializeServices();
+  }
+
+  Future<void> _initializeServices() async {
+    _inAppPurchaseService = ref.read(inAppPurchaseServiceProvider);
+    await _inAppPurchaseService.initialize();
+    setState(() {
+      _isLoading = false;
+    });
+  }
+
+  @override
+  void dispose() {
+    _inAppPurchaseService.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(final BuildContext context) {
     final localizations = AppLocalizations.of(context)!;
+    final isPortrait =
+        MediaQuery.of(context).orientation == Orientation.portrait;
 
     return DefaultTabController(
       length: 3,
@@ -17,114 +52,71 @@ class SubscriptionPage extends StatelessWidget {
           centerTitle: true,
           title: Text(
             localizations.selectPlan,
-            style: const TextStyle(fontSize: 28, fontWeight: FontWeight.bold, color: Colors.white),
+            style: const TextStyle(
+                fontSize: 28, fontWeight: FontWeight.bold, color: Colors.white),
           ),
           bottom: TabBar(
-            tabs: [
-              Tab(text: localizations.individualUser),
-              Tab(text: localizations.advancedUser),
-              Tab(text: localizations.corporateUser),
-            ],
-          ),
+                  tabs: [
+                    Tab(text: localizations.individualUser),
+                    Tab(text: localizations.advancedUser),
+                    Tab(text: localizations.corporateUser),
+                  ],
+                ),
         ),
-        body: Column(
-          children: [
-            Expanded(
-              child: TabBarView(
-                children: [
-                  _buildSubscriptionTab(
-                    context,
-                    title: localizations.individualUser,
-                    price: localizations.individualPrice,
-                    features: [localizations.individualFeatures_1, localizations.individualFeatures_2, localizations.individualFeatures_3],
-                    buttonText: localizations.subscribe,
-                    icon: Icons.person,
-                    glowColor: Colors.blue,
+        body: _isLoading
+            ? const LoadingAnimation()
+            : isPortrait
+                ? Column(
+                    children: [
+                      Expanded(
+                        child: TabBarView(
+                          children: [
+                            SubscriptionTab(
+                              productId: 'individual_subscription',
+                              inAppPurchaseService: _inAppPurchaseService,
+                            ),
+                            SubscriptionTab(
+                              productId: 'advanced_subscription',
+                              inAppPurchaseService: _inAppPurchaseService,
+                            ),
+                            SubscriptionTab(
+                              productId: 'corporate_subscription',
+                              inAppPurchaseService: _inAppPurchaseService,
+                            ),
+                          ],
+                        ),
+                      ),
+                      const NewUserOffer(),
+                    ],
+                  )
+                : Row(
+                    children: [
+                      Expanded(
+                        child: TabBarView(
+                          children: [
+                            SubscriptionTab(
+                              productId: 'individual_subscription',
+                              inAppPurchaseService: _inAppPurchaseService,
+                            ),
+                            SubscriptionTab(
+                              productId: 'advanced_subscription',
+                              inAppPurchaseService: _inAppPurchaseService,
+                            ),
+                            SubscriptionTab(
+                              productId: 'corporate_subscription',
+                              inAppPurchaseService: _inAppPurchaseService,
+                            ),
+                          ],
+                        ),
+                      ),
+                      Flexible(
+                        child: SizedBox(
+                          height: MediaQuery.of(context).size.height - 150,
+                          child: const NewUserOffer(),
+                        ),
+                      ),
+                    ],
                   ),
-                  _buildSubscriptionTab(
-                    context,
-                    title: localizations.advancedUser,
-                    price: localizations.advancedPrice,
-                    features: [localizations.advancedFeatures_1, localizations.advancedFeatures_2, localizations.advancedFeatures_3],
-                    buttonText: localizations.subscribe,
-                    icon: Icons.people,
-                    glowColor: Colors.purple,
-                  ),
-                  _buildSubscriptionTab(
-                    context,
-                    title: localizations.corporateUser,
-                    price: localizations.corporatePrice,
-                    features: [localizations.corporateFeatures],
-                    buttonText: localizations.contactUs,
-                    icon: Icons.business,
-                    glowColor: Colors.orange,
-                  ),
-                ],
-              ),
-            ),
-            _buildNewUserOffer(context),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildSubscriptionTab(
-      final BuildContext context, {
-        required final String title,
-        required final String price,
-        required final List<String> features,
-        required final String buttonText,
-        required final IconData icon,
-        required final Color glowColor,
-      }) {
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.all(24.0),
-        child: SubscriptionCard(
-          title: title,
-          price: price,
-          features: features,
-          buttonText: buttonText,
-          icon: icon,
-          glowColor: glowColor,
-        ),
-      ),
-    );
-  }
-
-  Widget _buildNewUserOffer(final BuildContext context) {
-    final localizations = AppLocalizations.of(context)!;
-    return Padding(
-      padding: const EdgeInsets.all(24.0),
-      child: Container(
-        padding: const EdgeInsets.all(24),
-        decoration: BoxDecoration(
-          color: Colors.grey[850],
-          borderRadius: BorderRadius.circular(16),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.green.withOpacity(0.5),
-              spreadRadius: 3,
-              blurRadius: 10,
-              offset: const Offset(0, 0),
-            ),
-          ],
-        ),
-        child: Column(
-          children: [
-            Text(
-              localizations.newUserOffer,
-              style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.white),
-            ),
-            const SizedBox(height: 16),
-            Text(
-              localizations.newUserOfferDetails,
-              style: const TextStyle(color: Colors.white, fontSize: 18),
-              textAlign: TextAlign.center,
-            ),
-          ],
-        ),
       ),
     );
   }

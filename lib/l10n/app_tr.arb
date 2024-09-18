@@ -95,7 +95,18 @@
   "advancedFeatures_3": "Kişiselleştirilmiş stok takibi",
   "corporateFeatures": "Kullanımına bağlı fiyatlandırma",
   "newUserOffer": "Yeni Kullanıcı Teklifi",
-  "newUserOfferDetails": "İlk kullanıma özel 30 AI Fatura okutma ve 10 AI fatura analizi ücretsiz!"
+  "newUserOfferDetails": "İlk kullanıma özel 30 AI Fatura okutma ve 10 AI fatura analizi ücretsiz!",
+
+  "loginToUseAI": "Yapay zeka özelliklerine erişmek için giriş yapın.",
+  "logOut": "Çıkış Yap",
+
+  "remainingInvoiceReads": "Kalan Fatura Okumaları",
+  "remainingInvoiceAnalyses": "Kalan Fatura Analizleri",
+  "invoiceReads": "Fatura Okumaları",
+  "invoiceAnalyses": "Fatura Analizleri",
+  "subscriptionExpiryDate": "Abonelik Bitiş Tarihi",
+  "subscriptionStatus": "Abonelik Durumu",
+  "plans": "Planlar"
 
 
 
