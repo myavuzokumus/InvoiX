@@ -58,15 +58,6 @@ class _CompanyPageState extends ConsumerState<CompanyPage> with _CompanyPageMixi
             )
           ],
         ),
-        floatingActionButton: Badge(
-          label: const Icon(Icons.add, color: Colors.white, size: 20),
-          largeSize: 28,
-          backgroundColor: Colors.red,
-          offset: const Offset(10, -10),
-          child: FloatingActionButton(
-              onPressed: nextPage,
-              child: const Icon(Icons.receipt_long, size: 46)),
-        ),
       ),
     );
   }
