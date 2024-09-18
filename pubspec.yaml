@@ -53,7 +53,7 @@ dependencies:
   google_mlkit_text_recognition: ^0.13.0
 
   #Chart
-  fl_chart: ^0.68.0
+  fl_chart: ^0.69.0
 
   #Excel
   syncfusion_flutter_xlsio: ^26.2.9
@@ -62,6 +62,12 @@ dependencies:
   firebase_core: ^3.3.0
   firebase_vertexai: ^0.2.2+4
   firebase_app_check: ^0.3.0+4
+
+  #GooglePlay
+  in_app_purchase: ^3.2.0
+  cloud_firestore: ^5.4.1
+  cloud_functions: ^5.1.1
+  google_sign_in: ^6.2.1
 
 
   #No longer use
@@ -114,7 +120,7 @@ flutter:
   assets:
     - assets/loading/InvoiceReadLoading.gif
     - assets/icons/categories/
-    - .env
+    - assets/icons/
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware
