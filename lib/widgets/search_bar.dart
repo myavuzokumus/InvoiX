@@ -8,10 +8,8 @@ class CompanySearchBar extends ConsumerWidget {
 
   final TextEditingController _controller = TextEditingController();
 
-
   @override
   Widget build(final BuildContext context, final ref) {
-
     final query = ref.watch(queryProvider);
     final listLengthState = ref.watch(companylistLengthProvider);
 
@@ -24,45 +22,46 @@ class CompanySearchBar extends ConsumerWidget {
           ref.read(queryProvider.notifier).updateQuery(newQuery);
         },
         decoration: InputDecoration(
-          floatingLabelBehavior: FloatingLabelBehavior.never,
-          label: const Center(
-            child: Text("InvoiX", textAlign: TextAlign.center, style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold))
-          ),
-          border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(50.0), // Köşeleri yuvarlatma
-          ),
-          suffixIconConstraints: const BoxConstraints(
-            minWidth: 0,
-            minHeight: 0,
-          ),
-          prefixIcon: const Icon(Icons.search),
+            floatingLabelBehavior: FloatingLabelBehavior.never,
+            label: const Center(
+                child: Text("InvoiX",
+                    textAlign: TextAlign.center,
+                    style:
+                        TextStyle(fontSize: 28, fontWeight: FontWeight.bold))),
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(50.0), // Köşeleri yuvarlatma
+            ),
+            suffixIconConstraints: const BoxConstraints(
+              minWidth: 0,
+              minHeight: 0,
+            ),
+            prefixIcon: const Icon(Icons.search, size: 24),
             suffixIcon: Row(
               mainAxisSize: MainAxisSize.min,
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
                 query.isNotEmpty
                     ? IconButton(
-                  icon: const Icon(Icons.close),
-                  onPressed: () {
-                    ref.read(queryProvider.notifier).clearQuery();
-                    _controller.clear();
-                  },
-                ) : const SizedBox(),
+                        icon: const Icon(Icons.close),
+                        onPressed: () {
+                          ref.read(queryProvider.notifier).clearQuery();
+                          _controller.clear();
+                        },
+                      )
+                    : const SizedBox(),
                 Padding(
                   padding: const EdgeInsets.only(right: 8.0),
                   child: Badge(
                       label: Text(
                         listLengthState.length.toString(),
-                        style: const TextStyle(color: Colors.white, fontSize: 18),
+                        style:
+                            const TextStyle(color: Colors.white, fontSize: 18),
                       ),
                       largeSize: 24),
                 ),
-
               ],
             ),
-          filled: true
-
-        ),
+            filled: true),
       ),
     );
   }
