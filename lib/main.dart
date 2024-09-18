@@ -1,42 +1,25 @@
 import 'dart:async';
 
-import 'package:firebase_app_check/firebase_app_check.dart';
-import 'package:firebase_core/firebase_core.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive_flutter/hive_flutter.dart';
-import 'package:invoix/firebase_options.dart';
 import 'package:invoix/invoix_main.dart';
-import 'package:invoix/models/invoice_data.dart';
+import 'package:invoix/services/firebase_service.dart';
+import 'package:invoix/services/hive_service.dart';
+import 'package:invoix/services/invoice_data_service.dart';
 
 void main() async {
 
   WidgetsFlutterBinding.ensureInitialized();
 
-  await Hive.initFlutter();
-  Hive.registerAdapter(InvoiceDataAdapter());
-  await Hive.openBox<InvoiceData>('InvoiceData');
-  await Hive.openBox<int>('remainingTimeBox');
+  final hiveService = HiveService();
+  await hiveService.initialize();
 
-  await Firebase.initializeApp(
-    name: "invoix",
-    options: DefaultFirebaseOptions.currentPlatform,
-  );
+  final firebaseService = FirebaseService();
+  await firebaseService.initialize();
 
-  if(!kDebugMode) {
-    await FirebaseAppCheck.instanceFor(app: Firebase.app("invoix")).activate(
-      androidProvider: AndroidProvider.playIntegrity,
-      appleProvider: AppleProvider.appAttest,
-      webProvider: ReCaptchaV3Provider('recaptcha-v3-site-key'),
-    );
-  } else {
-    await FirebaseAppCheck.instanceFor(app: Firebase.app("invoix")).activate(
-      androidProvider: AndroidProvider.debug,
-      appleProvider: AppleProvider.debug,
-      webProvider: ReCaptchaV3Provider('recaptcha-v3-site-key'),
-    );
-  }
+  final invoiceDataService = InvoiceDataService();
+  await invoiceDataService.initialize();
 
   runApp(const ProviderScope(child: InvoixMain()));
 
