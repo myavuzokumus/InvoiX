@@ -6,9 +6,8 @@ import 'package:invoix/models/list_length_state.dart';
 import 'package:invoix/models/selection_state.dart';
 import 'package:invoix/utils/export_to_excel.dart';
 import 'package:invoix/utils/invoice_data_service.dart';
-import 'package:invoix/widgets/loading_animation.dart';
+import 'package:invoix/widgets/profile/profile_bar.dart';
 import 'package:invoix/widgets/search_bar.dart';
-import 'package:invoix/widgets/sub_status.dart';
 import 'package:invoix/widgets/toast.dart';
 
 part 'list_page_scaffold_mixin.dart';
@@ -50,6 +49,7 @@ class _GeneralPageState extends ConsumerState<ListPageScaffold>
       },
       child: Scaffold(
         appBar: AppBar(
+            titleSpacing: 4,
             centerTitle: widget.type != ListType.company,
             title: selectionState.isSelectionMode
                 ? widget.type != ListType.company
@@ -111,19 +111,13 @@ class _GeneralPageState extends ConsumerState<ListPageScaffold>
                         ),
                         largeSize: 24),
                   ),
+                const Padding(
+                  padding: EdgeInsets.only(right: 12.0),
+                  child: ProfileBar(),
+                ),
               ],
             ]),
-        body: Column(
-          children: [
-            SubStatus(
-              errorState: ref.watch(errorProvider),
-              subsControl: true,
-            ),
-            Expanded(child: widget.body),
-          ],
-        ),
-        floatingActionButton: widget.floatingActionButton,
-        floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
+        body: widget.body,
       ),
     );
   }
