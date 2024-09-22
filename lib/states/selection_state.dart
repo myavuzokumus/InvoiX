@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:invoix/models/invoice_data.dart';
-import 'package:invoix/utils/invoice_data_service.dart';
+import 'package:invoix/services/invoice_data_service.dart';
+import 'package:invoix/states/invoice_data_state.dart';
 
 class SelectionState {
   bool isSelectionMode;
@@ -11,7 +12,11 @@ class SelectionState {
 }
 
 class SelectionNotifier extends StateNotifier<SelectionState> {
-  SelectionNotifier() : super(SelectionState(false, false, {}));
+  final Ref _ref;
+
+  SelectionNotifier(this._ref) : super(SelectionState(false, false, {}));
+
+  InvoiceDataService get _invoiceDataService => _ref.read(invoiceDataServiceProvider);
 
   Future<void> toggleItemSelection({
     required final String company,
@@ -36,7 +41,9 @@ class SelectionNotifier extends StateNotifier<SelectionState> {
       }
     }
 
-    final realLength = invoiceData == null ? await InvoiceDataService().getCompanyList() : await InvoiceDataService().getInvoiceList(company);
+    final realLength = invoiceData == null
+        ? await _invoiceDataService.getCompanyList()
+        : await _invoiceDataService.getInvoiceList(company);
     final currentLength = invoiceData == null ? state.selectedItems.length : state.selectedItems[company]!.length;
     if (currentLength == realLength.length) {
       state.selectAll = true;
@@ -55,10 +62,12 @@ class SelectionNotifier extends StateNotifier<SelectionState> {
     if (state.selectAll) {
       if (company != null) {
         state.selectedItems[company] =
-            await InvoiceDataService().getInvoiceList(company);
+        await _invoiceDataService.getInvoiceList(company);
       } else {
-        state.selectedItems = Map.fromIterable(await InvoiceDataService().getCompanyList(), value: (final _) => []);
-        //state.selectedItems.addAll();
+        state.selectedItems = Map.fromIterable(
+            await _invoiceDataService.getCompanyList(),
+            value: (final _) => []
+        );
       }
     } else {
       state.selectedItems.clear();
@@ -85,8 +94,8 @@ class SelectionNotifier extends StateNotifier<SelectionState> {
 }
 
 final companyProvider =
-    StateNotifierProvider.autoDispose<SelectionNotifier, SelectionState>(
-        (final ref) => SelectionNotifier());
+StateNotifierProvider.autoDispose<SelectionNotifier, SelectionState>(
+        (ref) => SelectionNotifier(ref));
 final invoiceProvider =
-    StateNotifierProvider.autoDispose<SelectionNotifier, SelectionState>(
-        (final ref) => SelectionNotifier());
+StateNotifierProvider.autoDispose<SelectionNotifier, SelectionState>(
+        (ref) => SelectionNotifier(ref));

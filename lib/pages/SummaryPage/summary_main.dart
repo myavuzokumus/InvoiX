@@ -1,23 +1,26 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:invoix/models/invoice_data.dart';
 import 'package:invoix/pages/InvoicesPage/invoice_card.dart';
 import 'package:invoix/pages/SummaryPage/indicator.dart';
-import 'package:invoix/utils/invoice_data_service.dart';
+import 'package:invoix/services/invoice_data_service.dart';
+import 'package:invoix/states/invoice_data_state.dart';
 import 'package:invoix/widgets/date_range_picker.dart';
 import 'package:invoix/widgets/loading_animation.dart';
 
 part 'summary_main_mixin.dart';
 
-class SummaryMain extends StatefulWidget {
+class SummaryMain extends ConsumerStatefulWidget {
   const SummaryMain({super.key});
 
   @override
-  State<SummaryMain> createState() => _SummaryMainState();
+  ConsumerState<SummaryMain> createState() => _SummaryMainState();
 }
 
-class _SummaryMainState extends State<SummaryMain> with _SummaryMainMixin {
+class _SummaryMainState extends ConsumerState<SummaryMain> with _SummaryMainMixin {
+
   @override
   Widget build(final BuildContext context) {
     return Scaffold(

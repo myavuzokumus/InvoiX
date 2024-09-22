@@ -5,10 +5,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:invoix/models/invoice_data.dart';
-import 'package:invoix/models/selection_state.dart';
+import 'package:invoix/services/invoice_data_service.dart';
+import 'package:invoix/states/selection_state.dart';
 import 'package:invoix/pages/InvoiceEditPage/invoice_edit.dart';
 import 'package:invoix/pages/InvoicesPage/ai_button.dart';
-import 'package:invoix/utils/invoice_data_service.dart';
 
 class InvoiceCard extends ConsumerWidget {
   const InvoiceCard({super.key, required this.invoiceData, this.selectionMode});

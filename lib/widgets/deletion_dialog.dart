@@ -1,14 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:invoix/models/selection_state.dart';
-import 'package:invoix/utils/invoice_data_service.dart';
+import 'package:invoix/services/invoice_data_service.dart';
+import 'package:invoix/states/selection_state.dart';
+
 import 'package:invoix/widgets/toast.dart';
 
 class DeletionDialog extends ConsumerStatefulWidget {
   const DeletionDialog(
       {super.key,
-      required this.type,
       this.companyName,
+      required this.type,
       required this.selectionProvider})
       : assert(
             type != ListType.invoice ||

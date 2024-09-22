@@ -5,12 +5,16 @@ mixin _CompanyListMixin on ConsumerState<CompanyList> {
   late Set<String> filters;
   late final TextEditingController companyTextController;
   late final GlobalKey<FormState> _companyNameformKey;
+  late final InvoiceDataService invoiceDataService;
 
   @override
   void initState() {
     filters = <String>{};
     companyTextController = TextEditingController();
     _companyNameformKey = GlobalKey<FormState>();
+
+    invoiceDataService = ref.read(invoiceDataServiceProvider);
+
     super.initState();
   }
 

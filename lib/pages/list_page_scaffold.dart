@@ -1,11 +1,11 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:invoix/misc/deletion_dialog.dart';
-import 'package:invoix/models/list_length_state.dart';
-import 'package:invoix/models/selection_state.dart';
+import 'package:invoix/services/invoice_data_service.dart';
+import 'package:invoix/states/list_length_state.dart';
+import 'package:invoix/states/selection_state.dart';
 import 'package:invoix/utils/export_to_excel.dart';
-import 'package:invoix/utils/invoice_data_service.dart';
+import 'package:invoix/widgets/deletion_dialog.dart';
 import 'package:invoix/widgets/profile/profile_bar.dart';
 import 'package:invoix/widgets/search_bar.dart';
 import 'package:invoix/widgets/toast.dart';

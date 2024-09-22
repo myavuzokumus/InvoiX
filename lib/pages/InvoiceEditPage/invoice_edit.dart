@@ -10,12 +10,13 @@ import 'package:intl/intl.dart';
 import 'package:invoix/models/invoice_data.dart';
 import 'package:invoix/pages/CompaniesPage/company_list.dart';
 import 'package:invoix/pages/InvoiceEditPage/date_format.dart';
+import 'package:invoix/services/invoice_data_service.dart';
+import 'package:invoix/states/invoice_data_state.dart';
 import 'package:invoix/utils/ai_mode/gemini_api.dart';
 import 'package:invoix/utils/ai_mode/prompts.dart';
 import 'package:invoix/utils/blur_detector.dart';
 import 'package:invoix/utils/date_parser.dart';
 import 'package:invoix/utils/image_filter.dart';
-import 'package:invoix/utils/invoice_data_service.dart';
 import 'package:invoix/utils/legacy_mode/invoice_parser.dart';
 import 'package:invoix/utils/legacy_mode/text_extraction.dart';
 import 'package:invoix/utils/legacy_mode/text_to_invoicedata_regex.dart';
@@ -57,7 +58,7 @@ class _InvoiceEditPageState extends ConsumerState<InvoiceEditPage>
                 item = item.replaceAll(companyRegex, "");
                 setState(() {
                   companyTextController.text = item;
-                  companySuffix = InvoiceDataService().companyTypeFinder(item);
+                  companySuffix = invoiceDataService.companyTypeFinder(item);
                 });
               },
             )

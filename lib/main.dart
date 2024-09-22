@@ -4,24 +4,22 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:invoix/invoix_main.dart';
-import 'package:invoix/services/firebase_service.dart';
-import 'package:invoix/services/hive_service.dart';
-import 'package:invoix/services/invoice_data_service.dart';
+import 'package:invoix/states/firebase_state.dart';
+import 'package:invoix/states/hive_state.dart';
+import 'package:invoix/states/invoice_data_state.dart';
 
 void main() async {
-
   WidgetsFlutterBinding.ensureInitialized();
 
-  final hiveService = HiveService();
-  await hiveService.initialize();
+  final container = ProviderContainer();
 
-  final firebaseService = FirebaseService();
-  await firebaseService.initialize();
+  //initialize services
+  await container.read(hiveServiceProvider).initialize();
+  await container.read(firebaseServiceProvider).initialize();
+  await container.read(invoiceDataServiceProvider).initialize();
 
-  final invoiceDataService = InvoiceDataService();
-  await invoiceDataService.initialize();
-
-  runApp(const ProviderScope(child: InvoixMain()));
+  runApp(UncontrolledProviderScope(
+      container: container, child: const InvoixMain()));
 
   final Box<int> box = Hive.box<int>('remainingTimeBox');
   for (final key in box.keys) {

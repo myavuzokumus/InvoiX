@@ -1,6 +1,6 @@
 part of 'summary_main.dart';
 
-mixin _SummaryMainMixin on State<SummaryMain> {
+mixin _SummaryMainMixin on ConsumerState<SummaryMain> {
 
   final ValueNotifier<double> touchedPercentageNotifier = ValueNotifier<double>(-1);
 
@@ -26,7 +26,10 @@ mixin _SummaryMainMixin on State<SummaryMain> {
   // Calculate total amounts on filtered invoices and find the 5 invoice categories with the highest amounts
   Future<Map<InvoiceCategory, double>> calculateTopCategories(final DateTime startDate,
       final DateTime endDate) async {
-    final List<InvoiceData> invoices = await InvoiceDataService().getInvoicesBetweenDates(
+
+    final invoiceDataService = ref.read(invoiceDataServiceProvider);
+
+    final List<InvoiceData> invoices = await invoiceDataService.getInvoicesBetweenDates(
         startDate, endDate);
 
     final Map<InvoiceCategory, double> categoryTotals = {};

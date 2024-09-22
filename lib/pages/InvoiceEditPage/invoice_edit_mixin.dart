@@ -23,6 +23,8 @@ mixin _InvoiceEditPageMixin on ConsumerState<InvoiceEditPage> {
 
   late Future<dynamic> _future;
 
+  late final InvoiceDataService invoiceDataService;
+
   @override
   void initState() {
     _saveButtonState.value = true;
@@ -41,6 +43,8 @@ mixin _InvoiceEditPageMixin on ConsumerState<InvoiceEditPage> {
     _formKey = GlobalKey<FormState>();
 
     _future = readMode != null ? analyzeNewData() : fetchInvoiceData();
+
+    invoiceDataService = ref.read(invoiceDataServiceProvider);
 
     super.initState();
   }
@@ -98,7 +102,6 @@ mixin _InvoiceEditPageMixin on ConsumerState<InvoiceEditPage> {
 
   Future<void> fetchInvoiceData({final String? outPut}) async {
     final InvoiceData item;
-    final InvoiceDataService invoiceDataService = InvoiceDataService();
 
     if (outPut == null) {
       item = invoiceDataService.getInvoiceData(widget.invoiceData!)!;
@@ -127,8 +130,6 @@ mixin _InvoiceEditPageMixin on ConsumerState<InvoiceEditPage> {
 
         // If the form is valid, display a snack bar. In the real world,
         // you'd often call a server or save the information in a database.
-
-        final InvoiceDataService invoiceDataService = InvoiceDataService();
 
         final List<String> companyList =
             await invoiceDataService.getCompanyList();
@@ -219,7 +220,7 @@ mixin _InvoiceEditPageMixin on ConsumerState<InvoiceEditPage> {
             category: invoiceCategory.name,
             id: widget.invoiceData?.id);
 
-        await InvoiceDataService().saveInvoiceData(data);
+        await invoiceDataService.saveInvoiceData(data);
 
         _isFileSaved = true;
 

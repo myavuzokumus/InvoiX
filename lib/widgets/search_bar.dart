@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:invoix/models/list_length_state.dart';
-import 'package:invoix/models/search_state.dart';
+import 'package:invoix/states/list_length_state.dart';
+import 'package:invoix/states/search_state.dart';
 
 class CompanySearchBar extends ConsumerWidget {
   CompanySearchBar({super.key});

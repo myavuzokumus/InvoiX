@@ -4,11 +4,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:invoix/models/invoice_data.dart';
-import 'package:invoix/models/list_length_state.dart';
-import 'package:invoix/models/search_state.dart';
-import 'package:invoix/models/selection_state.dart';
 import 'package:invoix/pages/InvoicesPage/invoice_main.dart';
-import 'package:invoix/utils/invoice_data_service.dart';
+import 'package:invoix/services/invoice_data_service.dart';
+import 'package:invoix/states/invoice_data_state.dart';
+import 'package:invoix/states/list_length_state.dart';
+import 'package:invoix/states/search_state.dart';
+import 'package:invoix/states/selection_state.dart';
 import 'package:invoix/widgets/loading_animation.dart';
 import 'package:invoix/widgets/toast.dart';
 import 'package:invoix/widgets/warn_icon.dart';
@@ -50,7 +51,7 @@ class _CompanyListState extends ConsumerState<CompanyList> with _CompanyListMixi
               );
             } else {
               return FutureBuilder<List<String>>(
-                future: InvoiceDataService().getCompanyList(),
+                future: invoiceDataService.getCompanyList(),
                 builder: (final BuildContext context,
                     final AsyncSnapshot<List<String>> company) {
                   if (company.hasData) {
@@ -204,7 +205,7 @@ class _CompanyListState extends ConsumerState<CompanyList> with _CompanyListMixi
 
   AlertDialog changeCompanyNameDialog(final String companyListName) {
 
-    CompanyType companySuffix = InvoiceDataService().companyTypeFinder(companyListName);
+    CompanyType companySuffix = invoiceDataService.companyTypeFinder(companyListName);
     companyTextController.clear();
 
     return AlertDialog(
@@ -296,7 +297,6 @@ class _CompanyListState extends ConsumerState<CompanyList> with _CompanyListMixi
             if (_companyNameformKey.currentState!.validate()) {
 
               try {
-                final InvoiceDataService invoiceDataService = InvoiceDataService();
 
                 companyTextController.text = invoiceDataService.companyTypeExtractor(
                     companyTextController.text);
@@ -313,8 +313,8 @@ class _CompanyListState extends ConsumerState<CompanyList> with _CompanyListMixi
               }
 
               for (final InvoiceData element
-              in await InvoiceDataService().getInvoiceList(companyListName)) {
-                await InvoiceDataService().saveInvoiceData(element.copyWith(
+              in await invoiceDataService.getInvoiceList(companyListName)) {
+                await invoiceDataService.saveInvoiceData(element.copyWith(
                     companyName: companyTextController.text));
               }
               if (!mounted) {

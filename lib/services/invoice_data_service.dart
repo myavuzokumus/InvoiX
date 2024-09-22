@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
 import 'package:invoix/models/invoice_data.dart';
+import 'package:invoix/services/hive_service.dart';
 import 'package:invoix/utils/legacy_mode/text_to_invoicedata_regex.dart';
 import 'package:string_similarity/string_similarity.dart';
-import 'package:invoix/services/hive_service.dart';
 
 enum ListType { company, invoice }
 
@@ -130,37 +130,37 @@ class InvoiceDataService {
     _remainingTimeBox = await HiveService().openBox<int>('remainingTimeBox');
   }
 
-  Future<void> saveInvoiceData(InvoiceData invoiceData) async {
+  Future<void> saveInvoiceData(final InvoiceData invoiceData) async {
     await _invoiceDataBox.put(invoiceData.id, invoiceData);
   }
 
-  Future<void> deleteInvoiceData(List<InvoiceData> invoiceData) async {
+  Future<void> deleteInvoiceData(final List<InvoiceData> invoiceData) async {
     await _remainingTimeBox.deleteAll(
-        invoiceData.map((invoiceData) => invoiceData.imagePath));
+        invoiceData.map((final invoiceData) => invoiceData.imagePath));
     await _invoiceDataBox
-        .deleteAll(invoiceData.map((invoiceData) => invoiceData.id));
+        .deleteAll(invoiceData.map((final invoiceData) => invoiceData.id));
   }
 
-  Future<void> deleteCompany(String companyName) async {
+  Future<void> deleteCompany(final String companyName) async {
     final invoices = await getInvoiceList(companyName);
     for (final invoice in invoices) {
       await deleteInvoiceData([invoice]);
     }
   }
 
-  InvoiceData? getInvoiceData(InvoiceData invoiceData) {
+  InvoiceData? getInvoiceData(final InvoiceData invoiceData) {
     return _invoiceDataBox.get(invoiceData.id);
   }
 
-  Future<List<InvoiceData>> getInvoiceList(String companyName) async {
+  Future<List<InvoiceData>> getInvoiceList(final String companyName) async {
     return _invoiceDataBox.values
-        .where((element) => companyName == element.companyName)
+        .where((final element) => companyName == element.companyName)
         .toList();
   }
 
   Future<List<String>> getCompanyList() async {
     return _invoiceDataBox.values
-        .map((item) => item.companyName)
+        .map((final item) => item.companyName)
         .toSet()
         .toList();
   }
@@ -193,10 +193,10 @@ class InvoiceDataService {
   }
 
   Future<List<InvoiceData>> getInvoicesBetweenDates(
-      DateTime startDate, DateTime endDate) async {
+      final DateTime startDate, final DateTime endDate) async {
     final allInvoices = await getAllInvoices();
     return allInvoices
-        .where((invoice) => isInvoiceBetweenDates(invoice, startDate, endDate))
+        .where((final invoice) => isInvoiceBetweenDates(invoice, startDate, endDate))
         .toList();
   }
 

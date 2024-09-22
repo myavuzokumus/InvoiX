@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:invoix/models/selection_state.dart';
 import 'package:invoix/pages/InvoicesPage/invoice_list.dart';
 import 'package:invoix/pages/list_page_scaffold.dart';
-import 'package:invoix/utils/invoice_data_service.dart';
+import 'package:invoix/services/invoice_data_service.dart';
+import 'package:invoix/states/selection_state.dart';
 
 
 class InvoicePage extends ConsumerWidget {
