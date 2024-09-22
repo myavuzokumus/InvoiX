@@ -2,7 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:invoix/models/firebase_state.dart';
+import 'package:invoix/states/firebase_state.dart';
 import 'package:invoix/widgets/glowing_container.dart';
 import 'package:invoix/widgets/profile/profile_dropdown.dart';
 

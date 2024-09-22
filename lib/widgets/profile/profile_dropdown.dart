@@ -2,10 +2,10 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:invoix/models/firebase_state.dart';
 import 'package:invoix/pages/SubscriptionPage/new_user_offer.dart';
 import 'package:invoix/pages/SubscriptionPage/subscription_page.dart';
 import 'package:invoix/services/firebase_service.dart';
+import 'package:invoix/states/firebase_state.dart';
 import 'package:invoix/widgets/glowing_container.dart';
 import 'package:invoix/widgets/toast.dart';
 

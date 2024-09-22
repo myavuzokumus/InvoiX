@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:invoix/models/firebase_state.dart';
 import 'package:invoix/pages/SubscriptionPage/new_user_offer.dart';
 import 'package:invoix/pages/SubscriptionPage/subscription_tab.dart';
 import 'package:invoix/services/in_app_purchase_service.dart';
+import 'package:invoix/states/app_purchase_state.dart';
 import 'package:invoix/widgets/loading_animation.dart';
 
 class SubscriptionPage extends ConsumerStatefulWidget {
