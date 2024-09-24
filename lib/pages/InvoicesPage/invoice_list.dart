@@ -4,6 +4,7 @@ import 'package:hive_flutter/hive_flutter.dart';
 import 'package:invoix/models/invoice_data.dart';
 import 'package:invoix/pages/InvoicesPage/invoice_card.dart';
 import 'package:invoix/services/invoice_data_service.dart';
+import 'package:invoix/states/invoice_data_state.dart';
 import 'package:invoix/states/list_length_state.dart';
 import 'package:invoix/widgets/amount_range_slider.dart';
 import 'package:invoix/widgets/date_range_picker.dart';
@@ -101,7 +102,7 @@ class _InvoiceListState extends ConsumerState<InvoiceList>
         itemBuilder: (final BuildContext context, final int index) {
           final InvoiceData invoiceData = invoiceList.elementAt(index);
           return ValueListenableBuilder<Box>(
-            valueListenable: invoiceDataBox.listenable(),
+            valueListenable: invoiceDataService.invoiceDataBox.listenable(),
             builder: (final BuildContext context, final Box<dynamic> value,
                 final Widget? child) {
               final newInvoiceData = value.get(invoiceData.id);

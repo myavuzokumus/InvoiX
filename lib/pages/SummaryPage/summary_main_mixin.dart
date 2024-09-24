@@ -10,6 +10,8 @@ mixin _SummaryMainMixin on ConsumerState<SummaryMain> {
   late DateTime startDate;
   late DateTime endDate;
 
+  late final InvoiceDataService invoiceDataService;
+
   @override
   void initState() {
     final DateTime today = DateTime.now();
@@ -20,6 +22,9 @@ mixin _SummaryMainMixin on ConsumerState<SummaryMain> {
     startDate = DateTime(1900);
     endDate = today;
     topCategoriesFuture = calculateTopCategories(today.subtract(const Duration(days: 30)), today);
+
+    invoiceDataService = ref.read(invoiceDataServiceProvider);
+
     super.initState();
   }
 

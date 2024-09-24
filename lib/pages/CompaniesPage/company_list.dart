@@ -37,11 +37,11 @@ class _CompanyListState extends ConsumerState<CompanyList> with _CompanyListMixi
 
     return ProviderScope(
       child: ValueListenableBuilder<Box>(
-          valueListenable: invoiceDataBox.listenable(),
+          valueListenable: invoiceDataService.invoiceDataBox.listenable(),
           builder: (final BuildContext context, final Box<dynamic> value,
               final Widget? child) {
             // Check if there is any invoice data
-            if (invoiceDataBox.values.isEmpty) {
+            if (invoiceDataService.invoiceDataBox.values.isEmpty) {
               return const Center(
                 child: Text(
                   "No invoice added yet.",

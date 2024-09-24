@@ -126,14 +126,9 @@ class ProfileDropdown extends ConsumerWidget {
   Future<void> _handleGoogleLogin(
       final BuildContext context, final FirebaseService firebaseService) async {
     try {
-      final user = await firebaseService.signInWithGoogle();
-      if (user != null) {
-        Toast(context, text: "Başarıyla giriş yapıldı!", color: Colors.green);
-      } else {
-        Toast(context, text: "Giriş yapılırken bir hata oluştu!");
-      }
+      await firebaseService.signInWithGoogle();
     } catch (e) {
-      Toast(context, text: "Giriş yapılırken bir hata oluştu: $e");
+      Toast(context, text: AppLocalizations.of(context)!.loginError(e.toString()));
     }
   }
 

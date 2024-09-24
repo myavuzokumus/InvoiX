@@ -27,6 +27,8 @@ mixin _InvoiceEditPageMixin on ConsumerState<InvoiceEditPage> {
 
   @override
   void initState() {
+    invoiceDataService = ref.read(invoiceDataServiceProvider);
+
     _saveButtonState.value = true;
     _isFileSaved = false;
 
@@ -43,8 +45,6 @@ mixin _InvoiceEditPageMixin on ConsumerState<InvoiceEditPage> {
     _formKey = GlobalKey<FormState>();
 
     _future = readMode != null ? analyzeNewData() : fetchInvoiceData();
-
-    invoiceDataService = ref.read(invoiceDataServiceProvider);
 
     super.initState();
   }
@@ -79,7 +79,7 @@ mixin _InvoiceEditPageMixin on ConsumerState<InvoiceEditPage> {
     } else if (readMode == ReadMode.ai) {
       try {
         await fetchInvoiceData(
-            outPut: await GeminiAPI().describeImage(
+            outPut: await describeImageWithAI(
                 imgFile: File(imageFile.path), prompt: identifyInvoicePrompt));
       } catch (e) {
         String error = e.toString();
@@ -87,8 +87,9 @@ mixin _InvoiceEditPageMixin on ConsumerState<InvoiceEditPage> {
           error = "No Internet Connection!";
         }
 
-        ref.read(errorProvider.notifier).state =
-            ref.read(errorProvider).copyWith(errorMessage: "$error\nSwitching to Legacy Mode...");
+        ref.read(errorProvider.notifier).state = ref
+            .read(errorProvider)
+            .copyWith(errorMessage: "$error\nSwitching to Legacy Mode...");
 
         await Future.delayed(const Duration(seconds: 2));
 
@@ -168,16 +169,19 @@ mixin _InvoiceEditPageMixin on ConsumerState<InvoiceEditPage> {
                       mainAxisSize: MainAxisSize.min,
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        const Text('Do you want to merge with it?', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                        const Text('Do you want to merge with it?',
+                            style: TextStyle(
+                                fontSize: 16, fontWeight: FontWeight.bold)),
                         FilledButton(
                           onPressed: () {},
                           child: Text(companyTextController.text),
                         ),
-                        const Text("↓", style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold)),
+                        const Text("↓",
+                            style: TextStyle(
+                                fontSize: 32, fontWeight: FontWeight.bold)),
                         FilledButton(
                           onPressed: () {},
-                          child:
-                              Text(companyName),
+                          child: Text(companyName),
                         ),
                       ],
                     ),

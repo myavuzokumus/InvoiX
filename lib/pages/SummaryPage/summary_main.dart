@@ -52,7 +52,7 @@ class _SummaryMainState extends ConsumerState<SummaryMain> with _SummaryMainMixi
           ),
           Expanded(
             child: ValueListenableBuilder<Box>(
-              valueListenable: invoiceDataBox.listenable(),
+              valueListenable: invoiceDataService.invoiceDataBox.listenable(),
               builder: (final BuildContext context, final value, final Widget? child) {
                 topCategoriesFuture =
                     calculateTopCategories(startDate, endDate);

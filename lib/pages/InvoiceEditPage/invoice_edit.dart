@@ -11,8 +11,9 @@ import 'package:invoix/models/invoice_data.dart';
 import 'package:invoix/pages/CompaniesPage/company_list.dart';
 import 'package:invoix/pages/InvoiceEditPage/date_format.dart';
 import 'package:invoix/services/invoice_data_service.dart';
+import 'package:invoix/states/error_state.dart';
 import 'package:invoix/states/invoice_data_state.dart';
-import 'package:invoix/utils/ai_mode/gemini_api.dart';
+import 'package:invoix/utils/ai_mode/describe_image_with_ai.dart';
 import 'package:invoix/utils/ai_mode/prompts.dart';
 import 'package:invoix/utils/blur_detector.dart';
 import 'package:invoix/utils/date_parser.dart';
@@ -43,7 +44,6 @@ class InvoiceEditPage extends ConsumerStatefulWidget {
 
 class _InvoiceEditPageState extends ConsumerState<InvoiceEditPage>
     with _InvoiceEditPageMixin {
-
   @override
   Widget build(final BuildContext context) {
     return SafeArea(
@@ -98,9 +98,12 @@ class _InvoiceEditPageState extends ConsumerState<InvoiceEditPage>
                   builder: (final BuildContext context,
                       final AsyncSnapshot<dynamic> snapshot) {
                     if (snapshot.connectionState == ConnectionState.done) {
-
                       if (snapshot.hasError) {
-                        Future(() {Toast(context, text: snapshot.error.toString(), color: Colors.red);});
+                        Future(() {
+                          Toast(context,
+                              text: snapshot.error.toString(),
+                              color: Colors.red);
+                        });
                       }
 
                       return Column(
@@ -294,7 +297,8 @@ class _InvoiceEditPageState extends ConsumerState<InvoiceEditPage>
                                           }).toList(),
                                           onChanged:
                                               (final InvoiceCategory? value) {
-                                            invoiceCategory = value ?? InvoiceCategory.Others;
+                                            invoiceCategory =
+                                                value ?? InvoiceCategory.Others;
                                           },
                                           decoration: const InputDecoration(
                                             isDense: true,
@@ -400,7 +404,7 @@ class _InvoiceEditPageState extends ConsumerState<InvoiceEditPage>
                     }
 
                     return LoadingAnimation(
-                        customHeight: MediaQuery.of(context).size.height - 350, subsControl: true);
+                        customHeight: MediaQuery.of(context).size.height - 375);
                   }),
             ),
           ]),

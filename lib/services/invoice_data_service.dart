@@ -111,8 +111,6 @@ extension InvoiceCategoryExtension on InvoiceCategory {
   }
 }
 
-final Box<InvoiceData> invoiceDataBox = Hive.box<InvoiceData>('InvoiceData');
-
 class InvoiceDataService {
   static final InvoiceDataService _instance = InvoiceDataService._internal();
 
@@ -122,22 +120,22 @@ class InvoiceDataService {
 
   InvoiceDataService._internal();
 
-  late Box<InvoiceData> _invoiceDataBox;
-  late Box<int> _remainingTimeBox;
+  late final Box<InvoiceData> invoiceDataBox;
+  late final Box<int> remainingTimeBox;
 
   Future<void> initialize() async {
-    _invoiceDataBox = await HiveService().openBox<InvoiceData>('InvoiceData');
-    _remainingTimeBox = await HiveService().openBox<int>('remainingTimeBox');
+    invoiceDataBox = await HiveService().openBox<InvoiceData>('InvoiceData');
+    remainingTimeBox = await HiveService().openBox<int>('remainingTimeBox');
   }
 
   Future<void> saveInvoiceData(final InvoiceData invoiceData) async {
-    await _invoiceDataBox.put(invoiceData.id, invoiceData);
+    await invoiceDataBox.put(invoiceData.id, invoiceData);
   }
 
   Future<void> deleteInvoiceData(final List<InvoiceData> invoiceData) async {
-    await _remainingTimeBox.deleteAll(
+    await remainingTimeBox.deleteAll(
         invoiceData.map((final invoiceData) => invoiceData.imagePath));
-    await _invoiceDataBox
+    await invoiceDataBox
         .deleteAll(invoiceData.map((final invoiceData) => invoiceData.id));
   }
 
@@ -149,24 +147,24 @@ class InvoiceDataService {
   }
 
   InvoiceData? getInvoiceData(final InvoiceData invoiceData) {
-    return _invoiceDataBox.get(invoiceData.id);
+    return invoiceDataBox.get(invoiceData.id);
   }
 
   Future<List<InvoiceData>> getInvoiceList(final String companyName) async {
-    return _invoiceDataBox.values
+    return invoiceDataBox.values
         .where((final element) => companyName == element.companyName)
         .toList();
   }
 
   Future<List<String>> getCompanyList() async {
-    return _invoiceDataBox.values
+    return invoiceDataBox.values
         .map((final item) => item.companyName)
         .toSet()
         .toList();
   }
 
   Future<List<InvoiceData>> getAllInvoices() async {
-    return _invoiceDataBox.values.toList();
+    return invoiceDataBox.values.toList();
   }
 
   CompanyType companyTypeFinder(String companyName) {
@@ -202,9 +200,8 @@ class InvoiceDataService {
 
   bool isInvoiceBetweenDates(final InvoiceData invoice,
       final DateTime startDate, final DateTime endDate) {
-    return ((invoice.date.isAfter(startDate) || invoice.date.isAtSameMomentAs(startDate))&&
-        (invoice.date.isBefore(endDate) ||
-            invoice.date.isAtSameMomentAs(endDate)));
+    return ((invoice.date.isAfter(startDate) || invoice.date.isAtSameMomentAs(startDate)) &&
+        (invoice.date.isBefore(endDate) || invoice.date.isAtSameMomentAs(endDate)));
   }
 
   bool isSameInvoice(

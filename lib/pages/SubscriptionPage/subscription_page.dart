@@ -68,47 +68,13 @@ class _SubscriptionPageState extends ConsumerState<SubscriptionPage> {
             : isPortrait
                 ? Column(
                     children: [
-                      Expanded(
-                        child: TabBarView(
-                          children: [
-                            SubscriptionTab(
-                              productId: 'individual_subscription',
-                              inAppPurchaseService: _inAppPurchaseService,
-                            ),
-                            SubscriptionTab(
-                              productId: 'advanced_subscription',
-                              inAppPurchaseService: _inAppPurchaseService,
-                            ),
-                            SubscriptionTab(
-                              productId: 'corporate_subscription',
-                              inAppPurchaseService: _inAppPurchaseService,
-                            ),
-                          ],
-                        ),
-                      ),
+                      tabs(),
                       const NewUserOffer(),
                     ],
                   )
                 : Row(
                     children: [
-                      Expanded(
-                        child: TabBarView(
-                          children: [
-                            SubscriptionTab(
-                              productId: 'individual_subscription',
-                              inAppPurchaseService: _inAppPurchaseService,
-                            ),
-                            SubscriptionTab(
-                              productId: 'advanced_subscription',
-                              inAppPurchaseService: _inAppPurchaseService,
-                            ),
-                            SubscriptionTab(
-                              productId: 'corporate_subscription',
-                              inAppPurchaseService: _inAppPurchaseService,
-                            ),
-                          ],
-                        ),
-                      ),
+                      tabs(),
                       Flexible(
                         child: SizedBox(
                           height: MediaQuery.of(context).size.height - 150,
@@ -120,4 +86,28 @@ class _SubscriptionPageState extends ConsumerState<SubscriptionPage> {
       ),
     );
   }
+
+  Expanded tabs() {
+
+    return Expanded(
+      child: TabBarView(
+        children: [
+          SubscriptionTab(
+            productId: 'individual_subscription',
+            inAppPurchaseService: _inAppPurchaseService,
+          ),
+          SubscriptionTab(
+            productId: 'advanced_subscription',
+            inAppPurchaseService: _inAppPurchaseService,
+          ),
+          SubscriptionTab(
+            productId: 'corporate_subscription',
+            inAppPurchaseService: _inAppPurchaseService,
+          ),
+        ],
+      ),
+    );
+
+  }
+
 }
