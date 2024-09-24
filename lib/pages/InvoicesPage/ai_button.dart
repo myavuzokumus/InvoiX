@@ -1,42 +1,37 @@
-import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:hive/hive.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:invoix/models/invoice_analysis.dart';
-import 'package:invoix/utils/ai_mode/gemini_api.dart';
+import 'package:invoix/states/invoice_data_state.dart';
+import 'package:invoix/utils/ai_mode/describe_image_with_ai.dart';
 import 'package:invoix/utils/ai_mode/prompts.dart';
+import 'package:invoix/utils/cooldown.dart';
 import 'package:invoix/widgets/loading_animation.dart';
+import 'package:invoix/widgets/no_internet_connection.dart';
 import 'package:invoix/widgets/toast.dart';
 import 'package:invoix/widgets/warn_icon.dart';
 
-class AIButton extends StatelessWidget {
+class AIButton extends ConsumerWidget {
   const AIButton({super.key, required this.invoiceImage});
 
   final File invoiceImage;
 
   @override
-  Widget build(final BuildContext context) {
+  Widget build(final BuildContext context, final WidgetRef ref) {
     return IconButton.outlined(
       style: OutlinedButton.styleFrom(
         backgroundColor: Colors.black.withOpacity(0.35),
         side: const BorderSide(width: 1.5, color: Colors.orangeAccent),
       ),
       onPressed: () async {
-        final Box<int> box = await Hive.openBox<int>('remainingTimeBox');
-        int remainingTime = box.get(invoiceImage.path) ?? 0;
+        final invoiceDataService = ref.read(invoiceDataServiceProvider);
+        final int remainingTime =
+            invoiceDataService.remainingTimeBox.get(invoiceImage.path) ?? 0;
 
         if (remainingTime == 0) {
-          Timer.periodic(const Duration(seconds: 1), (final t) async {
-            remainingTime += 1;
-
-            if (remainingTime >= 30) {
-              remainingTime = 0;
-              t.cancel();
-            }
-            await box.put(invoiceImage.path, remainingTime);
-          });
+          await cooldown(remainingTime, invoiceImage.path, invoiceDataService);
 
           await showModalBottomSheet<void>(
             showDragHandle: true,
@@ -57,7 +52,7 @@ class AIButton extends StatelessWidget {
                           child: Padding(
                             padding: const EdgeInsets.all(12.0),
                             child: FutureBuilder(
-                              future: GeminiAPI().describeImage(
+                              future: describeImageWithAI(
                                   imgFile: invoiceImage,
                                   prompt: describeInvoicePrompt),
                               builder: (final BuildContext context,
@@ -70,19 +65,7 @@ class AIButton extends StatelessWidget {
 
                                   return describedWidget(invoiceAnalysis);
                                 } else if (snapshot.hasError) {
-                                  return const Column(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceEvenly,
-                                    children: [
-                                      Icon(Icons.phonelink_erase_rounded,
-                                          size: 92, color: Colors.red),
-                                      Text('No Internet Connection',
-                                          textAlign: TextAlign.center,
-                                          style: TextStyle(
-                                              fontSize: 24,
-                                              fontWeight: FontWeight.bold)),
-                                    ],
-                                  );
+                                  return const NoInternetConnection();
                                 }
                                 return Column(
                                   children: [
@@ -91,7 +74,10 @@ class AIButton extends StatelessWidget {
                                             constraints.maxHeight - 72),
                                     const Text(
                                         'The invoice is being analyzed...',
-                                        textAlign: TextAlign.center, style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                                        textAlign: TextAlign.center,
+                                        style: TextStyle(
+                                            fontSize: 18,
+                                            fontWeight: FontWeight.bold)),
                                   ],
                                 );
                               },
@@ -105,7 +91,8 @@ class AIButton extends StatelessWidget {
           );
         } else {
           Toast(context,
-              text: "Please wait ${30 - remainingTime} seconds before analyze the invoice again.");
+              text:
+                  "Please wait ${30 - remainingTime} seconds before analyze the invoice again.");
         }
       },
       icon: const Text("✨", style: TextStyle(fontSize: 17)),
