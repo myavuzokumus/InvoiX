@@ -18,7 +18,7 @@ class HiveService {
   }
 
   Future<Box<T>> openBox<T>(final String boxName) async {
-    return await Hive.openBox<T>(boxName);
+    return Hive.openBox<T>(boxName);
   }
 
 }
