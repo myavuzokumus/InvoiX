@@ -26,7 +26,6 @@
     "pleaseEnterYourEmail",
     "pleaseEnterYourPassword",
     "loginSuccessful",
-    "loginError",
     "send",
     "passwordResetEmailSent",
     "error",

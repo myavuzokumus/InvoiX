@@ -49,7 +49,7 @@
       }
     }
   },
-  "loginError": "Giriş hatası: {error}",
+  "loginError": "Giriş yapılırken bir hata oluştu: {error}",
   "@loginError": {
     "placeholders": {
       "error": {

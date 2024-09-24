@@ -1,6 +1,14 @@
 {
   "@@locale": "en",
 
+  "loginError": "An error occurred while logging in: {error}",
+  "@loginError": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
 
   "selectPlan": "Select Your Plan",
   "individualUser": "Individual User",
