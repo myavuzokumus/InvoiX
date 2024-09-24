@@ -3,6 +3,7 @@ import 'package:cloud_functions/cloud_functions.dart';
 import 'package:firebase_app_check/firebase_app_check.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_vertexai/firebase_vertexai.dart';
 import 'package:flutter/foundation.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:invoix/firebase_options.dart';
@@ -16,10 +17,11 @@ class FirebaseService {
 
   FirebaseService._internal();
 
-  late FirebaseAuth _auth;
-  late FirebaseFirestore _firestore;
-  late FirebaseFunctions _functions;
-  final GoogleSignIn _googleSignIn = GoogleSignIn();
+  late final FirebaseAuth _auth;
+  late final FirebaseFirestore _firestore;
+  late final FirebaseFunctions _functions;
+  late final GenerativeModel model;
+  late final GoogleSignIn _googleSignIn;
 
   Future<void> initialize() async {
     await Firebase.initializeApp(
@@ -30,6 +32,13 @@ class FirebaseService {
     _auth = FirebaseAuth.instanceFor(app: Firebase.app("invoix"));
     _firestore = FirebaseFirestore.instanceFor(app: Firebase.app("invoix"));
     _functions = FirebaseFunctions.instanceFor(app: Firebase.app("invoix"));
+    _googleSignIn = GoogleSignIn(scopes: ["profile", "email"]);
+    model = FirebaseVertexAI.instanceFor(
+      appCheck: FirebaseAppCheck.instanceFor(app: Firebase.app("invoix")),
+    ).generativeModel(
+      model: 'gemini-1.5-flash',
+      generationConfig: GenerationConfig(responseMimeType: 'application/json', temperature: 1.15),
+    );
 
     if (!kDebugMode) {
       await FirebaseAppCheck.instanceFor(app: Firebase.app("invoix")).activate(
@@ -52,17 +61,27 @@ class FirebaseService {
 
   Future<User?> signInWithGoogle() async {
     try {
+      print("Starting Google Sign-In process");
+
+      // Trigger the authentication flow
       final GoogleSignInAccount? googleUser = await _googleSignIn.signIn();
+      print("Google Sign-In account retrieved: ${googleUser != null}");
+
       if (googleUser == null) {
+        Exception("Google Sign-In was cancelled by the user");
         return null;
       }
 
+      // Obtain the auth details from the request
       final GoogleSignInAuthentication googleAuth = await googleUser.authentication;
+
+      // Create a new credential
       final credential = GoogleAuthProvider.credential(
         accessToken: googleAuth.accessToken,
         idToken: googleAuth.idToken,
       );
 
+      // Sign in to Firebase with the credential
       final UserCredential userCredential = await _auth.signInWithCredential(credential);
       final User? user = userCredential.user;
 
@@ -76,7 +95,7 @@ class FirebaseService {
 
       return user;
     } catch (e) {
-      print('Error signing in with Google: ${e.toString()}');
+      print('Detailed error in signInWithGoogle: ${e.toString()}');
       return null;
     }
   }
@@ -84,9 +103,9 @@ class FirebaseService {
   Future<void> _createNewUserProfile(final String uid) async {
     await _firestore.collection('users').doc(uid).set({
       'subscriptionId': 'new_user_offer',
-      'aiInvoiceReads': 10,  // Example: 10 free reads
-      'aiInvoiceAnalyses': 5,  // Example: 5 free analyses
-      'subscriptionExpiryDate': DateTime.now().add(const Duration(days: 30)),  // 30-day trial
+      'aiInvoiceReads': 30,
+      'aiInvoiceAnalyses': 10,
+      'subscriptionExpiryDate': DateTime.now().add(const Duration(days: 30)),
     });
   }
 
@@ -95,7 +114,7 @@ class FirebaseService {
     await _auth.signOut();
   }
 
-  Future<void> verifyPurchase(final String productId, final String purchaseToken) async {
+  Future<bool> verifyPurchase(final String productId, final String purchaseToken) async {
     try {
       final HttpsCallable callable = _functions.httpsCallable('verifyPurchase');
       final results = await callable({
@@ -103,22 +122,37 @@ class FirebaseService {
         'purchaseToken': purchaseToken,
       });
 
-      if (results.data['isValid']) {
-        await _updateUserSubscription(productId);
-      }
+      return results.data['isValid'] as bool;
     } catch (e) {
       print('Error verifying purchase: ${e.toString()}');
+      return false;
     }
   }
 
-  Future<void> _updateUserSubscription(final String productId) async {
+  Future<void> updateUserSubscription(final String productId) async {
     final user = _auth.currentUser;
     if (user != null) {
+      final subscriptionDetails = _getSubscriptionDetails(productId);
       await _firestore.collection('users').doc(user.uid).set({
         'subscriptionId': productId,
         'subscriptionStatus': 'active',
-        'subscriptionExpiryDate': DateTime.now().add(const Duration(days: 30)), // Example: 30-day subscription
+        'subscriptionExpiryDate': DateTime.now().add(const Duration(days: 30)),
+        'aiInvoiceReads': subscriptionDetails['aiInvoiceReads'],
+        'aiInvoiceAnalyses': subscriptionDetails['aiInvoiceAnalyses'],
       }, SetOptions(merge: true));
+    }
+  }
+
+  Map<String, dynamic> _getSubscriptionDetails(String productId) {
+    switch (productId) {
+      case 'individual_subscription':
+        return {'aiInvoiceReads': 1000, 'aiInvoiceAnalyses': 1000};
+      case 'advanced_subscription':
+        return {'aiInvoiceReads': 10000, 'aiInvoiceAnalyses': 10000};
+      case 'corporate_subscription':
+        return {'aiInvoiceReads': -1, 'aiInvoiceAnalyses': -1}; // Unlimited
+      default:
+        return {'aiInvoiceReads': 0, 'aiInvoiceAnalyses': 0};
     }
   }
 
