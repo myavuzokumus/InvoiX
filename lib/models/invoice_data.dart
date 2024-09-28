@@ -9,7 +9,7 @@ class InvoiceData extends HiveObject {
   @HiveField(0)
   final String imagePath;
   @HiveField(1)
-  late String _id;
+  late String _id; //Attention!
   @HiveField(2)
   final String companyName;
   @HiveField(3)
@@ -22,6 +22,12 @@ class InvoiceData extends HiveObject {
   final double taxAmount;
   @HiveField(7, defaultValue: "Others")
   final String category;
+  @HiveField(8, defaultValue: "EUR")
+  final String unit;
+  @HiveField(9, defaultValue: "")
+  final String companyId;
+  @HiveField(10, defaultValue: {})
+  final Map<String, dynamic> contentCache = {};
 
   String get id => _id;
 
@@ -33,6 +39,8 @@ class InvoiceData extends HiveObject {
       required this.totalAmount,
       required this.taxAmount,
       required this.category,
+      required this.unit,
+      required this.companyId,
       final String? id}) {
     id != null ? _id = id : _id = const Uuid().v4();
   }
@@ -45,7 +53,9 @@ class InvoiceData extends HiveObject {
         category = json["category"] ?? "",
         _id = const Uuid().v4(),
         totalAmount = _parseAmount(json["totalAmount"] ?? "0"),
-        taxAmount = _parseAmount(json["taxAmount"] ?? "0");
+        taxAmount = _parseAmount(json["taxAmount"] ?? "0"),
+        unit = json["unit"] ?? "EUR",
+        companyId = json["companyId"] ?? "";
 
   static double _parseAmount(String amount) {
     if (amount[amount.length - 3] == ".") {
@@ -64,6 +74,9 @@ class InvoiceData extends HiveObject {
     final double? totalAmount,
     final double? taxAmount,
     final String? category,
+    final String? unit,
+    final String? companyId,
+    final Map<String, dynamic>? contentCache,
     final String? id,
   }) {
     return InvoiceData(
@@ -74,6 +87,8 @@ class InvoiceData extends HiveObject {
       totalAmount: totalAmount ?? this.totalAmount,
       taxAmount: taxAmount ?? this.taxAmount,
       category: category ?? this.category,
+      unit: unit ?? this.unit,
+      companyId: companyId ?? this.companyId,
       id: id ?? _id,
     );
   }

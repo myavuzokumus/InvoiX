@@ -10,10 +10,12 @@ mixin _InvoiceEditPageMixin on ConsumerState<InvoiceEditPage> {
 
   late CompanyType companySuffix = CompanyType.LTD;
   late InvoiceCategory invoiceCategory = InvoiceCategory.Others;
+  late PriceUnit priceUnit = PriceUnit.EUR;
 
   //TextLabelControllers
   late final TextEditingController companyTextController;
   late final TextEditingController invoiceNoTextController;
+  late final TextEditingController companyIdTextController;
   late final TextEditingController dateTextController;
   late final TextEditingController totalAmountTextController;
   late final TextEditingController taxAmountTextController;
@@ -36,6 +38,7 @@ mixin _InvoiceEditPageMixin on ConsumerState<InvoiceEditPage> {
     readMode = widget.readMode;
 
     companyTextController = TextEditingController();
+    companyIdTextController = TextEditingController();
     invoiceNoTextController = TextEditingController();
     dateTextController = TextEditingController();
     totalAmountTextController = TextEditingController();
@@ -52,6 +55,7 @@ mixin _InvoiceEditPageMixin on ConsumerState<InvoiceEditPage> {
   @override
   void dispose() {
     companyTextController.dispose();
+    companyIdTextController.dispose();
     invoiceNoTextController.dispose();
     dateTextController.dispose();
     totalAmountTextController.dispose();
@@ -80,18 +84,20 @@ mixin _InvoiceEditPageMixin on ConsumerState<InvoiceEditPage> {
       try {
         await fetchInvoiceData(
             outPut: await describeImageWithAI(
-                imgFile: File(imageFile.path), prompt: identifyInvoicePrompt));
+                imgFile: File(imageFile.path), type: ProcessType.scan));
       } catch (e) {
         String error = e.toString();
-        if (!(await isInternetConnected())) {
-          error = "No Internet Connection!";
+        final status = await currentStatusChecker("aiInvoiceReads");
+
+        if (status != null) {
+          error = status.name;
         }
 
-        ref.read(errorProvider.notifier).state = ref
-            .read(errorProvider)
-            .copyWith(errorMessage: "$error\nSwitching to Legacy Mode...");
+        ref.read(loadingProvider.notifier).state = ref
+            .read(loadingProvider)
+            .copyWith(message: "$error\nSwitching to Legacy Mode...");
 
-        await Future.delayed(const Duration(seconds: 2));
+        await Future.delayed(const Duration(seconds: 3));
 
         await fetchInvoiceData(
             outPut: parseInvoiceData(await getScannedText(imageFile)));
@@ -113,10 +119,15 @@ mixin _InvoiceEditPageMixin on ConsumerState<InvoiceEditPage> {
     companySuffix = invoiceDataService.companyTypeFinder(item.companyName);
     invoiceCategory =
         InvoiceCategory.parse(item.category) ?? InvoiceCategory.Others;
+    priceUnit =
+        PriceUnit.parse(item.unit) ?? PriceUnit.Others;
+
     companyTextController.text =
         invoiceDataService.companyTypeExtractor(item.companyName);
     companyTextController.text = invoiceDataService
         .invalidCompanyTypeExtractor(companyTextController.text);
+
+    companyIdTextController.text = item.companyId;
     invoiceNoTextController.text = item.invoiceNo;
     dateTextController.text = updateYear(dateFormat.format(item.date));
     totalAmountTextController.text = item.totalAmount.toString();
@@ -222,6 +233,8 @@ mixin _InvoiceEditPageMixin on ConsumerState<InvoiceEditPage> {
             totalAmount: double.parse(totalAmountTextController.text),
             taxAmount: double.parse(taxAmountTextController.text),
             category: invoiceCategory.name,
+            unit: priceUnit.name,
+            companyId: companyIdTextController.text,
             id: widget.invoiceData?.id);
 
         await invoiceDataService.saveInvoiceData(data);

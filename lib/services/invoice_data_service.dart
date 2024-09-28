@@ -111,6 +111,27 @@ extension InvoiceCategoryExtension on InvoiceCategory {
   }
 }
 
+enum PriceUnit {
+  EUR,
+  USD,
+  TRY,
+  GBP,
+  JPY,
+  CNY,
+  RUB,
+  AUD,
+  CAD,
+  Others;
+
+  static PriceUnit? parse(final String category) {
+    return PriceUnit.values.firstWhere(
+            (final PriceUnit e) => category.contains(e.name), orElse: () {
+      //print('Invalid category name: $category');
+      return PriceUnit.Others;
+    });
+  }
+}
+
 class InvoiceDataService {
   static final InvoiceDataService _instance = InvoiceDataService._internal();
 

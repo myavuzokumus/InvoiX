@@ -24,13 +24,15 @@ class InvoiceDataAdapter extends TypeAdapter<InvoiceData> {
       totalAmount: fields[5] as double,
       taxAmount: fields[6] == null ? 0.0 : fields[6] as double,
       category: fields[7] == null ? 'Others' : fields[7] as String,
+      unit: fields[8] == null ? '€' : fields[8] as String,
+      companyId: fields[9] == null ? '' : fields[9] as String,
     ).._id = fields[1] as String;
   }
 
   @override
   void write(BinaryWriter writer, InvoiceData obj) {
     writer
-      ..writeByte(8)
+      ..writeByte(11)
       ..writeByte(0)
       ..write(obj.imagePath)
       ..writeByte(1)
@@ -46,7 +48,13 @@ class InvoiceDataAdapter extends TypeAdapter<InvoiceData> {
       ..writeByte(6)
       ..write(obj.taxAmount)
       ..writeByte(7)
-      ..write(obj.category);
+      ..write(obj.category)
+      ..writeByte(8)
+      ..write(obj.unit)
+      ..writeByte(9)
+      ..write(obj.companyId)
+      ..writeByte(10)
+      ..write(obj.contentCache);
   }
 
   @override

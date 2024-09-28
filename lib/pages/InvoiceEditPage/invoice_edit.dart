@@ -6,24 +6,21 @@ import 'package:cross_file/cross_file.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:intl/intl.dart';
 import 'package:invoix/models/invoice_data.dart';
 import 'package:invoix/pages/CompaniesPage/company_list.dart';
-import 'package:invoix/pages/InvoiceEditPage/date_format.dart';
 import 'package:invoix/services/invoice_data_service.dart';
-import 'package:invoix/states/error_state.dart';
 import 'package:invoix/states/invoice_data_state.dart';
+import 'package:invoix/states/loading_state.dart';
 import 'package:invoix/utils/ai_mode/describe_image_with_ai.dart';
-import 'package:invoix/utils/ai_mode/prompts.dart';
 import 'package:invoix/utils/blur_detector.dart';
 import 'package:invoix/utils/date_parser.dart';
 import 'package:invoix/utils/image_filter.dart';
 import 'package:invoix/utils/legacy_mode/invoice_parser.dart';
 import 'package:invoix/utils/legacy_mode/text_extraction.dart';
 import 'package:invoix/utils/legacy_mode/text_to_invoicedata_regex.dart';
-import 'package:invoix/utils/network_check.dart';
 import 'package:invoix/utils/read_mode.dart';
-import 'package:invoix/widgets/loading_animation.dart';
+import 'package:invoix/utils/status/current_status_checker.dart';
+import 'package:invoix/widgets/status/loading_animation.dart';
 import 'package:invoix/widgets/toast.dart';
 import 'package:invoix/widgets/warn_icon.dart';
 import 'package:string_similarity/string_similarity.dart';
@@ -111,32 +108,7 @@ class _InvoiceEditPageState extends ConsumerState<InvoiceEditPage>
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           const Divider(height: 20),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                            children: [
-                              IconButton.filledTonal(
-                                  onPressed: () {
-                                    _scaffoldKey.currentState!.openEndDrawer();
-                                  },
-                                  icon: const Icon(Icons.search)),
-                              DateFormatSegmented(onChange: (final value) {
-                                if (dateTextController.text == "") {
-                                  return;
-                                }
-                                if (value == DateFormatSegment.uk) {
-                                  dateTextController.text =
-                                      DateFormat("dd-MM-yyyy").format(
-                                          DateFormat("MM-dd-yyyy")
-                                              .parse(dateTextController.text));
-                                } else if (value == DateFormatSegment.us) {
-                                  dateTextController.text =
-                                      DateFormat("MM-dd-yyyy").format(
-                                          DateFormat("dd-MM-yyyy")
-                                              .parse(dateTextController.text));
-                                }
-                              }),
-                            ],
-                          ),
+
                           Form(
                             autovalidateMode:
                                 AutovalidateMode.onUserInteraction,
@@ -147,85 +119,155 @@ class _InvoiceEditPageState extends ConsumerState<InvoiceEditPage>
                               child: Wrap(
                                 runSpacing: 16.0,
                                 children: [
-                                  TextFormField(
-                                    maxLength: 100,
-                                    controller: companyTextController,
-                                    decoration: InputDecoration(
-                                        labelText: "Company name:",
-                                        suffixIcon: Row(
-                                          mainAxisSize: MainAxisSize.min,
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.end,
-                                          children: [
-                                            SizedBox(
-                                              width: 70,
-                                              height: 35,
-                                              child: DropdownButtonFormField<
-                                                  CompanyType>(
-                                                value: companySuffix,
-                                                alignment: Alignment.center,
-                                                menuMaxHeight: 225,
-                                                hint: const Text("Type"),
-                                                iconSize: 0,
-                                                items: CompanyType.values.map(
-                                                    (final CompanyType value) {
-                                                  return DropdownMenuItem<
-                                                      CompanyType>(
-                                                    value: value,
-                                                    alignment: Alignment.center,
-                                                    child: Text(value.name),
-                                                  );
-                                                }).toList(),
-                                                onChanged:
-                                                    (final CompanyType? value) {
-                                                  companySuffix = value!;
-                                                },
-                                                decoration:
-                                                    const InputDecoration(
-                                                  contentPadding:
-                                                      EdgeInsets.symmetric(
-                                                          vertical: 4,
-                                                          horizontal: 12),
-                                                  filled: true,
-                                                ),
-                                                validator: (final value) {
-                                                  if (value == null) {
-                                                    return 'Please select company type.';
-                                                  }
-                                                  return null;
-                                                },
-                                              ),
-                                            ),
-                                            const Padding(
-                                              padding: EdgeInsets.only(
-                                                  right: 12.0, left: 4.0),
-                                              child: WarnIcon(
-                                                  message:
-                                                      "You must choose a company type."),
-                                            ),
-                                          ],
-                                        )),
-                                    validator: (final value) {
-                                      if (value == null || value.isEmpty) {
-                                        return 'Please enter some text';
-                                      }
-                                      return null;
-                                    },
+                                  Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Expanded(
+                                        child: TextFormField(
+                                          maxLength: 100,
+                                          controller: companyTextController,
+                                          decoration: InputDecoration(
+                                              labelText: "Company name:",
+                                              suffixIcon: Row(
+                                                mainAxisSize: MainAxisSize.min,
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment.end,
+                                                children: [
+                                                  SizedBox(
+                                                    width: 70,
+                                                    height: 35,
+                                                    child: DropdownButtonFormField<
+                                                        CompanyType>(
+                                                      value: companySuffix,
+                                                      alignment: Alignment.center,
+                                                      menuMaxHeight: 225,
+                                                      hint: const Text("Type"),
+                                                      iconSize: 0,
+                                                      items: CompanyType.values.map(
+                                                          (final CompanyType value) {
+                                                        return DropdownMenuItem<
+                                                            CompanyType>(
+                                                          value: value,
+                                                          alignment: Alignment.center,
+                                                          child: Text(value.name),
+                                                        );
+                                                      }).toList(),
+                                                      onChanged:
+                                                          (final CompanyType? value) {
+                                                        companySuffix = value!;
+                                                      },
+                                                      decoration:
+                                                          const InputDecoration(
+                                                        contentPadding:
+                                                            EdgeInsets.symmetric(
+                                                                vertical: 4,
+                                                                horizontal: 12),
+                                                        filled: true,
+                                                      ),
+                                                      validator: (final value) {
+                                                        if (value == null) {
+                                                          return 'Please select company type.';
+                                                        }
+                                                        return null;
+                                                      },
+                                                    ),
+                                                  ),
+                                                  const Padding(
+                                                    padding: EdgeInsets.only(
+                                                        right: 12.0, left: 4.0),
+                                                    child: WarnIcon(
+                                                        message:
+                                                            "You must choose a company type."),
+                                                  ),
+                                                ],
+                                              )),
+                                          validator: (final value) {
+                                            if (value == null || value.isEmpty) {
+                                              return 'Please enter some text';
+                                            }
+                                            return null;
+                                          },
+                                        ),
+                                      ),
+                                      IconButton.filledTonal(
+                                          onPressed: () {
+                                            _scaffoldKey.currentState!.openEndDrawer();
+                                          },
+                                          icon: const Icon(Icons.search)),
+                                    ],
                                   ),
                                   TextFormField(
                                     maxLength: 50,
-                                    controller: invoiceNoTextController,
+                                    controller: companyIdTextController,
                                     decoration: const InputDecoration(
-                                        labelText: "Invoice No:",
-                                        suffixIcon: WarnIcon(
-                                            message:
-                                                "You must enter a valid invoice no.")),
-                                    validator: (final value) {
-                                      if (value == null || value.isEmpty) {
-                                        return 'Please enter some text';
-                                      }
-                                      return null;
-                                    },
+                                        labelText: "Company Id:"),
+                                  ),
+                                  Row(
+                                    mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                    crossAxisAlignment:
+                                    CrossAxisAlignment.start,
+                                    children: [
+                                      Flexible(
+                                        child: TextFormField(
+                                          maxLength: 50,
+                                          controller: invoiceNoTextController,
+                                          decoration: const InputDecoration(
+                                              labelText: "Invoice No:",
+                                              suffixIcon: WarnIcon(
+                                                  message:
+                                                      "You must enter a valid invoice no.")),
+                                          validator: (final value) {
+                                            if (value == null || value.isEmpty) {
+                                              return 'Please enter some text';
+                                            }
+                                            return null;
+                                          },
+                                        ),
+                                      ),
+                                      const SizedBox(width: 16),
+                                      Expanded(
+                                        child: DropdownButtonFormField<
+                                            PriceUnit>(
+                                          value: priceUnit,
+                                          alignment: Alignment.centerRight,
+                                          menuMaxHeight: 225,
+                                          hint: const Text("Unit"),
+                                          iconSize: 0,
+                                          items: PriceUnit.values.map(
+                                                  (final PriceUnit value) {
+                                                return DropdownMenuItem<
+                                                    PriceUnit>(
+                                                  value: value,
+                                                  child: Text(value.name),
+                                                );
+                                              }).toList(),
+                                          onChanged:
+                                              (final PriceUnit? value) {
+                                                priceUnit =
+                                                value ?? PriceUnit.Others;
+                                          },
+                                          decoration: const InputDecoration(
+                                            isDense: true,
+                                            contentPadding:
+                                            EdgeInsets.symmetric(
+                                                horizontal: 18.0),
+                                            suffixIcon: WarnIcon(
+                                                message:
+                                                "You must choose a price unit."),
+                                            filled: true,
+                                          ),
+                                          validator: (final value) {
+                                            if (value == null) {
+                                              return 'Please select invoice category.';
+                                            }
+                                            return null;
+                                          },
+                                        ),
+                                      ),
+                                    ],
                                   ),
                                   Row(
                                     mainAxisAlignment:
