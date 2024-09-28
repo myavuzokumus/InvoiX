@@ -1,14 +1,12 @@
-import 'dart:io';
-
 import 'package:cross_file/cross_file.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:invoix/models/invoice_data.dart';
-import 'package:invoix/services/invoice_data_service.dart';
-import 'package:invoix/states/selection_state.dart';
 import 'package:invoix/pages/InvoiceEditPage/invoice_edit.dart';
 import 'package:invoix/pages/InvoicesPage/ai_button.dart';
+import 'package:invoix/services/invoice_data_service.dart';
+import 'package:invoix/states/selection_state.dart';
 
 class InvoiceCard extends ConsumerWidget {
   const InvoiceCard({super.key, required this.invoiceData, this.selectionMode});
@@ -66,8 +64,8 @@ class InvoiceCard extends ConsumerWidget {
                       physics: const NeverScrollableScrollPhysics(),
                       shrinkWrap: true,
                       children: <Widget>[
-                        selectionMode == null ? Text("Invoice No\n${invoiceData.invoiceNo}") : Text("Company Name\n${invoiceData.companyName}", overflow: TextOverflow.ellipsis,),
-                        const Divider(height: 2),
+                        if (selectionMode != null) Text("Company Name\n${invoiceData.companyName}", overflow: TextOverflow.ellipsis,),
+                        if (selectionMode != null) const Divider(height: 2),
                         Text("Date\n${DateFormat("dd-MM-yyyy").format(invoiceData.date)}"),
                         const Divider(height: 2),
                         Row(
@@ -85,11 +83,11 @@ class InvoiceCard extends ConsumerWidget {
                 Stack(
                   children: [
                     Padding(
-                      padding: const EdgeInsets.all(16),
+                      padding: const EdgeInsets.only(right: 16, bottom: 16, top: 8, left: 24),
                       child: ClipRRect(
                         borderRadius: BorderRadius.circular(16),
                         child: Image(image: InvoiceCategory.parse(invoiceData.category)!.icon,
-                          width: 92,
+                          width: selectionMode != null ? 92 : 64,
                           fit: BoxFit.cover,
                           frameBuilder: (final BuildContext context, final Widget child, final int? frame, final bool wasSynchronouslyLoaded) {
                             if (wasSynchronouslyLoaded) {
@@ -106,7 +104,7 @@ class InvoiceCard extends ConsumerWidget {
                       ),
                     ),
                     Positioned(right: 0, bottom: 0,
-                        child: AIButton(invoiceImage: File(invoiceData.imagePath))
+                        child: AIButton(invoice: invoiceData)
                     ),
                     if (selectionState.isSelectionMode)
                       Positioned(
