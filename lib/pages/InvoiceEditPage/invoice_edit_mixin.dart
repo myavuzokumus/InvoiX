@@ -89,9 +89,7 @@ mixin _InvoiceEditPageMixin on ConsumerState<InvoiceEditPage> {
         String error = e.toString();
         final status = await currentStatusChecker("aiInvoiceReads");
 
-        if (status != null) {
-          error = status.name;
-        }
+        error = status.name;
 
         ref.read(loadingProvider.notifier).state = ref
             .read(loadingProvider)

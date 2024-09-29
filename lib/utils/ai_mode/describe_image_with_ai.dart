@@ -3,12 +3,33 @@ import 'dart:io';
 import 'package:firebase_vertexai/firebase_vertexai.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:invoix/states/firebase_state.dart';
+import 'package:invoix/utils/ai_mode/prompts.dart';
 
-Future<String> describeImageWithAI({required final File imgFile, required final String prompt}) async {
+enum ProcessType {
+  scan,
+  describe,
+}
 
-  final model = ProviderContainer().read(firebaseServiceProvider).model;
+Future<String> describeImageWithAI({required final File imgFile, required final ProcessType type}) async {
 
-  final response = await (model.generateContent([
+  final firebaseService = ProviderContainer().read(firebaseServiceProvider);
+
+  final String prompt;
+  final Map<String, dynamic> checkUsage;
+
+    if (type == ProcessType.scan) {
+      prompt = identifyInvoicePrompt;
+      checkUsage = await firebaseService.checkUsageRights("aiInvoiceReads", decrease: true);
+    } else {
+      prompt = describeInvoicePrompt;
+      checkUsage = await firebaseService.checkUsageRights("aiInvoiceAnalyses", decrease: true);
+    }
+
+    if (!checkUsage["success"]) {
+      throw Exception(checkUsage.toString());
+    }
+
+  final response = await (firebaseService.model.generateContent([
     Content.multi([
       TextPart(prompt),
       DataPart('image/jpeg', imgFile.readAsBytesSync())

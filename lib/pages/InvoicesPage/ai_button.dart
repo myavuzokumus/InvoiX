@@ -4,19 +4,22 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:invoix/models/invoice_analysis.dart';
+import 'package:invoix/models/invoice_data.dart';
 import 'package:invoix/states/invoice_data_state.dart';
 import 'package:invoix/utils/ai_mode/describe_image_with_ai.dart';
-import 'package:invoix/utils/ai_mode/prompts.dart';
 import 'package:invoix/utils/cooldown.dart';
-import 'package:invoix/widgets/loading_animation.dart';
-import 'package:invoix/widgets/no_internet_connection.dart';
+import 'package:invoix/utils/status/current_status_checker.dart';
+import 'package:invoix/widgets/status/loading_animation.dart';
+import 'package:invoix/widgets/status/show_current_status.dart';
 import 'package:invoix/widgets/toast.dart';
 import 'package:invoix/widgets/warn_icon.dart';
 
 class AIButton extends ConsumerWidget {
-  const AIButton({super.key, required this.invoiceImage});
+  AIButton({super.key, required this.invoice});
 
-  final File invoiceImage;
+  final InvoiceData invoice;
+
+  late Future<String> _future;
 
   @override
   Widget build(final BuildContext context, final WidgetRef ref) {
@@ -27,65 +30,100 @@ class AIButton extends ConsumerWidget {
       ),
       onPressed: () async {
         final invoiceDataService = ref.read(invoiceDataServiceProvider);
-        final int remainingTime =
-            invoiceDataService.remainingTimeBox.get(invoiceImage.path) ?? 0;
 
-        if (remainingTime == 0) {
-          await cooldown(remainingTime, invoiceImage.path, invoiceDataService);
+        final int remainingTime =
+            invoiceDataService.remainingTimeBox.get(invoice.imagePath) ?? 0;
+
+        if (remainingTime == 0 || invoice.contentCache.isNotEmpty) {
+          if (invoice.contentCache.isEmpty) {
+            await cooldown(remainingTime, invoice.imagePath, invoiceDataService);
+          }
+
+          _future = invoice.contentCache.isEmpty
+              ? describeImageWithAI(
+              imgFile: File(invoice.imagePath), type: ProcessType.describe)
+              : Future.value(jsonEncode(invoice.contentCache));
 
           await showModalBottomSheet<void>(
             showDragHandle: true,
             context: context,
             builder: (final BuildContext context) {
-              return SizedBox(
-                height: 425,
-                width: double.infinity,
-                child: Padding(
-                  padding:
-                      const EdgeInsets.only(left: 24, bottom: 24, right: 24),
-                  child: LayoutBuilder(
-                    builder: (final BuildContext context,
-                        final BoxConstraints constraints) {
-                      return Card(
-                          color: const Color(0xff442a22),
-                          elevation: 16,
-                          child: Padding(
-                            padding: const EdgeInsets.all(12.0),
-                            child: FutureBuilder(
-                              future: describeImageWithAI(
-                                  imgFile: invoiceImage,
-                                  prompt: describeInvoicePrompt),
-                              builder: (final BuildContext context,
-                                  final AsyncSnapshot<String> snapshot) {
-                                if (snapshot.hasData) {
-                                  final Map<String, dynamic> decodedData =
-                                      jsonDecode(snapshot.data!);
-                                  final InvoiceAnalysis invoiceAnalysis =
-                                      InvoiceAnalysis.fromJson(decodedData);
+              return StatefulBuilder(
+                builder: (final BuildContext context, final void Function(void Function()) setModalState) { return SizedBox(
+                  height: 425,
+                  width: double.infinity,
+                  child: Padding(
+                    padding:
+                        const EdgeInsets.only(left: 24, bottom: 24, right: 24),
+                    child: LayoutBuilder(
+                      builder: (final BuildContext context,
+                          final BoxConstraints constraints) {
+                        return Card(
+                            color: const Color(0xff442a22),
+                            elevation: 16,
+                            child: Padding(
+                              padding: const EdgeInsets.all(12.0),
+                              child: FutureBuilder(
+                                future: _future,
+                                builder: (final BuildContext context,
+                                    final AsyncSnapshot<String> snapshot) {
+                                  if (snapshot.connectionState !=
+                                      ConnectionState.done) {
+                                    return Column(
+                                      children: [
+                                        LoadingAnimation(
+                                            message:
+                                                "The invoice is being analyzed...",
+                                            customHeight:
+                                                constraints.maxHeight - 72),
+                                      ],
+                                    );
+                                  } else if (snapshot.hasData && snapshot.connectionState ==
+                                      ConnectionState.done) {
+                                    final Map<String, dynamic> decodedData =
+                                        jsonDecode(snapshot.data!);
 
-                                  return describedWidget(invoiceAnalysis);
-                                } else if (snapshot.hasError) {
-                                  return const NoInternetConnection();
-                                }
-                                return Column(
-                                  children: [
-                                    LoadingAnimation(
-                                        customHeight:
-                                            constraints.maxHeight - 72),
-                                    const Text(
-                                        'The invoice is being analyzed...',
-                                        textAlign: TextAlign.center,
-                                        style: TextStyle(
-                                            fontSize: 18,
-                                            fontWeight: FontWeight.bold)),
-                                  ],
-                                );
-                              },
-                            ),
-                          ));
-                    },
+                                      invoice.contentCache = decodedData;
+                                      invoiceDataService.saveInvoiceData(invoice);
+
+
+                                    final InvoiceAnalysis invoiceAnalysis =
+                                        InvoiceAnalysis.fromJson(decodedData);
+
+                                    return describedWidget(context, invoiceAnalysis, invoiceDataService, setModalState);
+                                  } else if (snapshot.hasError) {
+                                    return FutureBuilder<Status>(
+                                      future: currentStatusChecker(
+                                          "aiInvoiceAnalyses"),
+                                      builder:
+                                          (final context, final statusSnapshot) {
+                                        if (statusSnapshot.connectionState ==
+                                            ConnectionState.done) {
+                                          return ShowCurrentStatus(
+                                              status: statusSnapshot.data!,
+                                              customHeight:
+                                                  constraints.maxHeight - 72);
+                                        }
+                                        return const LoadingAnimation();
+                                      },
+                                    );
+                                  }
+                                  return Column(
+                                    children: [
+                                      LoadingAnimation(
+                                          message:
+                                              "The invoice is being analyzed...",
+                                          customHeight:
+                                              constraints.maxHeight - 72),
+                                    ],
+                                  );
+                                },
+                              ),
+                            ));
+                      },
+                    ),
                   ),
-                ),
+                );}
               );
             },
           );
@@ -96,23 +134,33 @@ class AIButton extends ConsumerWidget {
         }
       },
       icon: const Text("✨", style: TextStyle(fontSize: 17)),
-      tooltip: 'Analyze it with AI',
+      tooltip: 'Analyze the invoice with AI',
     );
   }
 
   //This is ridiculous, I know, but I did it this way to improve the application.
-  Widget describedWidget(final InvoiceAnalysis invoiceAnalysis) {
+  Widget describedWidget(final context, final InvoiceAnalysis invoiceAnalysis, final invoiceDataService, final void Function(void Function() p1) setModalState) {
     return ListView(
       children: [
-        const Row(
+        Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text("Purchased products",
+            const Text("Purchased products",
                 style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                 textAlign: TextAlign.left),
-            WarnIcon(
+            const WarnIcon(
                 message:
-                    "The information provided may sometimes be incorrect. Please take this into consideration and pay attention to the recommendations.")
+                    "The information provided may sometimes be incorrect.\nPlease take this into consideration and pay attention to the recommendations."),
+            IconButton(onPressed: () {
+
+              setModalState(() {
+                  _future = describeImageWithAI(
+                      imgFile: File(invoice.imagePath), type: ProcessType.describe);
+                });
+
+
+            },
+                icon: const Icon(Icons.refresh_outlined)),
           ],
         ),
         Padding(

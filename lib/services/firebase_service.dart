@@ -143,7 +143,7 @@ class FirebaseService {
     }
   }
 
-  Map<String, dynamic> _getSubscriptionDetails(String productId) {
+  Map<String, dynamic> _getSubscriptionDetails(final String productId) {
     switch (productId) {
       case 'individual_subscription':
         return {'aiInvoiceReads': 1000, 'aiInvoiceAnalyses': 1000};
@@ -163,6 +163,48 @@ class FirebaseService {
     }
     throw Exception('User not logged in');
   }
+
+  Future<Map<String, dynamic>> checkUsageRights(final String processType, {final bool decrease = false}) async {
+    try {
+      final HttpsCallable callable = _functions.httpsCallable('checkAndUpdateUsage');
+      final result = await callable.call<Map<String, dynamic>>({
+        'processType': processType,
+        'decrease': decrease,
+      });
+      return result.data;
+    } catch (e) {
+      print('Error checking usage rights: ${e.toString()}');
+      return {'success': false, 'error': e.toString(), 'remainingUsage': null};
+    }
+  }
+
+  // Future<bool> checkUsageRights(final String processType) async {
+  //   try {
+  //     final HttpsCallable callable = _functions.httpsCallable('checkAndDecrementUsage');
+  //     final result = await callable.call<Map<String, dynamic>>({'processType': processType});
+  //     return result.data['success'] as bool;
+  //   } catch (e) {
+  //     throw Exception('Error checking usage rights: ${e.toString()}');
+  //   }
+  // }
+  //
+  // Future<void> decrementUsage(final String processType) async {
+  //   final user = _auth.currentUser;
+  //   if (user != null) {
+  //     final userDoc = await _firestore.collection('users').doc(user.uid).get();
+  //
+  //     int amount = userDoc.get(processType) as int;
+  //     if (amount > 0) {
+  //       amount--;
+  //       await _firestore.collection('users').doc(user.uid).update({
+  //         processType: amount,
+  //       });
+  //     }
+  //     else {
+  //       throw Exception('No more usage rights');
+  //     }
+  //   }
+  // }
 
   Stream<User?> authStateChanges() {
     return _auth.authStateChanges();

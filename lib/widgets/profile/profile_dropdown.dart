@@ -6,7 +6,10 @@ import 'package:invoix/pages/SubscriptionPage/new_user_offer.dart';
 import 'package:invoix/pages/SubscriptionPage/subscription_page.dart';
 import 'package:invoix/services/firebase_service.dart';
 import 'package:invoix/states/firebase_state.dart';
+import 'package:invoix/utils/status/current_status_checker.dart';
 import 'package:invoix/widgets/glowing_container.dart';
+import 'package:invoix/widgets/status/loading_animation.dart';
+import 'package:invoix/widgets/status/show_current_status.dart';
 import 'package:invoix/widgets/toast.dart';
 
 class ProfileDropdown extends ConsumerWidget {
@@ -52,7 +55,7 @@ class ProfileDropdown extends ConsumerWidget {
                           ),
                         ),
                         const SizedBox(height: 8),
-                        Text(user.displayName ?? '',
+                        Text(user.providerData[0].displayName ?? '',
                             style: const TextStyle(
                                 color: Colors.white,
                                 fontSize: 18,
@@ -107,8 +110,20 @@ class ProfileDropdown extends ConsumerWidget {
           ),
         );
       },
-      loading: () => const CircularProgressIndicator(),
-      error: (final error, final stack) => Text('Error: $error'),
+      loading: () => const LoadingAnimation(),
+      error: (final error, final stack) => LayoutBuilder(
+        builder: (final BuildContext context,
+            final BoxConstraints constraints) { return FutureBuilder<Status>(
+          future: currentStatusChecker("aiInvoiceAnalyses"),
+          builder: (final context, final statusSnapshot) {
+            if (statusSnapshot.connectionState == ConnectionState.done) {
+              return ShowCurrentStatus(status: statusSnapshot.data!, customHeight:
+              constraints.maxHeight - 72);
+            }
+            return const LoadingAnimation();
+          },
+        );}
+      ),
     );
   }
 
@@ -148,7 +163,7 @@ class ProfileDropdown extends ConsumerWidget {
           return const Text('No subscription data available',
               style: TextStyle(color: Colors.white));
         }
-        final userData = snapshot.data!.data() as Map<String, dynamic>;
+        final userData = snapshot.data!.data()! as Map<String, dynamic>;
         return Column(
           children: [
             _buildInfoTile("Plan", '${userData['subscriptionId'] ?? 'None'}'),
