@@ -17,7 +17,7 @@ class InvoiceCard extends ConsumerWidget {
   @override
   Widget build(final BuildContext context, final WidgetRef ref) {
 
-    final selectionState = ref.watch(invoiceProvider);
+    final selectionState = ref.watch(invoiceSelectionProvider);
 
     return Hero(
       tag: invoiceData.imagePath,
@@ -37,12 +37,12 @@ class InvoiceCard extends ConsumerWidget {
             onLongPress: () {
               if (!selectionState.isSelectionMode && selectionMode == null) {
                 selectionState.isSelectionMode = !selectionState.isSelectionMode;
-                ref.read(invoiceProvider.notifier).toggleItemSelection(company: invoiceData.companyName, invoiceData: invoiceData);
+                ref.read(invoiceSelectionProvider.notifier).toggleItemSelection(company: invoiceData.companyName, invoiceData: invoiceData);
               }
             },
             onTap: () {
               selectionState.isSelectionMode
-                  ? ref.read(invoiceProvider.notifier).toggleItemSelection(company: invoiceData.companyName, invoiceData: invoiceData)
+                  ? ref.read(invoiceSelectionProvider.notifier).toggleItemSelection(company: invoiceData.companyName, invoiceData: invoiceData)
                       :
               Navigator.push(
                   context,
@@ -71,9 +71,9 @@ class InvoiceCard extends ConsumerWidget {
                         Row(
                           mainAxisAlignment: MainAxisAlignment.start,
                           children: [
-                            Text("Total\n${invoiceData.totalAmount}"),
+                            Text("Total\n${invoiceData.unit} ${invoiceData.totalAmount}"),
                             const SizedBox(width: 16),
-                            Text("Tax\n${invoiceData.taxAmount}"),
+                            Text("Tax\n${invoiceData.unit} ${invoiceData.taxAmount}"),
                           ],
                         ),
                       ],
@@ -83,11 +83,11 @@ class InvoiceCard extends ConsumerWidget {
                 Stack(
                   children: [
                     Padding(
-                      padding: const EdgeInsets.only(right: 16, bottom: 16, top: 8, left: 24),
+                      padding: const EdgeInsets.only(right: 16, bottom: 8, top: 8, left: 24),
                       child: ClipRRect(
                         borderRadius: BorderRadius.circular(16),
                         child: Image(image: InvoiceCategory.parse(invoiceData.category)!.icon,
-                          width: selectionMode != null ? 92 : 64,
+                          width: selectionMode != null ? 92 : 76,
                           fit: BoxFit.cover,
                           frameBuilder: (final BuildContext context, final Widget child, final int? frame, final bool wasSynchronouslyLoaded) {
                             if (wasSynchronouslyLoaded) {
@@ -111,7 +111,7 @@ class InvoiceCard extends ConsumerWidget {
                         right: 0,
                         top: 0,
                         child: Checkbox(
-                            onChanged: (final bool? x) => ref.read(invoiceProvider.notifier).toggleItemSelection(company: invoiceData.companyName, invoiceData: invoiceData),
+                            onChanged: (final bool? x) => ref.read(invoiceSelectionProvider.notifier).toggleItemSelection(company: invoiceData.companyName, invoiceData: invoiceData),
                             value: selectionState.selectedItems[invoiceData.companyName]?.contains(invoiceData) ?? false,
                       ))
                   ],

@@ -27,7 +27,7 @@ class InvoiceData extends HiveObject {
   @HiveField(9, defaultValue: "")
   final String companyId;
   @HiveField(10, defaultValue: {})
-  final Map<String, dynamic> contentCache = {};
+  Map<String, dynamic> contentCache = {};
 
   String get id => _id;
 
