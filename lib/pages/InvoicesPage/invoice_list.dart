@@ -8,7 +8,7 @@ import 'package:invoix/states/invoice_data_state.dart';
 import 'package:invoix/states/list_length_state.dart';
 import 'package:invoix/widgets/amount_range_slider.dart';
 import 'package:invoix/widgets/date_range_picker.dart';
-import 'package:invoix/widgets/loading_animation.dart';
+import 'package:invoix/widgets/status/loading_animation.dart';
 
 part 'invoice_list_mixin.dart';
 
@@ -96,7 +96,7 @@ class _InvoiceListState extends ConsumerState<InvoiceList>
                   : 1,
           mainAxisSpacing: 15,
           crossAxisSpacing: 15,
-          childAspectRatio: 2.5,
+          childAspectRatio: 3.25,
         ),
         itemCount: invoiceList.length,
         itemBuilder: (final BuildContext context, final int index) {

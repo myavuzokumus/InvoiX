@@ -132,6 +132,8 @@ enum PriceUnit {
   }
 }
 
+
+
 class InvoiceDataService {
   static final InvoiceDataService _instance = InvoiceDataService._internal();
 
@@ -269,4 +271,5 @@ class InvoiceDataService {
 
     return text;
   }
+
 }

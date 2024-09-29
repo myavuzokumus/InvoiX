@@ -3,7 +3,7 @@ import 'package:invoix/pages/CompaniesPage/company_main.dart';
 import 'package:invoix/pages/SummaryPage/summary_main.dart';
 import 'package:invoix/utils/navigation_utils.dart';
 import 'package:invoix/utils/read_mode.dart';
-import 'package:invoix/widgets/loading_animation.dart';
+import 'package:invoix/widgets/status/loading_animation.dart';
 
 class MainPage extends StatefulWidget {
   const MainPage({super.key});

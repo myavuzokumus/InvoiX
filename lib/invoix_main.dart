@@ -43,11 +43,10 @@ class InvoixMain extends StatelessWidget {
           counterStyle: const TextStyle(fontSize: 0),
           errorStyle: const TextStyle(fontSize: 0),
         ),
-        listTileTheme: const ListTileThemeData(
-          shape: Border.symmetric(
-            vertical: BorderSide(color: Colors.white, width: 2.5),
-          ),
-          titleTextStyle: TextStyle(fontSize: 24),
+        listTileTheme: ListTileThemeData(
+          shape: const Border(right: BorderSide(color: Colors.white, width: 2.5)),
+          tileColor: Colors.grey[850],
+          titleTextStyle: const TextStyle(fontSize: 20),
         ),
         expansionTileTheme: const ExpansionTileThemeData(
           shape: Border.symmetric(

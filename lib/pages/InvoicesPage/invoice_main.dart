@@ -14,17 +14,17 @@ class InvoicePage extends ConsumerWidget {
   @override
   Widget build(final BuildContext context, final WidgetRef ref) {
 
-    final selectionState = ref.watch(invoiceProvider);
+    final selectionState = ref.watch(invoiceSelectionProvider);
 
     return PopScope(
       canPop: !selectionState.isSelectionMode,
       onPopInvoked: (final bool bool) {
         if (selectionState.isSelectionMode) {
-          ref.read(invoiceProvider.notifier).toggleSelectionMode();
+          ref.read(invoiceSelectionProvider.notifier).toggleSelectionMode();
         }
       },
       child: ListPageScaffold(
-          selectionProvider: invoiceProvider,
+          selectionProvider: invoiceSelectionProvider,
           title: "InvoiX\n",
           type: ListType.invoice,
           companyName: companyName,

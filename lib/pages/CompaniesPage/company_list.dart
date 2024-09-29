@@ -10,7 +10,7 @@ import 'package:invoix/states/invoice_data_state.dart';
 import 'package:invoix/states/list_length_state.dart';
 import 'package:invoix/states/search_state.dart';
 import 'package:invoix/states/selection_state.dart';
-import 'package:invoix/widgets/loading_animation.dart';
+import 'package:invoix/widgets/status/loading_animation.dart';
 import 'package:invoix/widgets/toast.dart';
 import 'package:invoix/widgets/warn_icon.dart';
 import 'package:string_similarity/string_similarity.dart';
@@ -32,7 +32,7 @@ class _CompanyListState extends ConsumerState<CompanyList> with _CompanyListMixi
   @override
   Widget build(final BuildContext context) {
 
-    final selectionState = ref.watch(companyProvider);
+    final selectionState = ref.watch(companySelectionProvider);
     final query = ref.watch(queryProvider).toLowerCase();
 
     return ProviderScope(
@@ -122,49 +122,53 @@ class _CompanyListState extends ConsumerState<CompanyList> with _CompanyListMixi
                                           }));
                                       return false; // Make it visible after swipe process
                                     },
-                                    child: ListTile(
-                                      title: Text(
-                                        companyListName,
+                                    child: Card(
+                                      color: Colors.grey[850],
+                                      child: ListTile(
+                                        leading: const Icon(Icons.business, color: Colors.redAccent),
+                                        title: Text(
+                                          companyListName,
+                                        ),
+                                        onLongPress: () {
+                                          if (ModalRoute.of(context)?.settings.name == null) {
+                                            return;
+                                          }
+                                          if (!selectionState.isSelectionMode) {
+                                            selectionState.isSelectionMode = !selectionState.isSelectionMode;
+                                            ref.read(companySelectionProvider.notifier).toggleItemSelection(company: companyListName);
+                                          }
+                                        },
+                                        onTap: () {
+                                          if (widget.onTap != null) {
+                                            widget.onTap!(companyListName);
+                                            return;
+                                          }
+                                          else if (selectionState.isSelectionMode) {
+                                            ref.read(companySelectionProvider.notifier).toggleItemSelection(company: companyListName);
+                                          }
+                                          else {
+                                            Navigator.push(
+                                                context,
+                                                PageRouteBuilder(
+                                                    pageBuilder: (final BuildContext context, final Animation<double> animation, final Animation<double> secondaryAnimation) => InvoicePage(
+                                                        companyName: companyListName),
+                                                  transitionDuration: const Duration(milliseconds: 250),
+                                                  transitionsBuilder: (final context, animation, final animationTime, final child) {
+                                                    animation = CurvedAnimation(parent: animation, curve: Curves.easeInOut);
+                                                    return FadeTransition(
+                                                      opacity: animation,
+                                                      child: child,
+                                                    );
+                                                  },
+                                      
+                                                ));
+                                          }
+                                        },
+                                        trailing: selectionState.isSelectionMode
+                                            ? Checkbox(
+                                            onChanged: (final bool? x) => ref.read(companySelectionProvider.notifier).toggleItemSelection(company: companyListName),
+                                            value: selectionState.selectedItems.containsKey(companyListName)) : const SizedBox.shrink(),
                                       ),
-                                      onLongPress: () {
-                                        if (ModalRoute.of(context)?.settings.name == null) {
-                                          return;
-                                        }
-                                        if (!selectionState.isSelectionMode) {
-                                          selectionState.isSelectionMode = !selectionState.isSelectionMode;
-                                          ref.read(companyProvider.notifier).toggleItemSelection(company: companyListName);
-                                        }
-                                      },
-                                      onTap: () {
-                                        if (widget.onTap != null) {
-                                          widget.onTap!(companyListName);
-                                          return;
-                                        }
-                                        else if (selectionState.isSelectionMode) {
-                                          ref.read(companyProvider.notifier).toggleItemSelection(company: companyListName);
-                                        }
-                                        else {
-                                          Navigator.push(
-                                              context,
-                                              PageRouteBuilder(
-                                                  pageBuilder: (final BuildContext context, final Animation<double> animation, final Animation<double> secondaryAnimation) => InvoicePage(
-                                                      companyName: companyListName),
-                                                transitionDuration: const Duration(milliseconds: 250),
-                                                transitionsBuilder: (final context, animation, final animationTime, final child) {
-                                                  animation = CurvedAnimation(parent: animation, curve: Curves.easeInOut);
-                                                  return FadeTransition(
-                                                    opacity: animation,
-                                                    child: child,
-                                                  );
-                                                },
-
-                                              ));
-                                        }
-                                      },
-                                      trailing: selectionState.isSelectionMode
-                                          ? Checkbox(
-                                          onChanged: (final bool? x) => ref.read(companyProvider.notifier).toggleItemSelection(company: companyListName),
-                                          value: selectionState.selectedItems.containsKey(companyListName)) : const SizedBox.shrink(),
                                     ),
                                   );
                                 },
