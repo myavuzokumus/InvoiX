@@ -23,44 +23,17 @@ class InvoiceList extends ConsumerStatefulWidget {
 
 class _InvoiceListState extends ConsumerState<InvoiceList>
     with _InvoiceListMixin {
+
+  ValueNotifier<bool> isExpanded = ValueNotifier(false);
+
   @override
   Widget build(final BuildContext context) {
+
     return Column(
       children: [
-        Padding(
-          padding: const EdgeInsets.only(left: 32, right: 32, top: 16),
-          child: CustomDateRangePicker(
-            initialTimeRange: initialDateTime,
-            onDateRangeChanged:
-                (final DateTime startDate, final DateTime endDate) {
-              setState(() {
-                this.startDate = startDate;
-                this.endDate = endDate;
-                initialDateTime = DateTimeRange(
-                  start: startDate,
-                  end: endDate,
-                );
-                originalInvoicesFuture = retrieveInvoicesAccordingDate(
-                    startDate, endDate, widget.companyName);
-                filteredInvoicesFuture = originalInvoicesFuture;
-              });
-            },
-          ),
-        ),
-        AmountRangeSlider(
-          minAmount: minAmount,
-          maxAmount: maxAmount,
-          onAmountRangeChanged:
-              (final double minAmount, final double maxAmount) {
-            setState(() {
-              filteredInvoicesFuture = originalInvoicesFuture.then(
-                  (final List<InvoiceData> invoices) =>
-                      invoices.where((final invoice) {
-                        return (invoice.totalAmount >= minAmount &&
-                            invoice.totalAmount <= maxAmount);
-                      }).toList());
-            });
-          },
+
+        const SizedBox(
+          height: 10,
         ),
         Expanded(
           child: FutureBuilder<List<InvoiceData>>(
@@ -73,12 +46,87 @@ class _InvoiceListState extends ConsumerState<InvoiceList>
     );
   }
 
+  Widget filterPanel() {
+    return ValueListenableBuilder(
+        valueListenable: isExpanded,
+        builder: (final BuildContext context, final value, final Widget? child) {
+          return ExpansionPanelList(
+              expandedHeaderPadding: EdgeInsets.zero,
+              elevation: 4,
+              expansionCallback: (final int index,  final bool isExpanded) {
+                setState(() {
+                  this.isExpanded.value = !value;
+                });
+              },
+              children: [
+                ExpansionPanel(
+                  backgroundColor: Theme.of(context).colorScheme.onSecondary,
+                  isExpanded: value,
+                  body: SingleChildScrollView(
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 48),
+                      child: Column(
+                        children: [
+                          CustomDateRangePicker(
+                            initialTimeRange: initialDateTime,
+                            onDateRangeChanged: (final DateTime startDate,
+                                final DateTime endDate) {
+                              setState(() {
+                                this.startDate = startDate;
+                                this.endDate = endDate;
+                                initialDateTime = DateTimeRange(
+                                  start: startDate,
+                                  end: endDate,
+                                );
+                                originalInvoicesFuture =
+                                    retrieveInvoicesAccordingDate(
+                                        startDate, endDate, widget.companyName);
+                                filteredInvoicesFuture = originalInvoicesFuture;
+                              });
+                            },
+                          ),
+                          const Divider(
+                            height: 32,
+                            color: Colors.white,
+                            thickness: 1,
+                          ),
+                          AmountRangeSlider(
+                            minAmount: minAmount,
+                            maxAmount: maxAmount,
+                            onAmountRangeChanged:
+                                (final double minAmount, final double maxAmount) {
+                              setState(() {
+                                filteredInvoicesFuture = originalInvoicesFuture
+                                    .then((final List<InvoiceData> invoices) =>
+                                    invoices.where((final invoice) {
+                                      return (invoice.totalAmount >=
+                                          minAmount &&
+                                          invoice.totalAmount <= maxAmount);
+                                    }).toList());
+                              });
+                            },
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                  headerBuilder:
+                      (final BuildContext context, final bool isExpanded) {
+                    return Center(child: Text(value ? 'Filtreleri Gizle' : 'Filtreleri Göster', style: Theme.of(context).textTheme.bodyLarge));
+                  },
+                ),
+              ]);}
+    );
+  }
+
   Widget futureInvoiceList(final AsyncSnapshot<List<InvoiceData>> invoice) {
     if (invoice.connectionState == ConnectionState.done && invoice.hasData) {
       final List<InvoiceData> invoiceList = invoice.data!;
 
       Future(() {
-        ref.read(invoicelistLengthProvider.notifier).updateLength(invoiceList.length);
+        ref
+            .read(invoicelistLengthProvider.notifier)
+            .updateLength(invoiceList.length);
       });
 
       if (invoiceList.isEmpty) {
@@ -106,10 +154,13 @@ class _InvoiceListState extends ConsumerState<InvoiceList>
             builder: (final BuildContext context, final Box<dynamic> value,
                 final Widget? child) {
               final newInvoiceData = value.get(invoiceData.id);
-              if (newInvoiceData == null || !invoiceDataService.isSameInvoice(invoiceData, newInvoiceData)) {
+              if (newInvoiceData == null ||
+                  !invoiceDataService.isSameInvoice(
+                      invoiceData, newInvoiceData)) {
                 WidgetsBinding.instance.addPostFrameCallback((final _) {
                   setState(() {
-                    originalInvoicesFuture = retrieveInvoicesAccordingDate(startDate, endDate, widget.companyName);
+                    originalInvoicesFuture = retrieveInvoicesAccordingDate(
+                        startDate, endDate, widget.companyName);
                     filteredInvoicesFuture = originalInvoicesFuture;
                   });
                 });

@@ -24,8 +24,8 @@ class CompanyPage extends ConsumerStatefulWidget {
   ConsumerState<CompanyPage> createState() => _CompanyPageState();
 }
 
-class _CompanyPageState extends ConsumerState<CompanyPage> with _CompanyPageMixin{
-
+class _CompanyPageState extends ConsumerState<CompanyPage>
+    with _CompanyPageMixin {
   @override
   Widget build(final BuildContext context) {
     final selectionState = ref.watch(companySelectionProvider);
@@ -66,7 +66,9 @@ class _CompanyPageState extends ConsumerState<CompanyPage> with _CompanyPageMixi
             Theme(
               data: Theme.of(context).copyWith(
                 listTileTheme: const ListTileThemeData(
-                  shape: Border(right: BorderSide(color: Colors.transparent, width: 0), bottom: BorderSide(color: Colors.white, width: 1.5)),
+                  shape: Border(
+                      right: BorderSide(color: Colors.transparent, width: 0),
+                      bottom: BorderSide(color: Colors.white, width: 1.5)),
                   tileColor: Colors.transparent,
                 ),
                 dividerColor: Colors.transparent,
@@ -77,32 +79,40 @@ class _CompanyPageState extends ConsumerState<CompanyPage> with _CompanyPageMixi
               ),
               child: const ExpansionTile(
                 initiallyExpanded: true,
-                title: Text(
-                    "AI Insights",
+                title: Text("AI Insights",
                     textAlign: TextAlign.left,
-                    style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
+                    style:
+                        TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
                 children: [
                   SizedBox(
                     height: 128,
                     child: CarouselView(
-                      padding: EdgeInsets.only(top: 8, bottom: 20, right: 8, left: 8),
-                    itemSnapping: true,
-                    itemExtent: 328,
-                    shrinkExtent: 128,
-                    children: [
-                      InvoixAICard(children: <Widget>[
-                        Text("I'm InvoiX, your AI assistant.\n"
-                            "Just click on the invoice add icon to get started."),
-                      ],),
-                      InvoixAICard(children: <Widget>[
-                        Text(
-                            "You can also select multiple invoices to delete or excel output them."),
-                      ],),
-                      InvoixAICard(children: <Widget>[
-                        Text("AI Insights are available for subscribers only very soon. Work in progress."),
-                      ],),
-                    ],
-                                        ),
+                      padding: EdgeInsets.only(
+                          top: 8, bottom: 20, right: 8, left: 8),
+                      itemSnapping: true,
+                      itemExtent: 328,
+                      shrinkExtent: 128,
+                      children: [
+                        InvoixAICard(
+                          children: <Widget>[
+                            Text("I'm InvoiX, your AI assistant.\n"
+                                "Just click on the invoice add icon to get started."),
+                          ],
+                        ),
+                        InvoixAICard(
+                          children: <Widget>[
+                            Text(
+                                "You can also select multiple invoices to delete or excel output them."),
+                          ],
+                        ),
+                        InvoixAICard(
+                          children: <Widget>[
+                            Text(
+                                "AI Insights are available for subscribers only very soon. Work in progress."),
+                          ],
+                        ),
+                      ],
+                    ),
                   )
                 ],
               ),
