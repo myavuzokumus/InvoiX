@@ -92,14 +92,14 @@ class _CompanyPageState extends ConsumerState<CompanyPage> with _CompanyPageMixi
                     children: [
                       InvoixAICard(children: <Widget>[
                         Text("I'm InvoiX, your AI assistant.\n"
-                            "Just click on the camera icon to get started."),
+                            "Just click on the invoice add icon to get started."),
                       ],),
                       InvoixAICard(children: <Widget>[
                         Text(
                             "You can also select multiple invoices to delete or excel output them."),
                       ],),
                       InvoixAICard(children: <Widget>[
-                        Text("AI Insights are available for Subscribers only very soon. Work in progress."),
+                        Text("AI Insights are available for subscribers only very soon. Work in progress."),
                       ],),
                     ],
                                         ),
