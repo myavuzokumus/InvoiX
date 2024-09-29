@@ -76,7 +76,7 @@ class _DeletionDialogState extends ConsumerState<DeletionDialog> {
                       if ((await InvoiceDataService().getCompanyList())
                           .isEmpty) {
                         ref
-                            .read(companyProvider.notifier)
+                            .read(companySelectionProvider.notifier)
                             .toggleSelectionMode();
                       }
                     case ListType.invoice:

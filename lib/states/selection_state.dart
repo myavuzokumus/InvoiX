@@ -93,9 +93,10 @@ class SelectionNotifier extends StateNotifier<SelectionState> {
   }
 }
 
-final companyProvider =
+final companySelectionProvider =
 StateNotifierProvider.autoDispose<SelectionNotifier, SelectionState>(
-        (ref) => SelectionNotifier(ref));
-final invoiceProvider =
+        (final ref) => SelectionNotifier(ref));
+
+final invoiceSelectionProvider =
 StateNotifierProvider.autoDispose<SelectionNotifier, SelectionState>(
-        (ref) => SelectionNotifier(ref));
+        (final ref) => SelectionNotifier(ref));

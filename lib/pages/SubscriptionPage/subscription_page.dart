@@ -5,7 +5,7 @@ import 'package:invoix/pages/SubscriptionPage/new_user_offer.dart';
 import 'package:invoix/pages/SubscriptionPage/subscription_tab.dart';
 import 'package:invoix/services/in_app_purchase_service.dart';
 import 'package:invoix/states/app_purchase_state.dart';
-import 'package:invoix/widgets/loading_animation.dart';
+import 'package:invoix/widgets/status/loading_animation.dart';
 
 class SubscriptionPage extends ConsumerStatefulWidget {
   const SubscriptionPage({super.key});

@@ -8,7 +8,7 @@ import 'package:invoix/pages/SummaryPage/indicator.dart';
 import 'package:invoix/services/invoice_data_service.dart';
 import 'package:invoix/states/invoice_data_state.dart';
 import 'package:invoix/widgets/date_range_picker.dart';
-import 'package:invoix/widgets/loading_animation.dart';
+import 'package:invoix/widgets/status/loading_animation.dart';
 
 part 'summary_main_mixin.dart';
 
