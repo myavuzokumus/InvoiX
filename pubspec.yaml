@@ -34,19 +34,21 @@ dependencies:
     sdk: flutter
 
   intl: ^0.19.0
-  #Mapping
-  #flutter_localization: ^0.2.1
+  shared_preferences: ^2.3.2
   uuid: ^4.5.0
-  hive: ^2.2.3
-  hive_flutter: ^1.1.0
-
   permission_handler: ^11.3.1
   string_similarity: ^2.1.1
   cross_file: ^0.3.4+2
   image: ^4.2.0
   downloadsfolder: ^1.1.0
-  flutter_riverpod: ^2.5.1
   opencv_dart: ^1.2.4
+
+  #State Management
+  flutter_riverpod: ^2.5.1
+
+  #Database
+  hive: ^2.2.3
+  hive_flutter: ^1.1.0
 
   #ML
   google_mlkit_document_scanner: ^0.2.1
@@ -71,7 +73,7 @@ dependencies:
   #No longer use
   #google_generative_ai: ^0.4.3
   #flutter_dotenv: ^5.1.0
-  #shared_preferences: ^2.2.2
+
 
 dev_dependencies:
   flutter_test:
@@ -118,6 +120,7 @@ flutter:
   assets:
     - assets/loading/InvoiceReadLoading.gif
     - assets/icons/categories/
+    - assets/icons/welcome/
     - assets/icons/
 
   # An image asset can refer to one or more resolution-specific "variants", see

@@ -4,10 +4,12 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:invoix/pages/SubscriptionPage/new_user_offer.dart';
 import 'package:invoix/pages/SubscriptionPage/subscription_page.dart';
+import 'package:invoix/pages/settings_page.dart';
 import 'package:invoix/services/firebase_service.dart';
 import 'package:invoix/states/firebase_state.dart';
 import 'package:invoix/utils/status/current_status_checker.dart';
 import 'package:invoix/widgets/glowing_container.dart';
+import 'package:invoix/widgets/settings_button.dart';
 import 'package:invoix/widgets/status/loading_animation.dart';
 import 'package:invoix/widgets/status/show_current_status.dart';
 import 'package:invoix/widgets/toast.dart';
@@ -81,7 +83,7 @@ class ProfileDropdown extends ConsumerWidget {
                       horizontal: 16.0, vertical: 8.0),
                   child: Column(
                     children: [
-                      _buildElevatedButton(
+                      SettingsButton(
                         icon: Icons.shopping_cart,
                         label: localizations.plans,
                         onPressed: () {
@@ -93,9 +95,21 @@ class ProfileDropdown extends ConsumerWidget {
                           );
                         },
                       ),
+                      const SizedBox(height: 8),
+                      SettingsButton(
+                          icon: Icons.settings,
+                          label: "Settings",
+                          onPressed: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (final context) =>
+                                      const SettingsPage()),
+                            );
+                          }),
                       if (user != null) const SizedBox(height: 8),
                       if (user != null)
-                        _buildElevatedButton(
+                        SettingsButton(
                           icon: Icons.exit_to_app,
                           label: localizations.logOut,
                           onPressed: () async {
@@ -111,19 +125,20 @@ class ProfileDropdown extends ConsumerWidget {
         );
       },
       loading: () => const LoadingAnimation(),
-      error: (final error, final stack) => LayoutBuilder(
-        builder: (final BuildContext context,
-            final BoxConstraints constraints) { return FutureBuilder<Status>(
+      error: (final error, final stack) => LayoutBuilder(builder:
+          (final BuildContext context, final BoxConstraints constraints) {
+        return FutureBuilder<Status>(
           future: currentStatusChecker("aiInvoiceAnalyses"),
           builder: (final context, final statusSnapshot) {
             if (statusSnapshot.connectionState == ConnectionState.done) {
-              return ShowCurrentStatus(status: statusSnapshot.data!, customHeight:
-              constraints.maxHeight - 72);
+              return ShowCurrentStatus(
+                  status: statusSnapshot.data!,
+                  customHeight: constraints.maxHeight - 72);
             }
             return const LoadingAnimation();
           },
-        );}
-      ),
+        );
+      }),
     );
   }
 
@@ -143,7 +158,8 @@ class ProfileDropdown extends ConsumerWidget {
     try {
       await firebaseService.signInWithGoogle();
     } catch (e) {
-      Toast(context, text: AppLocalizations.of(context)!.loginError(e.toString()));
+      Toast(context,
+          text: AppLocalizations.of(context)!.loginError(e.toString()));
     }
   }
 
@@ -200,28 +216,5 @@ class ProfileDropdown extends ConsumerWidget {
     return date.toString();
   }
 
-  Widget _buildElevatedButton({
-    required final IconData icon,
-    required final String label,
-    required final VoidCallback onPressed,
-  }) {
-    return ElevatedButton(
-      style: ElevatedButton.styleFrom(
-        foregroundColor: Colors.white,
-        backgroundColor: Colors.grey[800],
-        minimumSize: const Size(double.infinity, 50),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(24),
-        ),
-      ),
-      onPressed: onPressed,
-      child: Row(
-        children: [
-          Icon(icon),
-          const SizedBox(width: 8),
-          Text(label, style: const TextStyle(fontSize: 18)),
-        ],
-      ),
-    );
-  }
+
 }
