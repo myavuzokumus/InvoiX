@@ -87,7 +87,7 @@ class InvoiceCard extends ConsumerWidget {
                       child: ClipRRect(
                         borderRadius: BorderRadius.circular(16),
                         child: Image(image: InvoiceCategory.parse(invoiceData.category)!.icon,
-                          width: selectionMode != null ? 92 : 76,
+                          width: selectionMode != null ? 88 : 76,
                           fit: BoxFit.cover,
                           frameBuilder: (final BuildContext context, final Widget child, final int? frame, final bool wasSynchronouslyLoaded) {
                             if (wasSynchronouslyLoaded) {
