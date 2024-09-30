@@ -5,12 +5,14 @@ mixin _SummaryMainMixin on ConsumerState<SummaryMain> {
   final ValueNotifier<double> touchedPercentageNotifier = ValueNotifier<double>(-1);
 
   late DateTimeRange initialDateTime;
-  late List<InvoiceData> top5Invoices;
+  late List<InvoiceData> selectedInvoices;
+  late List<InvoiceData> selected5Invoices;
   late Future<Map<InvoiceCategory, double>> topCategoriesFuture;
   late DateTime startDate;
   late DateTime endDate;
 
   late final InvoiceDataService invoiceDataService;
+  Set<SortType> _selection = {SortType.amount};
 
   @override
   void initState() {
@@ -49,13 +51,23 @@ mixin _SummaryMainMixin on ConsumerState<SummaryMain> {
       }
     }
 
-    final List<InvoiceData> sortedInvoices = invoices
-      ..sort((final a, final b) => b.totalAmount.compareTo(a.totalAmount));
+    selectedInvoices = invoices;
 
-    top5Invoices = sortedInvoices.take(5).toList();
+    final List<InvoiceData> sortedInvoices;
+    switch (_selection.first) {
+      case SortType.amount:
+        sortedInvoices = selectedInvoices..sort((final a, final b) => b.totalAmount.compareTo(a.totalAmount));
+        break;
+      case SortType.date:
+        sortedInvoices = selectedInvoices..sort((final a, final b) => b.date.compareTo(a.date));
+        break;
+    }
+
+    selected5Invoices = sortedInvoices.take(5).toList();
 
     return categoryTotals;
   }
+
 
   List<Widget> getIndicators(final Map<InvoiceCategory, double> categoryTotals) {
 
@@ -84,3 +96,5 @@ mixin _SummaryMainMixin on ConsumerState<SummaryMain> {
   }
 
 }
+
+enum SortType { amount, date }

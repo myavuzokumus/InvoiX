@@ -31,7 +31,7 @@ class _InvoiceListState extends ConsumerState<InvoiceList>
 
     return Column(
       children: [
-
+        filterPanel(),
         const SizedBox(
           height: 10,
         ),
