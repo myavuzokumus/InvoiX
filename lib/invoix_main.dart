@@ -14,7 +14,7 @@ class InvoixMain extends StatefulWidget {
 }
 
 class _InvoixMainState extends State<InvoixMain> {
-  bool _showWelcomePage = true;
+  bool _showWelcomePage = false;
 
   @override
   void initState() {
