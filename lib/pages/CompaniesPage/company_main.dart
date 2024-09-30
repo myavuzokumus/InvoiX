@@ -14,6 +14,7 @@ import 'package:invoix/utils/document_scanner.dart';
 import 'package:invoix/utils/read_mode.dart';
 import 'package:invoix/widgets/status/loading_animation.dart';
 import 'package:invoix/widgets/toast.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 part 'company_main_mixin.dart';
 
@@ -26,13 +27,14 @@ class CompanyPage extends ConsumerStatefulWidget {
 
 class _CompanyPageState extends ConsumerState<CompanyPage>
     with _CompanyPageMixin {
+
   @override
   Widget build(final BuildContext context) {
     final selectionState = ref.watch(companySelectionProvider);
 
     return PopScope(
       canPop: !selectionState.isSelectionMode,
-      onPopInvoked: (final bool bool) {
+      onPopInvokedWithResult: (final bool bool, final dynamic result) {
         if (selectionState.isSelectionMode) {
           ref.read(companySelectionProvider.notifier).toggleSelectionMode();
         }
@@ -67,8 +69,7 @@ class _CompanyPageState extends ConsumerState<CompanyPage>
               data: Theme.of(context).copyWith(
                 listTileTheme: const ListTileThemeData(
                   shape: Border(
-                      right: BorderSide(color: Colors.transparent, width: 0),
-                      bottom: BorderSide(color: Colors.white, width: 1.5)),
+                      bottom: BorderSide(color: Colors.white, width: 2.5)),
                   tileColor: Colors.transparent,
                 ),
                 dividerColor: Colors.transparent,
@@ -77,13 +78,20 @@ class _CompanyPageState extends ConsumerState<CompanyPage>
                   collapsedBackgroundColor: Colors.transparent,
                 ),
               ),
-              child: const ExpansionTile(
-                initiallyExpanded: true,
-                title: Text("AI Insights",
+              child: ExpansionTile(
+                expansionAnimationStyle: AnimationStyle(
+                  curve: Curves.easeInOut,
+                  duration: const Duration(milliseconds: 600),
+                ),
+                controller: expansionTileController,
+                onExpansionChanged: (final bool isExpanded) {
+                  prefs.setBool('isAITurnOff', isExpanded);
+                },
+                title: const Text("AI Insights",
                     textAlign: TextAlign.left,
                     style:
                         TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
-                children: [
+                children: const [
                   SizedBox(
                     height: 128,
                     child: CarouselView(

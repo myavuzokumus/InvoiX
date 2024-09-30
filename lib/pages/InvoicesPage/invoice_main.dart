@@ -18,7 +18,7 @@ class InvoicePage extends ConsumerWidget {
 
     return PopScope(
       canPop: !selectionState.isSelectionMode,
-      onPopInvoked: (final bool bool) {
+      onPopInvokedWithResult: (final bool bool, final dynamic result) {
         if (selectionState.isSelectionMode) {
           ref.read(invoiceSelectionProvider.notifier).toggleSelectionMode();
         }

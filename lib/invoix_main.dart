@@ -1,20 +1,22 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:invoix/pages/main_page.dart';
 import 'package:invoix/pages/welcome_page.dart';
 import 'package:invoix/theme.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-class InvoixMain extends StatefulWidget {
+class InvoixMain extends ConsumerStatefulWidget {
   const InvoixMain({super.key});
 
   @override
-  State<InvoixMain> createState() => _InvoixMainState();
+  ConsumerState<InvoixMain> createState() => _InvoixMainState();
 }
 
-class _InvoixMainState extends State<InvoixMain> {
+class _InvoixMainState extends ConsumerState<InvoixMain> {
   bool _showWelcomePage = false;
+  late final SharedPreferences prefs;
 
   @override
   void initState() {
@@ -23,7 +25,7 @@ class _InvoixMainState extends State<InvoixMain> {
   }
 
   Future<void> _checkFirstSeen() async {
-    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    prefs = await SharedPreferences.getInstance();
     final bool seen = (prefs.getBool('seen') ?? false);
 
     setState(() {
@@ -31,9 +33,10 @@ class _InvoixMainState extends State<InvoixMain> {
     });
   }
 
-  void _onWelcomePageDone() {
+  Future<void> _onWelcomePageDone() async {
     setState(() {
       _showWelcomePage = false;
+      prefs.setBool('seen', false);
     });
   }
 

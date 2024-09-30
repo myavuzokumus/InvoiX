@@ -3,12 +3,29 @@ part of 'company_main.dart';
 mixin _CompanyPageMixin on ConsumerState<CompanyPage> {
   final ValueNotifier<bool> _isLoadingNotifier = ValueNotifier(false);
 
+  late final ExpansionTileController expansionTileController;
+  late final SharedPreferences prefs;
+
   late ReadMode readMode;
 
   @override
   void initState() {
     readMode = ReadMode.ai;
+    expansionTileController = ExpansionTileController();
+    _checkFirstSeen();
     super.initState();
+  }
+
+  Future<void> _checkFirstSeen() async {
+    prefs = await SharedPreferences.getInstance();
+    final bool isTurnOff = (prefs.getBool('isAITurnOff') ?? true);
+
+    if (isTurnOff) {
+      expansionTileController.expand();
+    } else {
+      expansionTileController.collapse();
+    }
+
   }
 
   Future<void> nextPage() async {
