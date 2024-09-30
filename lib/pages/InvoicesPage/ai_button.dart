@@ -36,20 +36,22 @@ class AIButton extends ConsumerWidget {
 
         if (remainingTime == 0 || invoice.contentCache.isNotEmpty) {
           if (invoice.contentCache.isEmpty) {
-            await cooldown(remainingTime, invoice.imagePath, invoiceDataService);
+            await cooldown(
+                remainingTime, invoice.imagePath, invoiceDataService);
           }
 
           _future = invoice.contentCache.isEmpty
               ? describeImageWithAI(
-              imgFile: File(invoice.imagePath), type: ProcessType.describe)
+                  imgFile: File(invoice.imagePath), type: ProcessType.describe)
               : Future.value(jsonEncode(invoice.contentCache));
 
           await showModalBottomSheet<void>(
             showDragHandle: true,
             context: context,
             builder: (final BuildContext context) {
-              return StatefulBuilder(
-                builder: (final BuildContext context, final void Function(void Function()) setModalState) { return SizedBox(
+              return StatefulBuilder(builder: (final BuildContext context,
+                  final void Function(void Function()) setModalState) {
+                return SizedBox(
                   height: 425,
                   width: double.infinity,
                   child: Padding(
@@ -78,25 +80,29 @@ class AIButton extends ConsumerWidget {
                                                 constraints.maxHeight - 72),
                                       ],
                                     );
-                                  } else if (snapshot.hasData && snapshot.connectionState ==
-                                      ConnectionState.done) {
+                                  } else if (snapshot.hasData &&
+                                      snapshot.connectionState ==
+                                          ConnectionState.done) {
                                     final Map<String, dynamic> decodedData =
                                         jsonDecode(snapshot.data!);
 
-                                      invoice.contentCache = decodedData;
-                                      invoiceDataService.saveInvoiceData(invoice);
-
+                                    invoice.contentCache = decodedData;
+                                    invoiceDataService.saveInvoiceData(invoice);
 
                                     final InvoiceAnalysis invoiceAnalysis =
                                         InvoiceAnalysis.fromJson(decodedData);
 
-                                    return describedWidget(context, invoiceAnalysis, invoiceDataService, setModalState);
+                                    return describedWidget(
+                                        context,
+                                        invoiceAnalysis,
+                                        invoiceDataService,
+                                        setModalState);
                                   } else if (snapshot.hasError) {
                                     return FutureBuilder<Status>(
                                       future: currentStatusChecker(
                                           "aiInvoiceAnalyses"),
-                                      builder:
-                                          (final context, final statusSnapshot) {
+                                      builder: (final context,
+                                          final statusSnapshot) {
                                         if (statusSnapshot.connectionState ==
                                             ConnectionState.done) {
                                           return ShowCurrentStatus(
@@ -123,8 +129,8 @@ class AIButton extends ConsumerWidget {
                       },
                     ),
                   ),
-                );}
-              );
+                );
+              });
             },
           );
         } else {
@@ -139,7 +145,11 @@ class AIButton extends ConsumerWidget {
   }
 
   //This is ridiculous, I know, but I did it this way to improve the application.
-  Widget describedWidget(final context, final InvoiceAnalysis invoiceAnalysis, final invoiceDataService, final void Function(void Function() p1) setModalState) {
+  Widget describedWidget(
+      final context,
+      final InvoiceAnalysis invoiceAnalysis,
+      final invoiceDataService,
+      final void Function(void Function() p1) setModalState) {
     return ListView(
       children: [
         Row(
@@ -151,15 +161,14 @@ class AIButton extends ConsumerWidget {
             const WarnIcon(
                 message:
                     "The information provided may sometimes be incorrect.\nPlease take this into consideration and pay attention to the recommendations."),
-            IconButton(onPressed: () {
-
-              setModalState(() {
-                  _future = describeImageWithAI(
-                      imgFile: File(invoice.imagePath), type: ProcessType.describe);
-                });
-
-
-            },
+            IconButton(
+                onPressed: () {
+                  setModalState(() {
+                    _future = describeImageWithAI(
+                        imgFile: File(invoice.imagePath),
+                        type: ProcessType.describe);
+                  });
+                },
                 icon: const Icon(Icons.refresh_outlined)),
           ],
         ),
