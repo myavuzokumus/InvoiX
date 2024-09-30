@@ -46,91 +46,157 @@ class AIButton extends ConsumerWidget {
               : Future.value(jsonEncode(invoice.contentCache));
 
           await showModalBottomSheet<void>(
-            showDragHandle: true,
             context: context,
+            isScrollControlled: true,
+            useSafeArea: true,
+            enableDrag: false,
             builder: (final BuildContext context) {
-              return StatefulBuilder(builder: (final BuildContext context,
-                  final void Function(void Function()) setModalState) {
-                return SizedBox(
-                  height: 425,
-                  width: double.infinity,
-                  child: Padding(
-                    padding:
-                        const EdgeInsets.only(left: 24, bottom: 24, right: 24),
-                    child: LayoutBuilder(
+              return DraggableScrollableSheet(
+                  initialChildSize: 0.6,
+                  minChildSize: 0.55,
+                  maxChildSize: 0.9,
+                  expand: false,
+                  shouldCloseOnMinExtent: false,
+                  builder: (final context, final scrollController) {
+                    return LayoutBuilder(
                       builder: (final BuildContext context,
                           final BoxConstraints constraints) {
-                        return Card(
-                            color: const Color(0xff442a22),
-                            elevation: 16,
-                            child: Padding(
-                              padding: const EdgeInsets.all(12.0),
-                              child: FutureBuilder(
-                                future: _future,
-                                builder: (final BuildContext context,
-                                    final AsyncSnapshot<String> snapshot) {
-                                  if (snapshot.connectionState !=
-                                      ConnectionState.done) {
-                                    return Column(
-                                      children: [
-                                        LoadingAnimation(
-                                            message:
-                                                "The invoice is being analyzed...",
-                                            customHeight:
-                                                constraints.maxHeight - 72),
-                                      ],
+                        return Container(
+                            decoration: const BoxDecoration(
+                              borderRadius: BorderRadius.vertical(
+                                  top: Radius.circular(20)),
+                            ),
+                            child: SingleChildScrollView(
+                              controller: scrollController,
+                              child: Column(
+                                children: [
+                                  Container(
+                                    width: 40,
+                                    height: 5,
+                                    margin: const EdgeInsets.symmetric(
+                                        vertical: 16),
+                                    decoration: BoxDecoration(
+                                      color: Theme.of(context)
+                                          .buttonTheme
+                                          .colorScheme!
+                                          .secondary,
+                                      borderRadius: BorderRadius.circular(2.5),
+                                    ),
+                                  ),
+                                  StatefulBuilder(builder:
+                                      (final BuildContext context,
+                                          final void Function(void Function())
+                                              setModalState) {
+                                    return SizedBox(
+                                      height: constraints.maxHeight - 38,
+                                      width: double.infinity,
+                                      child: Padding(
+                                        padding: const EdgeInsets.only(
+                                            left: 24, bottom: 24, right: 24),
+                                        child: Card(
+                                            color: const Color(0xff442a22),
+                                            elevation: 16,
+                                            child: Padding(
+                                              padding: const EdgeInsets.all(
+                                                  12.0),
+                                              child: FutureBuilder(
+                                                future: _future,
+                                                builder: (final BuildContext
+                                                        context,
+                                                    final AsyncSnapshot<
+                                                            String>
+                                                        snapshot) {
+                                                  if (snapshot
+                                                          .connectionState !=
+                                                      ConnectionState
+                                                          .done) {
+                                                    return Column(
+                                                      children: [
+                                                        LoadingAnimation(
+                                                            message:
+                                                                "The invoice is being analyzed...",
+                                                            customHeight:
+                                                                constraints
+                                                                        .maxHeight -
+                                                                    110),
+                                                      ],
+                                                    );
+                                                  } else if (snapshot
+                                                          .hasData &&
+                                                      snapshot.connectionState ==
+                                                          ConnectionState
+                                                              .done) {
+                                                    final Map<String,
+                                                            dynamic>
+                                                        decodedData =
+                                                        jsonDecode(
+                                                            snapshot.data!);
+
+                                                    invoice.contentCache =
+                                                        decodedData;
+                                                    invoiceDataService
+                                                        .saveInvoiceData(
+                                                            invoice);
+
+                                                    final InvoiceAnalysis
+                                                        invoiceAnalysis =
+                                                        InvoiceAnalysis
+                                                            .fromJson(
+                                                                decodedData);
+
+                                                    return describedWidget(
+                                                        context,
+                                                        invoiceAnalysis,
+                                                        invoiceDataService,
+                                                        setModalState);
+                                                  } else if (snapshot
+                                                      .hasError) {
+                                                    return FutureBuilder<
+                                                        Status>(
+                                                      future: currentStatusChecker(
+                                                          "aiInvoiceAnalyses"),
+                                                      builder: (final context,
+                                                          final statusSnapshot) {
+                                                        if (statusSnapshot
+                                                                .connectionState ==
+                                                            ConnectionState
+                                                                .done) {
+                                                          return ShowCurrentStatus(
+                                                              status:
+                                                                  statusSnapshot
+                                                                      .data!,
+                                                              customHeight:
+                                                                  constraints
+                                                                          .maxHeight -
+                                                                      72);
+                                                        }
+                                                        return const LoadingAnimation();
+                                                      },
+                                                    );
+                                                  }
+                                                  return Column(
+                                                    children: [
+                                                      LoadingAnimation(
+                                                          message:
+                                                              "The invoice is being analyzed...",
+                                                          customHeight:
+                                                              constraints
+                                                                      .maxHeight -
+                                                                  72),
+                                                    ],
+                                                  );
+                                                },
+                                              ),
+                                            )),
+                                      ),
                                     );
-                                  } else if (snapshot.hasData &&
-                                      snapshot.connectionState ==
-                                          ConnectionState.done) {
-                                    final Map<String, dynamic> decodedData =
-                                        jsonDecode(snapshot.data!);
-
-                                    invoice.contentCache = decodedData;
-                                    invoiceDataService.saveInvoiceData(invoice);
-
-                                    final InvoiceAnalysis invoiceAnalysis =
-                                        InvoiceAnalysis.fromJson(decodedData);
-
-                                    return describedWidget(
-                                        context,
-                                        invoiceAnalysis,
-                                        invoiceDataService,
-                                        setModalState);
-                                  } else if (snapshot.hasError) {
-                                    return FutureBuilder<Status>(
-                                      future: currentStatusChecker(
-                                          "aiInvoiceAnalyses"),
-                                      builder: (final context,
-                                          final statusSnapshot) {
-                                        if (statusSnapshot.connectionState ==
-                                            ConnectionState.done) {
-                                          return ShowCurrentStatus(
-                                              status: statusSnapshot.data!,
-                                              customHeight:
-                                                  constraints.maxHeight - 72);
-                                        }
-                                        return const LoadingAnimation();
-                                      },
-                                    );
-                                  }
-                                  return Column(
-                                    children: [
-                                      LoadingAnimation(
-                                          message:
-                                              "The invoice is being analyzed...",
-                                          customHeight:
-                                              constraints.maxHeight - 72),
-                                    ],
-                                  );
-                                },
+                                  }),
+                                ],
                               ),
                             ));
                       },
-                    ),
-                  ),
-                );
-              });
+                    );
+                  });
             },
           );
         } else {
