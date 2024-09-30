@@ -72,10 +72,14 @@ class _InvoixMainState extends State<InvoixMain> {
               errorStyle: const TextStyle(fontSize: 0),
             ),
             listTileTheme: ListTileThemeData(
-              shape: const Border(
-                  right: BorderSide(color: Colors.white, width: 2.5)),
+              shape: const RoundedRectangleBorder(
+                borderRadius: BorderRadius.only(
+                  topLeft: Radius.circular(15),
+                  bottomLeft: Radius.circular(15),
+                ),
+              ),
               tileColor: Colors.grey[850],
-              titleTextStyle: const TextStyle(fontSize: 20),
+              titleTextStyle: const TextStyle(fontSize: 18),
             ),
             expansionTileTheme: const ExpansionTileThemeData(
               shape: Border.symmetric(

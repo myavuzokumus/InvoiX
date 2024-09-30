@@ -122,8 +122,12 @@ class _CompanyListState extends ConsumerState<CompanyList> with _CompanyListMixi
                                           }));
                                       return false; // Make it visible after swipe process
                                     },
-                                    child: Card(
-                                      color: Colors.grey[850],
+                                    child: Container(
+                                      decoration: const BoxDecoration(
+                                        border: Border(
+                                          right: BorderSide(color: Colors.white, width: 2.5),
+                                        ),
+                                      ),
                                       child: ListTile(
                                         leading: const Icon(Icons.business, color: Colors.redAccent),
                                         title: Text(
@@ -160,7 +164,7 @@ class _CompanyListState extends ConsumerState<CompanyList> with _CompanyListMixi
                                                       child: child,
                                                     );
                                                   },
-                                      
+
                                                 ));
                                           }
                                         },
