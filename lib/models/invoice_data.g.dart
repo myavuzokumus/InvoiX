@@ -24,8 +24,11 @@ class InvoiceDataAdapter extends TypeAdapter<InvoiceData> {
       totalAmount: fields[5] as double,
       taxAmount: fields[6] == null ? 0.0 : fields[6] as double,
       category: fields[7] == null ? 'Others' : fields[7] as String,
-      unit: fields[8] == null ? '€' : fields[8] as String,
+      unit: fields[8] == null ? 'EUR' : fields[8] as String,
       companyId: fields[9] == null ? '' : fields[9] as String,
+      contentCache: fields[10] == null
+          ? {}
+          : (fields[10] as Map?)?.cast<String, dynamic>(),
     ).._id = fields[1] as String;
   }
 

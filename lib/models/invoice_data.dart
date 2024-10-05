@@ -27,7 +27,7 @@ class InvoiceData extends HiveObject {
   @HiveField(9, defaultValue: "")
   final String companyId;
   @HiveField(10, defaultValue: {})
-  Map<String, dynamic> contentCache = {};
+  late Map<String, dynamic> contentCache;
 
   String get id => _id;
 
@@ -41,8 +41,10 @@ class InvoiceData extends HiveObject {
       required this.category,
       required this.unit,
       required this.companyId,
+      final Map<String, dynamic>? contentCache,
       final String? id}) {
     id != null ? _id = id : _id = const Uuid().v4();
+    contentCache != null ? this.contentCache = contentCache : this.contentCache = <String, dynamic>{};
   }
 
   InvoiceData.fromJson(final Map<String, dynamic> json)
@@ -55,7 +57,8 @@ class InvoiceData extends HiveObject {
         totalAmount = _parseAmount(json["totalAmount"] ?? "0"),
         taxAmount = _parseAmount(json["taxAmount"] ?? "0"),
         unit = json["unit"] ?? "EUR",
-        companyId = json["companyId"] ?? "";
+        companyId = json["companyId"] ?? "",
+        contentCache = <String, dynamic>{};
 
   static double _parseAmount(String amount) {
     if (amount[amount.length - 3] == ".") {
@@ -89,6 +92,7 @@ class InvoiceData extends HiveObject {
       category: category ?? this.category,
       unit: unit ?? this.unit,
       companyId: companyId ?? this.companyId,
+      contentCache: contentCache ?? this.contentCache,
       id: id ?? _id,
     );
   }
