@@ -20,7 +20,8 @@ class SummaryMain extends ConsumerStatefulWidget {
 }
 
 class _SummaryMainState extends ConsumerState<SummaryMain>
-    with _SummaryMainMixin {
+    with _SummaryMainMixin, AutomaticKeepAliveClientMixin{
+
   @override
   Widget build(final BuildContext context) {
     return Scaffold(
@@ -266,4 +267,8 @@ class _SummaryMainState extends ConsumerState<SummaryMain>
       },
     );
   }
+
+  @override
+  bool get wantKeepAlive => true;
+
 }

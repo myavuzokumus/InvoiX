@@ -26,7 +26,7 @@ class CompanyPage extends ConsumerStatefulWidget {
 }
 
 class _CompanyPageState extends ConsumerState<CompanyPage>
-    with _CompanyPageMixin {
+    with _CompanyPageMixin, AutomaticKeepAliveClientMixin {
 
   @override
   Widget build(final BuildContext context) {
@@ -130,4 +130,8 @@ class _CompanyPageState extends ConsumerState<CompanyPage>
       ),
     );
   }
+
+  @override
+  bool get wantKeepAlive => true;
+
 }
