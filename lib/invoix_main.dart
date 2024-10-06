@@ -4,8 +4,12 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:invoix/pages/main_page.dart';
 import 'package:invoix/pages/welcome_page.dart';
+import 'package:invoix/states/invoice_data_state.dart';
 import 'package:invoix/theme.dart';
+import 'package:invoix/utils/cooldown.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
+part 'invoix_main_mixin.dart';
 
 class InvoixMain extends ConsumerStatefulWidget {
   const InvoixMain({super.key});
@@ -14,31 +18,8 @@ class InvoixMain extends ConsumerStatefulWidget {
   ConsumerState<InvoixMain> createState() => _InvoixMainState();
 }
 
-class _InvoixMainState extends ConsumerState<InvoixMain> {
-  bool _showWelcomePage = false;
-  late final SharedPreferences prefs;
+class _InvoixMainState extends ConsumerState<InvoixMain> with _InvoixMainMixin {
 
-  @override
-  void initState() {
-    super.initState();
-    _checkFirstSeen();
-  }
-
-  Future<void> _checkFirstSeen() async {
-    prefs = await SharedPreferences.getInstance();
-    final bool seen = (prefs.getBool('seen') ?? false);
-
-    setState(() {
-      _showWelcomePage = !seen;
-    });
-  }
-
-  Future<void> _onWelcomePageDone() async {
-    setState(() {
-      _showWelcomePage = false;
-      prefs.setBool('seen', false);
-    });
-  }
 
   @override
   Widget build(final BuildContext context) {
