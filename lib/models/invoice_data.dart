@@ -54,19 +54,37 @@ class InvoiceData extends HiveObject {
         date = dateParser(json["date"] ?? DateTime.now().toString()),
         category = json["category"] ?? "",
         _id = const Uuid().v4(),
-        totalAmount = _parseAmount(json["totalAmount"] ?? "0"),
-        taxAmount = _parseAmount(json["taxAmount"] ?? "0"),
+        totalAmount = _parseAmount(json["totalAmount"].toString()),
+        taxAmount = _parseAmount(json["taxAmount"].toString()),
         unit = json["unit"] ?? "EUR",
         companyId = json["companyId"] ?? "",
         contentCache = <String, dynamic>{};
 
-  static double _parseAmount(String amount) {
-    if (amount[amount.length - 3] == ".") {
-      final List<String> charList = amount.split('');
-      charList[charList.length - 3] = ",";
-      amount = charList.join();
-    }
-    return double.tryParse(amount.replaceAll(".", "").replaceAll(",", ".")) ?? 0;
+  Map<String, dynamic> toJson() {
+    return {
+      "ImagePath": imagePath,
+      "companyName": companyName,
+      "invoiceNo": invoiceNo,
+      "date": date.toString(),
+      "totalAmount": totalAmount,
+      "taxAmount": taxAmount,
+      "category": category,
+      "unit": unit,
+      "companyId": companyId,
+      "contentCache": contentCache,
+      "id": _id,
+    };
+  }
+
+  static double _parseAmount(final String amount) {
+
+    // Ondalık ayraçlarını düzelt
+    final newAmount = amount.replaceAllMapped(
+        RegExp(r'(\d+)([.,])(\d{1,2})$'),
+            (final Match m) => '${m[1]}${m[2] == "." ? "," : "."}${m[3]}'
+    );
+
+    return double.tryParse(newAmount.replaceAll(".", "").replaceAll(",", ".")) ?? 0;
   }
 
   InvoiceData copyWith({
