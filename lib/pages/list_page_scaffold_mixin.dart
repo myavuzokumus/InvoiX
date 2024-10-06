@@ -41,15 +41,6 @@ mixin _ListPageScaffoldMixin on ConsumerState<ListPageScaffold> {
     _deleteProcessingNotifier.value = false;
   }
 
-  // Function to be run in a separate isolate
-  Future<void> exportToExcelInIsolate(final Map<String, dynamic> params) async {
-    await exportToExcel(
-      listType: params['listType'],
-      companyName: params['companyName'],
-      outputList: params['outputList'],
-    );
-  }
-
   // Modified onExcelOutput function
   Future<void> onExcelOutput() async {
     _excelExportingNotifier.value = true;
@@ -69,15 +60,34 @@ mixin _ListPageScaffoldMixin on ConsumerState<ListPageScaffold> {
                   .isNotEmpty) ||
           (widget.type != ListType.invoice &&
               ref.read(widget.selectionProvider).selectedItems.isNotEmpty)) {
-        // Prepare parameters for the isolate
-        final params = {
-          'listType': widget.type,
-          'companyName': widget.companyName,
-          'outputList': ref.read(widget.selectionProvider).selectedItems,
-        };
+
+        final Map<String, List<Map<String, dynamic>>> inputList = Map.from({});
+
+        for (final entry in ref.read(widget.selectionProvider).selectedItems.entries) {
+          final key = entry.key;
+          final value = entry.value;
+          final List<InvoiceData> a;
+          if (value.isEmpty) {
+            a = await ref.read(invoiceDataServiceProvider).getInvoiceList(key);
+          } else {
+            a = value;
+          }
+          inputList[key] = a.map((e) {
+            return e.toJson();
+          }).toList();
+        }
+
+
+        final downloadDirectoryPath =
+            (await download.getDownloadDirectory()).path;
 
         // Run exportToExcel in a separate isolate
-        await compute(exportToExcelInIsolate, params);
+        await compute(exportToExcel, {
+          'listType': widget.type,
+          'companyName': widget.companyName,
+          'inputList': inputList,
+          'path': downloadDirectoryPath,
+        });
 
         Toast(context,
             text:
@@ -92,6 +102,7 @@ mixin _ListPageScaffoldMixin on ConsumerState<ListPageScaffold> {
       }
     } catch (e) {
       Toast(context, text: e.toString(), color: Colors.redAccent);
+      print("Error in onExcelOutput: $e");
     } finally {
       _excelExportingNotifier.value = false;
     }

@@ -1,19 +1,29 @@
 import 'dart:async';
 import 'dart:io';
 
-import 'package:downloadsfolder/downloadsfolder.dart';
-import 'package:flutter/foundation.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter/services.dart';
 import 'package:invoix/models/invoice_data.dart';
 import 'package:invoix/services/invoice_data_service.dart';
-import 'package:invoix/states/invoice_data_state.dart';
-
 import 'package:syncfusion_flutter_xlsio/xlsio.dart';
 
-Future<void> exportToExcel(
-    {required final ListType listType,
-    final String? companyName,
-    required final Map<String, List<InvoiceData>> outputList}) async {
+Future<void> exportToExcel(final Map<String, dynamic> params) async {
+
+  final ListType listType = params['listType'];
+  final String? companyName = params['companyName'];
+
+  final Map<String, List<InvoiceData>> inputList = Map.from({});
+
+  for (final entry in params['inputList'].entries) {
+    final key = entry.key;
+    final value = entry.value;
+    inputList[key] = value.map<InvoiceData>((final e) {
+      return InvoiceData.fromJson(e);
+    }).toList();
+  }
+
+  print(inputList);
+  final String path = params['path'];
+
   // PermissionStatus status = await Permission.manageExternalStorage.status;
   //
   // if (status.isPermanentlyDenied) {
@@ -28,8 +38,6 @@ Future<void> exportToExcel(
   //     throw Exception('Storage permission not granted.');
   //   }
   // }
-
-  final container = ProviderContainer();
 
   // Create a new Excel document.
   final Workbook workbook = Workbook();
@@ -54,7 +62,7 @@ Future<void> exportToExcel(
     ..borders.all.color = '#e7bdb2';
 
   if (listType == ListType.company) {
-    final companies = outputList.keys.toList();
+    final companies = inputList.keys.toList();
 
     for (final String companyName in companies) {
       final Worksheet sheet;
@@ -67,7 +75,7 @@ Future<void> exportToExcel(
         sheet = workbook.worksheets.addWithName(companyName);
       }
 
-      await importInvoiceData(container, sheet, companyName, titleStyle, cellStyle, null);
+      await _importInvoiceData(sheet, titleStyle, cellStyle, inputList[companyName]!);
     }
   } else if (listType == ListType.invoice) {
     if (companyName == null) {
@@ -76,53 +84,39 @@ Future<void> exportToExcel(
 
     final Worksheet sheet = workbook.worksheets[0];
 
-    await importInvoiceData(
-        container, sheet, companyName, titleStyle, cellStyle, outputList[companyName]);
+    await _importInvoiceData(sheet, titleStyle, cellStyle, inputList[companyName]!);
   }
-
   try {
-    final String downloadDirectoryPath = (await getDownloadDirectory()).path;
     // Save the Excel file.
     final List<int> bytes = workbook.saveAsStream();
-    workbook.dispose();
 
-    final String fileName;
-
-    ListType.invoice == listType
-        ? fileName =
-            "InvoiX-$companyName-${DateTime.now()}.xlsx".replaceAll(":", ".")
-        : fileName = "InvoiX-All-${DateTime.now()}.xlsx".replaceAll(":", ".");
+    final String fileName = ListType.invoice == listType
+        ? "InvoiX-$companyName-${DateTime.now()}.xlsx".replaceAll(":", ".")
+        : "InvoiX-All-${DateTime.now()}.xlsx".replaceAll(":", ".");
 
     // Write the Excel file to the documents directory.
-    await File('$downloadDirectoryPath/$fileName').writeAsBytes(bytes);
+    await File('$path/$fileName').writeAsBytes(bytes);
   } catch (e) {
     throw Exception('Failed to retrieve downloads folder path. $e');
   } finally {
     workbook.dispose();
-    container.dispose();
   }
 }
 
-Future<void> importInvoiceData(
-    final ProviderContainer container,
+Future<void> _importInvoiceData(
     final Worksheet sheet,
-    final String companyName,
     final titleStyle,
     final cellStyle,
-    final List<InvoiceData>? invoiceList) async {
-  sheet.getRangeByName('A1:E1').cellStyle = titleStyle;
-
-  final invoiceDataService = container.read(invoiceDataServiceProvider);
-  // Get all invoices for the current company
-  final List<InvoiceData> invoices =
-      invoiceList ?? await invoiceDataService.getInvoiceList(companyName);
+    final List<InvoiceData> invoices) async {
+  sheet.getRangeByName('A1:F1').cellStyle = titleStyle;
 
   // Create Excel headers
   sheet.getRangeByName('A1').setText('Invoice Number');
   sheet.getRangeByName('B1').setText('Date');
   sheet.getRangeByName('C1').setText('Total Amount');
   sheet.getRangeByName('D1').setText('Tax Amount');
-  sheet.getRangeByName('E1').setText('Image');
+  sheet.getRangeByName('E1').setText('Company Id');
+  sheet.getRangeByName('F1').setText('Image');
 
   // Fill the worksheet with invoice data
   for (var i = 0; i < invoices.length; i++) {
@@ -145,10 +139,14 @@ Future<void> importInvoiceData(
       ..setNumber(invoices[i].taxAmount)
       ..cellStyle = cellStyle;
 
-    sheet.pictures.addStream(i + 2, 5, image)
+    sheet.getRangeByName('E${i + 2}')
+      ..setText(invoices[i].companyId)
+      ..cellStyle = cellStyle;
+
+    sheet.pictures.addStream(i + 2, 6, image)
       ..height = 344
       ..width = 216;
-    sheet.getRangeByName('E${i + 2}')
+    sheet.getRangeByName('F${i + 2}')
       ..columnWidth = 32
       ..rowHeight = 256
       ..cellStyle = cellStyle;
@@ -159,5 +157,6 @@ Future<void> importInvoiceData(
     ..autoFitColumn(1)
     ..autoFitColumn(2)
     ..autoFitColumn(3)
-    ..autoFitColumn(4);
+    ..autoFitColumn(4)
+    ..autoFitColumn(5);
 }
