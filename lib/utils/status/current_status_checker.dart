@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:invoix/states/firebase_state.dart';
+import 'package:invoix/states/global_provider.dart';
 import 'package:invoix/utils/status/network_check.dart';
 
 enum Status {
@@ -41,7 +42,7 @@ extension StatusExtension on Status {
 
 Future<Status> currentStatusChecker(final String usageCheckType) async {
 
-  final firebaseService = ProviderContainer().read(firebaseServiceProvider);
+  final firebaseService = GlobalProviderContainer.get().read(firebaseServiceProvider);
 
   if (!await isInternetConnected()) {
     return Status.noInternetConnection;

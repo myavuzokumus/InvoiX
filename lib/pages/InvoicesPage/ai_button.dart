@@ -5,8 +5,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:invoix/models/invoice_analysis.dart';
 import 'package:invoix/models/invoice_data.dart';
+import 'package:invoix/services/firebase_service.dart';
+import 'package:invoix/states/firebase_state.dart';
 import 'package:invoix/states/invoice_data_state.dart';
-import 'package:invoix/utils/ai_mode/describe_image_with_ai.dart';
 import 'package:invoix/utils/cooldown.dart';
 import 'package:invoix/utils/status/current_status_checker.dart';
 import 'package:invoix/widgets/status/loading_animation.dart';
@@ -30,6 +31,7 @@ class AIButton extends ConsumerWidget {
       ),
       onPressed: () async {
         final invoiceDataService = ref.read(invoiceDataServiceProvider);
+        final firebaseService = ref.read(firebaseServiceProvider);
 
         final int remainingTime =
             invoiceDataService.remainingTimeBox.get(invoice.imagePath) ?? 0;
@@ -41,7 +43,7 @@ class AIButton extends ConsumerWidget {
           }
 
           _future = invoice.contentCache.isEmpty
-              ? describeImageWithAI(
+              ? firebaseService.describeImageWithAI(
                   imgFile: File(invoice.imagePath), type: ProcessType.describe)
               : Future.value(jsonEncode(invoice.contentCache));
 
@@ -126,29 +128,54 @@ class AIButton extends ConsumerWidget {
                                                       snapshot.connectionState ==
                                                           ConnectionState
                                                               .done) {
-                                                    final Map<String,
-                                                            dynamic>
-                                                        decodedData =
-                                                        jsonDecode(
-                                                            snapshot.data!);
+                                                    try {
+                                                      final Map<String,
+                                                              dynamic>
+                                                          decodedData =
+                                                          jsonDecode(
+                                                              snapshot.data!);
 
-                                                    invoice.contentCache =
-                                                        decodedData;
-                                                    invoiceDataService
-                                                        .saveInvoiceData(
-                                                            invoice);
+                                                      invoice.contentCache =
+                                                          decodedData;
+                                                      invoiceDataService
+                                                          .saveInvoiceData(
+                                                              invoice);
 
-                                                    final InvoiceAnalysis
-                                                        invoiceAnalysis =
-                                                        InvoiceAnalysis
-                                                            .fromJson(
-                                                                decodedData);
+                                                      final InvoiceAnalysis
+                                                          invoiceAnalysis =
+                                                          InvoiceAnalysis
+                                                              .fromJson(
+                                                                  decodedData);
 
-                                                    return describedWidget(
-                                                        context,
-                                                        invoiceAnalysis,
-                                                        invoiceDataService,
-                                                        setModalState);
+                                                      return describedWidget(
+                                                          context,
+                                                          invoiceAnalysis,
+                                                          firebaseService,
+                                                          setModalState);
+                                                    } on Exception catch (e) {
+                                                      return FutureBuilder<
+                                                          Status>(
+                                                        future: currentStatusChecker(
+                                                            "aiInvoiceAnalyses"),
+                                                        builder: (final context,
+                                                            final statusSnapshot) {
+                                                          if (statusSnapshot
+                                                              .connectionState ==
+                                                              ConnectionState
+                                                                  .done) {
+                                                            return ShowCurrentStatus(
+                                                                status:
+                                                                statusSnapshot
+                                                                    .data!,
+                                                                customHeight:
+                                                                constraints
+                                                                    .maxHeight -
+                                                                    72);
+                                                          }
+                                                          return const LoadingAnimation();
+                                                        },
+                                                      );
+                                                    }
                                                   } else if (snapshot
                                                       .hasError) {
                                                     return FutureBuilder<
@@ -214,7 +241,7 @@ class AIButton extends ConsumerWidget {
   Widget describedWidget(
       final context,
       final InvoiceAnalysis invoiceAnalysis,
-      final invoiceDataService,
+      final firebaseService,
       final void Function(void Function() p1) setModalState) {
     return ListView(
       children: [
@@ -230,7 +257,7 @@ class AIButton extends ConsumerWidget {
             IconButton(
                 onPressed: () {
                   setModalState(() {
-                    _future = describeImageWithAI(
+                    _future = firebaseService.describeImageWithAI(
                         imgFile: File(invoice.imagePath),
                         type: ProcessType.describe);
                   });
