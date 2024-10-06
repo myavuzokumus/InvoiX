@@ -68,14 +68,14 @@ class _CompanyPageState extends ConsumerState<CompanyPage>
             Theme(
               data: Theme.of(context).copyWith(
                 listTileTheme: const ListTileThemeData(
-                  shape: Border(
-                      bottom: BorderSide(color: Colors.white, width: 2.5)),
+                  shape: Border(bottom: BorderSide(color: Colors.white, width: 2)),
                   tileColor: Colors.transparent,
                 ),
                 dividerColor: Colors.transparent,
-                expansionTileTheme: const ExpansionTileThemeData(
-                  backgroundColor: Colors.transparent,
-                  collapsedBackgroundColor: Colors.transparent,
+                expansionTileTheme: ExpansionTileThemeData(
+                  collapsedShape: const Border(bottom: BorderSide(color: Colors.white, width: 1.5)),
+                  backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+                  collapsedBackgroundColor: Theme.of(context).scaffoldBackgroundColor,
                 ),
               ),
               child: ExpansionTile(
