@@ -1,19 +1,20 @@
 import 'package:flutter/material.dart';
 
 void Toast(final BuildContext context,
-    {required final String text, final Color color = Colors.deepOrangeAccent}) {
+    {required final String text, final Color color = Colors.deepOrangeAccent, final Duration duration = const Duration(milliseconds: 10000)}) {
 
-  const duration = Duration(milliseconds: 10000);
+  // its prevent reset animation when page change
+  final GlobalKey<_ToastContentState> _toastKey = GlobalKey<_ToastContentState>();
 
   ScaffoldMessenger.of(context).hideCurrentSnackBar();
   final snackBar = SnackBar(
-    content: ToastContent(text: text, duration: duration),
-    backgroundColor: color,
-    behavior: SnackBarBehavior.floating,
-    margin: const EdgeInsets.all(50),
-    elevation: 30,
-    duration: duration,
-    padding: const EdgeInsets.all(0)
+      content: ToastContent(key: _toastKey, text: text, duration: duration),
+      backgroundColor: color,
+      behavior: SnackBarBehavior.floating,
+      margin: const EdgeInsets.all(50),
+      elevation: 30,
+      duration: duration,
+      padding: const EdgeInsets.all(0)
   );
   ScaffoldMessenger.of(context).showSnackBar(snackBar);
 }
@@ -29,7 +30,7 @@ class ToastContent extends StatefulWidget {
 }
 
 class _ToastContentState extends State<ToastContent> with SingleTickerProviderStateMixin {
-  late AnimationController _controller;
+  late final AnimationController _controller;
 
   @override
   void initState() {
@@ -58,7 +59,7 @@ class _ToastContentState extends State<ToastContent> with SingleTickerProviderSt
           child: Text(widget.text, style: const TextStyle(color: Colors.white)),
         ),
         AnimatedBuilder(animation: _controller,
-        builder: (final BuildContext context, final Widget? child) => LinearProgressIndicator(value: 1.0 - _controller.value)),
+            builder: (final BuildContext context, final Widget? child) => LinearProgressIndicator(value: 1.0 - _controller.value)),
       ],
     );
   }
