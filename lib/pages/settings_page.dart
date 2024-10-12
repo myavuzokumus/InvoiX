@@ -35,8 +35,32 @@ class SettingsPage extends StatelessWidget {
             },
           ),
           // Diğer ayarlar buraya eklenebilir...
+          _buildPolicyAndTerms(),
         ],
       ),
     );
   }
+
+  Widget _buildPolicyAndTerms() {
+    return Padding(
+      padding: const EdgeInsets.all(32.0),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          TextButton(
+            onPressed: () {},
+            child: const Text('Privacy Policy',
+                style: TextStyle(color: Colors.white)),
+          ),
+          TextButton(
+            onPressed: () {},
+            child: const Text('Terms of Service',
+                style: TextStyle(color: Colors.white)),
+          ),
+        ],
+      ),
+    );
+  }
+
 }
