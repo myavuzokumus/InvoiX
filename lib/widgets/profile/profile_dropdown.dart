@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:invoix/l10n/localization_extension.dart';
 import 'package:invoix/pages/SubscriptionPage/new_user_offer.dart';
 import 'package:invoix/pages/SubscriptionPage/subscription_page.dart';
 import 'package:invoix/pages/settings_page.dart';
@@ -185,7 +186,7 @@ class ProfileDropdown extends ConsumerWidget {
       await firebaseService.signInWithGoogle();
     } catch (e) {
       Toast(context,
-          text: AppLocalizations.of(context)!.loginError(e.toString()));
+          text: context.l10n.loginError(await currentStatusChecker("").then((final value) => value.name)));
     }
   }
 

@@ -128,7 +128,7 @@ class FirebaseService {
       return user;
     } catch (e) {
       print('Detailed error in signInWithGoogle: ${e.toString()}');
-      return null;
+      rethrow;
     }
   }
 
