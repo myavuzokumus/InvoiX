@@ -3,11 +3,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:invoix/models/invoice_data.dart';
+import 'package:invoix/pages/CompaniesPage/invox_ai_card.dart';
 import 'package:invoix/pages/InvoicesPage/invoice_card.dart';
 import 'package:invoix/pages/SummaryPage/indicator.dart';
 import 'package:invoix/services/invoice_data_service.dart';
 import 'package:invoix/states/invoice_data_state.dart';
 import 'package:invoix/widgets/date_range_picker.dart';
+import 'package:invoix/widgets/filter_panel.dart';
 import 'package:invoix/widgets/status/loading_animation.dart';
 
 part 'summary_main_mixin.dart';
@@ -20,10 +22,10 @@ class SummaryMain extends ConsumerStatefulWidget {
 }
 
 class _SummaryMainState extends ConsumerState<SummaryMain>
-    with _SummaryMainMixin, AutomaticKeepAliveClientMixin{
-
+    with _SummaryMainMixin, AutomaticKeepAliveClientMixin {
   @override
   Widget build(final BuildContext context) {
+    super.build(context);
     return Scaffold(
       appBar: AppBar(
         title: const Text('Summary'),
@@ -31,24 +33,45 @@ class _SummaryMainState extends ConsumerState<SummaryMain>
       ),
       body: Column(
         children: [
-          Padding(
-            padding: const EdgeInsets.only(left: 32, right: 32, top: 16),
-            child: CustomDateRangePicker(
-              initialTimeRange: initialDateTime,
-              onDateRangeChanged:
-                  (final DateTime startDate, final DateTime endDate) {
-                setState(() {
-                  this.startDate = startDate;
-                  this.endDate = endDate;
-                  initialDateTime = DateTimeRange(
-                    start: startDate,
-                    end: endDate,
+          FilterPanel(
+            children: [
+              CustomDateRangePicker(
+                initialTimeRange: initialDateTime,
+                onDateRangeChanged:
+                    (final DateTime startDate, final DateTime endDate) {
+                  setState(() {
+                    this.startDate = startDate;
+                    this.endDate = endDate;
+                    initialDateTime = DateTimeRange(
+                      start: startDate,
+                      end: endDate,
+                    );
+                    topCategoriesFuture =
+                        calculateTopCategories(startDate, endDate);
+                  });
+                },
+              ),
+              DropdownButtonFormField<PriceUnit>(
+                value: priceUnit,
+                alignment: Alignment.centerRight,
+                menuMaxHeight: 225,
+                hint: const Text("Unit"),
+                iconSize: 0,
+                items: PriceUnit.values.map((final PriceUnit value) {
+                  return DropdownMenuItem<PriceUnit>(
+                    value: value,
+                    child: Text(value.name),
                   );
-                  topCategoriesFuture =
-                      calculateTopCategories(startDate, endDate);
-                });
-              },
-            ),
+                }).toList(),
+                onChanged: (final PriceUnit? value) {
+                  setState(() {
+                    priceUnit = value ?? PriceUnit.Others;
+                    topCategoriesFuture =
+                        calculateTopCategories(startDate, endDate);
+                  });
+                },
+              ),
+            ],
           ),
           Expanded(
             child: ValueListenableBuilder<Box>(
@@ -64,11 +87,12 @@ class _SummaryMainState extends ConsumerState<SummaryMain>
                               snapshot) {
                         if (snapshot.connectionState == ConnectionState.done) {
                           if (snapshot.hasError || snapshot.data!.isEmpty) {
-                            return Center(
-                                child: Column(
-                              children: [
-                                const Text("Invoice data couldn't be found."),
-                                ElevatedButton(
+                            return Padding(
+                              padding: const EdgeInsets.all(32),
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  InvoixAICard(
                                     onPressed: () {
                                       setState(() {
                                         topCategoriesFuture =
@@ -76,9 +100,17 @@ class _SummaryMainState extends ConsumerState<SummaryMain>
                                                 startDate, endDate);
                                       });
                                     },
-                                    child: const Text('Retry'))
-                              ],
-                            ));
+                                    children: const <Widget>[
+                                      Text(
+                                          "Invoice data couldn't be found.\n"
+                                          "\nTry to change filter settings.",
+                                          style: TextStyle(
+                                              fontWeight: FontWeight.bold)),
+                                    ],
+                                  ),
+                                ],
+                              ),
+                            );
                           } else if (snapshot.hasData) {
                             final bool isLandscape =
                                 MediaQuery.of(context).orientation ==
@@ -270,5 +302,4 @@ class _SummaryMainState extends ConsumerState<SummaryMain>
 
   @override
   bool get wantKeepAlive => true;
-
 }

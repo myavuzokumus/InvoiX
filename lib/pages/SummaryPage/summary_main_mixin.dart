@@ -12,7 +12,9 @@ mixin _SummaryMainMixin on ConsumerState<SummaryMain> {
   late DateTime endDate;
 
   late final InvoiceDataService invoiceDataService;
+
   Set<SortType> _selection = {SortType.amount};
+  late PriceUnit priceUnit = PriceUnit.Others;
 
   @override
   void initState() {
@@ -34,11 +36,13 @@ mixin _SummaryMainMixin on ConsumerState<SummaryMain> {
   Future<Map<InvoiceCategory, double>> calculateTopCategories(final DateTime startDate,
       final DateTime endDate) async {
 
-    final invoiceDataService = ref.read(invoiceDataServiceProvider);
-
-    final List<InvoiceData> invoices = await invoiceDataService.getInvoicesBetweenDates(
+    List<InvoiceData> invoices = await invoiceDataService.getInvoicesBetweenDates(
         startDate, endDate);
 
+    // Sort invoices based on the selected price unit
+    if (priceUnit != PriceUnit.Others) {
+      invoices = invoices.where((final invoice) => invoice.unit == priceUnit.name).toList();
+    }
     final Map<InvoiceCategory, double> categoryTotals = {};
     for (final invoice in invoices) {
       final InvoiceCategory category = InvoiceCategory.values.firstWhere((final InvoiceCategory e) => e.name.contains(invoice.category));
