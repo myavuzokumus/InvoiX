@@ -60,6 +60,7 @@ class _InvoiceListState extends ConsumerState<InvoiceList>
               },
               children: [
                 ExpansionPanel(
+                  canTapOnHeader: true,
                   backgroundColor: Theme.of(context).colorScheme.onSecondary,
                   isExpanded: value,
                   body: SingleChildScrollView(

@@ -43,7 +43,7 @@ class LoadingAnimation extends ConsumerWidget {
         Text(loadingState.message,
             style: const TextStyle(
                 color: Colors.red,
-                fontSize: 32,
+                fontSize: 21,
                 fontWeight: FontWeight.bold),
             textAlign: TextAlign.center),
       ],
