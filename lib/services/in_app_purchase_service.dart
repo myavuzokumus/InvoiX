@@ -1,8 +1,9 @@
 import 'dart:async';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+
 import 'package:in_app_purchase/in_app_purchase.dart';
 import 'package:invoix/services/firebase_service.dart';
 import 'package:invoix/states/firebase_state.dart';
+import 'package:invoix/states/global_provider.dart';
 
 class InAppPurchaseService {
   static final InAppPurchaseService _instance = InAppPurchaseService._internal();
@@ -16,7 +17,7 @@ class InAppPurchaseService {
   final InAppPurchase _inAppPurchase = InAppPurchase.instance;
   late StreamSubscription<List<PurchaseDetails>> _subscription;
   List<ProductDetails> _products = [];
-  final FirebaseService _firebaseService = ProviderContainer().read(firebaseServiceProvider);
+  final FirebaseService _firebaseService = GlobalProviderContainer.get().read(firebaseServiceProvider);
 
   Future<void> initialize() async {
     final bool isAvailable = await _inAppPurchase.isAvailable();
