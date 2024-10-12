@@ -76,16 +76,24 @@ class _InvoiceEditPageState extends ConsumerState<InvoiceEditPage>
               ],
               expandedHeight: 350,
               flexibleSpace: FlexibleSpaceBar(
-                background: InteractiveViewer(
-                  child: Hero(
-                    tag: imageFile.path,
-                    child: AspectRatio(
-                        aspectRatio: 1,
-                        child: Image.file(
-                          File(imageFile.path),
-                          fit: BoxFit.fitHeight,
-                          width: double.maxFinite,
-                        )),
+                background: Container(
+                  margin: const EdgeInsets.all(24),
+                  clipBehavior: Clip.antiAlias,
+                  decoration: BoxDecoration(
+                    color: Theme.of(context).indicatorColor,
+                    borderRadius: const BorderRadius.all(Radius.circular(25)),
+                  ),
+                  child: InteractiveViewer(
+                    child: Hero(
+                      tag: imageFile.path,
+                      child: AspectRatio(
+                          aspectRatio: 1,
+                          child: Image.file(
+                            File(imageFile.path),
+                            fit: BoxFit.fitHeight,
+                            width: double.maxFinite,
+                          )),
+                    ),
                   ),
                 ),
               ),
@@ -108,8 +116,7 @@ class _InvoiceEditPageState extends ConsumerState<InvoiceEditPage>
                         mainAxisAlignment: MainAxisAlignment.center,
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          const Divider(height: 20),
-
+                          const Divider(height: 1),
                           Form(
                             autovalidateMode:
                                 AutovalidateMode.onUserInteraction,
