@@ -44,10 +44,13 @@ class _CompanyListState extends ConsumerState<CompanyList> with _CompanyListMixi
             // Check if there is any invoice data
             if (invoiceDataService.invoiceDataBox.values.isEmpty) {
               return const Center(
-                child: InvoixAICard(
-                  children: <Widget>[
-                    Text("Just click on the invoice add icon to get started"),
-                  ],
+                child: Padding(
+                  padding: EdgeInsets.all(32),
+                  child: InvoixAICard(
+                    children: <Widget>[
+                      Text("Just click on the invoice add icon to get started."),
+                    ],
+                  ),
                 ),
               );
             } else {

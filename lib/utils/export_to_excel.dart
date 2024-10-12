@@ -108,7 +108,8 @@ Future<void> _importInvoiceData(
     final titleStyle,
     final cellStyle,
     final List<InvoiceData> invoices) async {
-  sheet.getRangeByName('A1:F1').cellStyle = titleStyle;
+
+  sheet.getRangeByName('A1:G1').cellStyle = titleStyle;
 
   // Create Excel headers
   sheet.getRangeByName('A1').setText('Invoice Number');
@@ -116,7 +117,8 @@ Future<void> _importInvoiceData(
   sheet.getRangeByName('C1').setText('Total Amount');
   sheet.getRangeByName('D1').setText('Tax Amount');
   sheet.getRangeByName('E1').setText('Company Id');
-  sheet.getRangeByName('F1').setText('Image');
+  sheet.getRangeByName('F1').setText('Unit');
+  sheet.getRangeByName('G1').setText('Image');
 
   // Fill the worksheet with invoice data
   for (var i = 0; i < invoices.length; i++) {
@@ -143,10 +145,14 @@ Future<void> _importInvoiceData(
       ..setText(invoices[i].companyId)
       ..cellStyle = cellStyle;
 
-    sheet.pictures.addStream(i + 2, 6, image)
+    sheet.getRangeByName('F${i + 2}')
+      ..setText(invoices[i].unit)
+      ..cellStyle = cellStyle;
+
+    sheet.pictures.addStream(i + 2, 7, image)
       ..height = 344
       ..width = 216;
-    sheet.getRangeByName('F${i + 2}')
+    sheet.getRangeByName('G${i + 2}')
       ..columnWidth = 32
       ..rowHeight = 256
       ..cellStyle = cellStyle;
@@ -158,5 +164,6 @@ Future<void> _importInvoiceData(
     ..autoFitColumn(2)
     ..autoFitColumn(3)
     ..autoFitColumn(4)
-    ..autoFitColumn(5);
+    ..autoFitColumn(5)
+    ..autoFitColumn(6);
 }

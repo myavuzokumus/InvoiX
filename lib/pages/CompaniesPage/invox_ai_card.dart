@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 
 class InvoixAICard extends StatelessWidget {
-  const InvoixAICard({super.key, required this.children});
+  const InvoixAICard({super.key, required this.children, this.onPressed});
 
   final List<Widget> children;
+  final VoidCallback? onPressed;
 
   @override
   Widget build(final BuildContext context) {

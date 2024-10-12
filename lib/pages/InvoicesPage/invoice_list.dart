@@ -8,6 +8,7 @@ import 'package:invoix/states/invoice_data_state.dart';
 import 'package:invoix/states/list_length_state.dart';
 import 'package:invoix/widgets/amount_range_slider.dart';
 import 'package:invoix/widgets/date_range_picker.dart';
+import 'package:invoix/widgets/filter_panel.dart';
 import 'package:invoix/widgets/status/loading_animation.dart';
 
 part 'invoice_list_mixin.dart';
@@ -24,14 +25,47 @@ class InvoiceList extends ConsumerStatefulWidget {
 class _InvoiceListState extends ConsumerState<InvoiceList>
     with _InvoiceListMixin {
 
-  ValueNotifier<bool> isExpanded = ValueNotifier(false);
-
   @override
   Widget build(final BuildContext context) {
 
     return Column(
       children: [
-        filterPanel(),
+        FilterPanel(children: [
+          CustomDateRangePicker(
+            initialTimeRange: initialDateTime,
+            onDateRangeChanged: (final DateTime startDate,
+                final DateTime endDate) {
+              setState(() {
+                this.startDate = startDate;
+                this.endDate = endDate;
+                initialDateTime = DateTimeRange(
+                  start: startDate,
+                  end: endDate,
+                );
+                originalInvoicesFuture =
+                    retrieveInvoicesAccordingDate(
+                        startDate, endDate, widget.companyName);
+                filteredInvoicesFuture = originalInvoicesFuture;
+              });
+            },
+          ),
+          AmountRangeSlider(
+            minAmount: minAmount,
+            maxAmount: maxAmount,
+            onAmountRangeChanged:
+                (final double minAmount, final double maxAmount) {
+              setState(() {
+                filteredInvoicesFuture = originalInvoicesFuture
+                    .then((final List<InvoiceData> invoices) =>
+                    invoices.where((final invoice) {
+                      return (invoice.totalAmount >=
+                          minAmount &&
+                          invoice.totalAmount <= maxAmount);
+                    }).toList());
+              });
+            },
+          ),
+        ]),
         const SizedBox(
           height: 10,
         ),
@@ -43,80 +77,6 @@ class _InvoiceListState extends ConsumerState<InvoiceList>
                   futureInvoiceList(invoice)),
         ),
       ],
-    );
-  }
-
-  Widget filterPanel() {
-    return ValueListenableBuilder(
-        valueListenable: isExpanded,
-        builder: (final BuildContext context, final value, final Widget? child) {
-          return ExpansionPanelList(
-              expandedHeaderPadding: EdgeInsets.zero,
-              elevation: 4,
-              expansionCallback: (final int index,  final bool isExpanded) {
-                setState(() {
-                  this.isExpanded.value = !value;
-                });
-              },
-              children: [
-                ExpansionPanel(
-                  canTapOnHeader: true,
-                  backgroundColor: Theme.of(context).colorScheme.onSecondary,
-                  isExpanded: value,
-                  body: SingleChildScrollView(
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 48),
-                      child: Column(
-                        children: [
-                          CustomDateRangePicker(
-                            initialTimeRange: initialDateTime,
-                            onDateRangeChanged: (final DateTime startDate,
-                                final DateTime endDate) {
-                              setState(() {
-                                this.startDate = startDate;
-                                this.endDate = endDate;
-                                initialDateTime = DateTimeRange(
-                                  start: startDate,
-                                  end: endDate,
-                                );
-                                originalInvoicesFuture =
-                                    retrieveInvoicesAccordingDate(
-                                        startDate, endDate, widget.companyName);
-                                filteredInvoicesFuture = originalInvoicesFuture;
-                              });
-                            },
-                          ),
-                          const Divider(
-                            height: 32,
-                            color: Colors.white,
-                            thickness: 1,
-                          ),
-                          AmountRangeSlider(
-                            minAmount: minAmount,
-                            maxAmount: maxAmount,
-                            onAmountRangeChanged:
-                                (final double minAmount, final double maxAmount) {
-                              setState(() {
-                                filteredInvoicesFuture = originalInvoicesFuture
-                                    .then((final List<InvoiceData> invoices) =>
-                                    invoices.where((final invoice) {
-                                      return (invoice.totalAmount >=
-                                          minAmount &&
-                                          invoice.totalAmount <= maxAmount);
-                                    }).toList());
-                              });
-                            },
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                  headerBuilder:
-                      (final BuildContext context, final bool isExpanded) {
-                    return Center(child: Text(value ? 'Filtreleri Gizle' : 'Filtreleri Göster', style: Theme.of(context).textTheme.bodyLarge));
-                  },
-                ),
-              ]);}
     );
   }
 
