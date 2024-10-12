@@ -154,7 +154,7 @@ class ProfileDropdown extends ConsumerWidget {
       error: (final error, final stack) => LayoutBuilder(builder:
           (final BuildContext context, final BoxConstraints constraints) {
         return FutureBuilder<Status>(
-          future: currentStatusChecker("aiInvoiceAnalyses"),
+          future: currentStatusChecker(""),
           builder: (final context, final statusSnapshot) {
             if (statusSnapshot.connectionState == ConnectionState.done) {
               return ShowCurrentStatus(

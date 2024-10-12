@@ -282,20 +282,17 @@ class _SummaryMainState extends ConsumerState<SummaryMain>
         setModalState(() {
           _selection = newSelection;
         });
-        final List<InvoiceData> sortedInvoices;
         switch (_selection.first) {
           case SortType.amount:
-            sortedInvoices = selectedInvoices
-              ..sort(
+            selectedInvoices.sort(
                   (final a, final b) => b.totalAmount.compareTo(a.totalAmount));
             break;
           case SortType.date:
-            sortedInvoices = selectedInvoices
-              ..sort((final a, final b) => b.date.compareTo(a.date));
+            selectedInvoices.sort((final a, final b) => b.date.compareTo(a.date));
             break;
         }
 
-        selected5Invoices = sortedInvoices.take(5).toList();
+        selected5Invoices = selectedInvoices.take(5).toList();
       },
     );
   }

@@ -57,17 +57,16 @@ mixin _SummaryMainMixin on ConsumerState<SummaryMain> {
 
     selectedInvoices = invoices;
 
-    final List<InvoiceData> sortedInvoices;
     switch (_selection.first) {
       case SortType.amount:
-        sortedInvoices = selectedInvoices..sort((final a, final b) => b.totalAmount.compareTo(a.totalAmount));
+        selectedInvoices.sort((final a, final b) => b.totalAmount.compareTo(a.totalAmount));
         break;
       case SortType.date:
-        sortedInvoices = selectedInvoices..sort((final a, final b) => b.date.compareTo(a.date));
+        selectedInvoices.sort((final a, final b) => b.date.compareTo(a.date));
         break;
     }
 
-    selected5Invoices = sortedInvoices.take(5).toList();
+    selected5Invoices = selectedInvoices.take(5).toList();
 
     return categoryTotals;
   }
