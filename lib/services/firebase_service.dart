@@ -1,12 +1,22 @@
+import 'dart:convert';
+import 'dart:io';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cloud_functions/cloud_functions.dart';
 import 'package:firebase_app_check/firebase_app_check.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_remote_config/firebase_remote_config.dart';
 import 'package:firebase_vertexai/firebase_vertexai.dart';
 import 'package:flutter/foundation.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:invoix/firebase_options.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
+enum ProcessType {
+  scan,
+  describe,
+}
 
 class FirebaseService {
   static final FirebaseService _instance = FirebaseService._internal();
@@ -20,8 +30,9 @@ class FirebaseService {
   late final FirebaseAuth _auth;
   late final FirebaseFirestore _firestore;
   late final FirebaseFunctions _functions;
-  late final GenerativeModel model;
+  late final GenerativeModel _model;
   late final GoogleSignIn _googleSignIn;
+  late final FirebaseRemoteConfig _remoteConfig;
 
   Future<void> initialize() async {
     await Firebase.initializeApp(
@@ -33,11 +44,20 @@ class FirebaseService {
     _firestore = FirebaseFirestore.instanceFor(app: Firebase.app("invoix"));
     _functions = FirebaseFunctions.instanceFor(app: Firebase.app("invoix"));
     _googleSignIn = GoogleSignIn(scopes: ["profile", "email"]);
-    model = FirebaseVertexAI.instanceFor(
+    _remoteConfig = FirebaseRemoteConfig.instanceFor(app: Firebase.app("invoix"));
+
+    await _remoteConfig.setConfigSettings(RemoteConfigSettings(
+      fetchTimeout: const Duration(minutes: 1),
+      minimumFetchInterval: const Duration(hours: 1),
+    ));
+
+    await _remoteConfig.fetchAndActivate();
+
+    _model = FirebaseVertexAI.instanceFor(
       appCheck: FirebaseAppCheck.instanceFor(app: Firebase.app("invoix")),
     ).generativeModel(
-      model: 'gemini-1.5-flash',
-      generationConfig: GenerationConfig(responseMimeType: 'application/json', temperature: 1.15),
+      model: _remoteConfig.getString('model_name'),
+      generationConfig: GenerationConfig(responseMimeType: 'application/json', temperature: _remoteConfig.getDouble('temperature')),
     );
 
     if (!kDebugMode) {
@@ -53,6 +73,7 @@ class FirebaseService {
         webProvider: ReCaptchaV3Provider('recaptcha-v3-site-key'),
       );
     }
+
   }
 
   User? getUser() {
@@ -89,9 +110,12 @@ class FirebaseService {
         // Check if it's a new user
         final userDoc = await _firestore.collection('users').doc(user.uid).get();
         if (!userDoc.exists) {
-          await _createNewUserProfile(user.uid);
+          await createNewUserProfile(user.uid);
         }
       }
+
+      final SharedPreferences prefs = await SharedPreferences.getInstance();
+      await prefs.setBool('isFirstLogin', false);
 
       return user;
     } catch (e) {
@@ -100,13 +124,14 @@ class FirebaseService {
     }
   }
 
-  Future<void> _createNewUserProfile(final String uid) async {
-    await _firestore.collection('users').doc(uid).set({
-      'subscriptionId': 'new_user_offer',
-      'aiInvoiceReads': 30,
-      'aiInvoiceAnalyses': 10,
-      'subscriptionExpiryDate': DateTime.now().add(const Duration(days: 30)),
-    });
+  Future<void> createNewUserProfile(final String uid) async {
+    try {
+      final HttpsCallable callable = _functions.httpsCallable('createNewUserProfile');
+      await callable.call<void>({'uid': uid});
+    } catch (e) {
+      print('Error creating new user profile: ${e.toString()}');
+      throw e;
+    }
   }
 
   Future<void> signOut() async {
@@ -117,7 +142,7 @@ class FirebaseService {
   Future<bool> verifyPurchase(final String productId, final String purchaseToken) async {
     try {
       final HttpsCallable callable = _functions.httpsCallable('verifyPurchase');
-      final results = await callable({
+      final results = await callable.call({
         'productId': productId,
         'purchaseToken': purchaseToken,
       });
@@ -130,29 +155,23 @@ class FirebaseService {
   }
 
   Future<void> updateUserSubscription(final String productId) async {
-    final user = _auth.currentUser;
-    if (user != null) {
-      final subscriptionDetails = _getSubscriptionDetails(productId);
-      await _firestore.collection('users').doc(user.uid).set({
-        'subscriptionId': productId,
-        'subscriptionStatus': 'active',
-        'subscriptionExpiryDate': DateTime.now().add(const Duration(days: 30)),
-        'aiInvoiceReads': subscriptionDetails['aiInvoiceReads'],
-        'aiInvoiceAnalyses': subscriptionDetails['aiInvoiceAnalyses'],
-      }, SetOptions(merge: true));
+    try {
+      final HttpsCallable callable = _functions.httpsCallable('updateUserSubscription');
+      await callable.call<void>({'productId': productId});
+    } catch (e) {
+      print('Error updating user subscription: ${e.toString()}');
+      rethrow;
     }
   }
 
-  Map<String, dynamic> _getSubscriptionDetails(final String productId) {
-    switch (productId) {
-      case 'individual_subscription':
-        return {'aiInvoiceReads': 1000, 'aiInvoiceAnalyses': 1000};
-      case 'advanced_subscription':
-        return {'aiInvoiceReads': 10000, 'aiInvoiceAnalyses': 10000};
-      case 'corporate_subscription':
-        return {'aiInvoiceReads': -1, 'aiInvoiceAnalyses': -1}; // Unlimited
-      default:
-        return {'aiInvoiceReads': 0, 'aiInvoiceAnalyses': 0};
+  Future<Map<String, dynamic>> getSubscriptionDetails(final String productId) async {
+    try {
+      final HttpsCallable callable = _functions.httpsCallable('getSubscriptionDetails');
+      final result = await callable.call<Map<String, dynamic>>({'productId': productId});
+      return result.data;
+    } catch (e) {
+      print('Error getting subscription details: ${e.toString()}');
+      rethrow;
     }
   }
 
@@ -164,49 +183,102 @@ class FirebaseService {
     throw Exception('User not logged in');
   }
 
-  Future<Map<String, dynamic>> checkUsageRights(final String processType, {final bool decrease = false}) async {
+  Future<Map<String, dynamic>> checkUsageRights(final String processType, {final int decrease = 0}) async {
+
+    final user = _auth.currentUser;
+    if (user == null) {
+      throw Exception('User must be authenticated to use this function.');
+    }
+
     try {
-      final HttpsCallable callable = _functions.httpsCallable('checkAndUpdateUsage');
+      print('Calling checkAndUpdateUsage with processType: $processType, decrease: $decrease');
+      final HttpsCallable callable = _functions.httpsCallable(
+        'checkAndUpdateUsage',
+        options: HttpsCallableOptions(
+          timeout: const Duration(seconds: 30),
+        ),
+      );
       final result = await callable.call<Map<String, dynamic>>({
         'processType': processType,
         'decrease': decrease,
       });
+
+      print('checkUsageRights result: ${result.data}');
       return result.data;
     } catch (e) {
       print('Error checking usage rights: ${e.toString()}');
-      return {'success': false, 'error': e.toString(), 'remainingUsage': null};
+      if (e is FirebaseFunctionsException) {
+        print('Firebase Functions Error Code: ${e.code}');
+        print('Firebase Functions Error Details: ${e.details}');
+        return {
+          'success': false,
+          'error': e.code,
+          'details': e.details,
+          'remainingUsage': null
+        };
+      }
+      return {
+        'success': false,
+        'error': e.toString(),
+        'remainingUsage': null
+      };
     }
   }
 
-  // Future<bool> checkUsageRights(final String processType) async {
-  //   try {
-  //     final HttpsCallable callable = _functions.httpsCallable('checkAndDecrementUsage');
-  //     final result = await callable.call<Map<String, dynamic>>({'processType': processType});
-  //     return result.data['success'] as bool;
-  //   } catch (e) {
-  //     throw Exception('Error checking usage rights: ${e.toString()}');
-  //   }
-  // }
-  //
-  // Future<void> decrementUsage(final String processType) async {
-  //   final user = _auth.currentUser;
-  //   if (user != null) {
-  //     final userDoc = await _firestore.collection('users').doc(user.uid).get();
-  //
-  //     int amount = userDoc.get(processType) as int;
-  //     if (amount > 0) {
-  //       amount--;
-  //       await _firestore.collection('users').doc(user.uid).update({
-  //         processType: amount,
-  //       });
-  //     }
-  //     else {
-  //       throw Exception('No more usage rights');
-  //     }
-  //   }
-  // }
+  Future<String> describeImageWithAI({required final File imgFile, required final ProcessType type}) async {
+    final user = _auth.currentUser;
+    if (user == null) {
+      throw Exception('User must be authenticated to use this function.');
+    }
+
+    final String processType = type == ProcessType.scan ? 'aiInvoiceReads' : 'aiInvoiceAnalyses';
+
+    final String prompt = _remoteConfig.getString(processType);
+    final Map<String, dynamic> checkUsage = await checkUsageRights(processType, decrease: 1);
+
+    if (!checkUsage["success"]) {
+      throw Exception(checkUsage.toString());
+    }
+
+    final imageBytes = await imgFile.readAsBytes();
+
+    try {
+      final response = await (_model.generateContent([
+        Content.multi([
+          TextPart(prompt),
+          DataPart('image/jpeg', imageBytes)
+        ])
+      ]));
+
+      final HttpsCallable callable = _functions.httpsCallable('logUsage');
+      await callable.call<void>({
+        'processType': processType,
+        'decrease': 1,
+        'image': base64Encode(imageBytes),
+        'output': response.text,
+      });
+
+      return response.text!;
+    } on Exception catch (e) {
+      print('Error describing image: ${e.toString()}');
+      rethrow;
+    }
+
+  }
 
   Stream<User?> authStateChanges() {
     return _auth.authStateChanges();
+
+  // Future<void> _logUsage(final String processType) async {
+  //   try {
+  //     final HttpsCallable callable = _functions.httpsCallable('logUsage');
+  //     await callable.call<void>({'processType': processType});
+  //   } catch (e) {
+  //     print('Error logging usage: ${e.toString()}');
+  //     // Burada hatayı yutuyoruz çünkü bu işlem kullanıcı deneyimini etkilememeli
+  //   }
+  // }
+
   }
+
 }
