@@ -78,13 +78,29 @@ class InvoiceData extends HiveObject {
 
   static double _parseAmount(final String amount) {
 
+    print(amount);
     // Ondalık ayraçlarını düzelt
     final newAmount = amount.replaceAllMapped(
         RegExp(r'(\d+)([.,])(\d{1,2})$'),
-            (final Match m) => '${m[1]}${m[2] == "." ? "," : "."}${m[3]}'
+            (final Match m) => '${m[1]}${"."}${m[3]}'
     );
 
-    return double.tryParse(newAmount.replaceAll(".", "").replaceAll(",", ".")) ?? 0;
+    String reversedText = newAmount.split('').reversed.join('');
+
+    // İlk noktayı bul ve metni ikiye ayır
+    int lastDotIndex = reversedText.indexOf('.');
+    String beforeLastDot = reversedText.substring(lastDotIndex + 1);
+    String afterLastDot = reversedText.substring(0, lastDotIndex + 1);
+
+    // Noktaları kaldır ve metni tekrar birleştir
+    beforeLastDot = beforeLastDot.replaceAll('.', '');
+    String result = beforeLastDot + afterLastDot;
+
+    result = result.split('').reversed.join('');
+
+    // Metni tekrar ters çevir
+    print(result.replaceAll(",", "."));
+    return double.tryParse(newAmount.replaceAll(",", ".")) ?? 0;
   }
 
   InvoiceData copyWith({
