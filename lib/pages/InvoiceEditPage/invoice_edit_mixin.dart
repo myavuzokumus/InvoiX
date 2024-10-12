@@ -26,10 +26,12 @@ mixin _InvoiceEditPageMixin on ConsumerState<InvoiceEditPage> {
   late Future<dynamic> _future;
 
   late final InvoiceDataService invoiceDataService;
+  late final FirebaseService firebaseService;
 
   @override
   void initState() {
     invoiceDataService = ref.read(invoiceDataServiceProvider);
+    firebaseService = ref.read(firebaseServiceProvider);
 
     _saveButtonState.value = true;
     _isFileSaved = false;
@@ -83,7 +85,7 @@ mixin _InvoiceEditPageMixin on ConsumerState<InvoiceEditPage> {
     } else if (readMode == ReadMode.ai) {
       try {
         await fetchInvoiceData(
-            outPut: await describeImageWithAI(
+            outPut: await firebaseService.describeImageWithAI(
                 imgFile: File(imageFile.path), type: ProcessType.scan));
       } catch (e) {
         String error = e.toString();
