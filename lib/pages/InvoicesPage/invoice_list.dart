@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:invoix/models/invoice_data.dart';
 import 'package:invoix/pages/InvoicesPage/invoice_card.dart';
+import 'package:invoix/pages/SummaryPage/summary_main.dart';
 import 'package:invoix/services/invoice_data_service.dart';
 import 'package:invoix/states/invoice_data_state.dart';
 import 'package:invoix/states/list_length_state.dart';
@@ -65,6 +66,7 @@ class _InvoiceListState extends ConsumerState<InvoiceList>
               });
             },
           ),
+          sortType(),
         ]),
         const SizedBox(
           height: 10,
@@ -137,4 +139,41 @@ class _InvoiceListState extends ConsumerState<InvoiceList>
     }
     return const LoadingAnimation();
   }
+
+  Widget sortType() {
+    return SegmentedButton<SortType>(
+      showSelectedIcon: false,
+      segments: const <ButtonSegment<SortType>>[
+        ButtonSegment<SortType>(
+          value: SortType.amount,
+          label: Text('Amount'),
+        ),
+        ButtonSegment<SortType>(
+          value: SortType.date,
+          label: Text('Date'),
+        ),
+      ],
+      selected: _selection,
+      onSelectionChanged: (final Set<SortType> newSelection) async {
+
+        _selection = newSelection;
+        final List<InvoiceData> sortedInvoices = await filteredInvoicesFuture;
+        switch (_selection.first) {
+          case SortType.amount:
+            filteredInvoicesFuture = Future.value(sortedInvoices..sort(
+                      (final a, final b) => b.totalAmount.compareTo(a.totalAmount)));
+            break;
+          case SortType.date:
+            filteredInvoicesFuture = Future.value(sortedInvoices
+              ..sort((final a, final b) => b.date.compareTo(a.date)));
+            break;
+        }
+
+        setState(() {
+
+        });
+      },
+    );
+  }
+
 }
