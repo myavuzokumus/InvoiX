@@ -34,6 +34,8 @@ class FirebaseService {
   late final GoogleSignIn _googleSignIn;
   late final FirebaseRemoteConfig _remoteConfig;
 
+  late final HttpsCallableOptions _options;
+
   Future<void> initialize() async {
     await Firebase.initializeApp(
       name: "invoix",
@@ -44,7 +46,8 @@ class FirebaseService {
     _firestore = FirebaseFirestore.instanceFor(app: Firebase.app("invoix"));
     _functions = FirebaseFunctions.instanceFor(app: Firebase.app("invoix"));
     _googleSignIn = GoogleSignIn(scopes: ["profile", "email"]);
-    _remoteConfig = FirebaseRemoteConfig.instanceFor(app: Firebase.app("invoix"));
+    _remoteConfig =
+        FirebaseRemoteConfig.instanceFor(app: Firebase.app("invoix"));
 
     await _remoteConfig.setConfigSettings(RemoteConfigSettings(
       fetchTimeout: const Duration(minutes: 1),
@@ -52,12 +55,15 @@ class FirebaseService {
     ));
 
     await _remoteConfig.fetchAndActivate();
+    _options = HttpsCallableOptions(limitedUseAppCheckToken: true);
 
     _model = FirebaseVertexAI.instanceFor(
       appCheck: FirebaseAppCheck.instanceFor(app: Firebase.app("invoix")),
     ).generativeModel(
       model: _remoteConfig.getString('model_name'),
-      generationConfig: GenerationConfig(responseMimeType: 'application/json', temperature: _remoteConfig.getDouble('temperature')),
+      generationConfig: GenerationConfig(
+          responseMimeType: 'application/json',
+          temperature: _remoteConfig.getDouble('temperature')),
     );
 
     if (!kDebugMode) {
@@ -73,7 +79,6 @@ class FirebaseService {
         webProvider: ReCaptchaV3Provider('recaptcha-v3-site-key'),
       );
     }
-
   }
 
   User? getUser() {
@@ -94,7 +99,8 @@ class FirebaseService {
       }
 
       // Obtain the auth details from the request
-      final GoogleSignInAuthentication googleAuth = await googleUser.authentication;
+      final GoogleSignInAuthentication googleAuth =
+          await googleUser.authentication;
 
       // Create a new credential
       final credential = GoogleAuthProvider.credential(
@@ -103,12 +109,14 @@ class FirebaseService {
       );
 
       // Sign in to Firebase with the credential
-      final UserCredential userCredential = await _auth.signInWithCredential(credential);
+      final UserCredential userCredential =
+          await _auth.signInWithCredential(credential);
       final User? user = userCredential.user;
 
       if (user != null) {
         // Check if it's a new user
-        final userDoc = await _firestore.collection('users').doc(user.uid).get();
+        final userDoc =
+            await _firestore.collection('users').doc(user.uid).get();
         if (!userDoc.exists) {
           await createNewUserProfile(user.uid);
         }
@@ -126,7 +134,8 @@ class FirebaseService {
 
   Future<void> createNewUserProfile(final String uid) async {
     try {
-      final HttpsCallable callable = _functions.httpsCallable('createNewUserProfile');
+      final HttpsCallable callable =
+          _functions.httpsCallable('createNewUserProfile', options: _options);
       await callable.call<void>({'uid': uid});
     } catch (e) {
       print('Error creating new user profile: ${e.toString()}');
@@ -139,9 +148,11 @@ class FirebaseService {
     await _auth.signOut();
   }
 
-  Future<bool> verifyPurchase(final String productId, final String purchaseToken) async {
+  Future<bool> verifyPurchase(
+      final String productId, final String purchaseToken) async {
     try {
-      final HttpsCallable callable = _functions.httpsCallable('verifyPurchase');
+      final HttpsCallable callable =
+          _functions.httpsCallable('verifyPurchase', options: _options);
       final results = await callable.call({
         'productId': productId,
         'purchaseToken': purchaseToken,
@@ -156,7 +167,8 @@ class FirebaseService {
 
   Future<void> updateUserSubscription(final String productId) async {
     try {
-      final HttpsCallable callable = _functions.httpsCallable('updateUserSubscription');
+      final HttpsCallable callable =
+          _functions.httpsCallable('updateUserSubscription', options: _options);
       await callable.call<void>({'productId': productId});
     } catch (e) {
       print('Error updating user subscription: ${e.toString()}');
@@ -164,10 +176,13 @@ class FirebaseService {
     }
   }
 
-  Future<Map<String, dynamic>> getSubscriptionDetails(final String productId) async {
+  Future<Map<String, dynamic>> getSubscriptionDetails(
+      final String productId) async {
     try {
-      final HttpsCallable callable = _functions.httpsCallable('getSubscriptionDetails');
-      final result = await callable.call<Map<String, dynamic>>({'productId': productId});
+      final HttpsCallable callable =
+          _functions.httpsCallable('getSubscriptionDetails', options: _options);
+      final result =
+          await callable.call<Map<String, dynamic>>({'productId': productId});
       return result.data;
     } catch (e) {
       print('Error getting subscription details: ${e.toString()}');
@@ -183,21 +198,19 @@ class FirebaseService {
     throw Exception('User not logged in');
   }
 
-  Future<Map<String, dynamic>> checkUsageRights(final String processType, {final int decrease = 0}) async {
-
+  Future<Map<String, dynamic>> checkUsageRights(final String processType,
+      {final int decrease = 0}) async {
     final user = _auth.currentUser;
     if (user == null) {
       throw Exception('User must be authenticated to use this function.');
     }
 
     try {
-      print('Calling checkAndUpdateUsage with processType: $processType, decrease: $decrease');
-      final HttpsCallable callable = _functions.httpsCallable(
-        'checkAndUpdateUsage',
-        options: HttpsCallableOptions(
-          timeout: const Duration(seconds: 30),
-        ),
-      );
+      print(
+          'Calling checkAndUpdateUsage with processType: $processType, decrease: $decrease');
+      final HttpsCallable callable =
+          _functions.httpsCallable('checkAndUpdateUsage', options: _options);
+
       final result = await callable.call<Map<String, dynamic>>({
         'processType': processType,
         'decrease': decrease,
@@ -217,24 +230,23 @@ class FirebaseService {
           'remainingUsage': null
         };
       }
-      return {
-        'success': false,
-        'error': e.toString(),
-        'remainingUsage': null
-      };
+      return {'success': false, 'error': e.toString(), 'remainingUsage': null};
     }
   }
 
-  Future<String> describeImageWithAI({required final File imgFile, required final ProcessType type}) async {
+  Future<String> describeImageWithAI(
+      {required final File imgFile, required final ProcessType type}) async {
     final user = _auth.currentUser;
     if (user == null) {
       throw Exception('User must be authenticated to use this function.');
     }
 
-    final String processType = type == ProcessType.scan ? 'aiInvoiceReads' : 'aiInvoiceAnalyses';
+    final String processType =
+        type == ProcessType.scan ? 'aiInvoiceReads' : 'aiInvoiceAnalyses';
 
     final String prompt = _remoteConfig.getString(processType);
-    final Map<String, dynamic> checkUsage = await checkUsageRights(processType, decrease: 1);
+    final Map<String, dynamic> checkUsage =
+        await checkUsageRights(processType, decrease: 1);
 
     if (!checkUsage["success"]) {
       throw Exception(checkUsage.toString());
@@ -244,13 +256,11 @@ class FirebaseService {
 
     try {
       final response = await (_model.generateContent([
-        Content.multi([
-          TextPart(prompt),
-          DataPart('image/jpeg', imageBytes)
-        ])
+        Content.multi([TextPart(prompt), DataPart('image/jpeg', imageBytes)])
       ]));
 
-      final HttpsCallable callable = _functions.httpsCallable('logUsage');
+      final HttpsCallable callable =
+          _functions.httpsCallable('logUsage', options: _options);
       await callable.call<void>({
         'processType': processType,
         'decrease': 1,
@@ -263,22 +273,9 @@ class FirebaseService {
       print('Error describing image: ${e.toString()}');
       rethrow;
     }
-
   }
 
   Stream<User?> authStateChanges() {
     return _auth.authStateChanges();
-
-  // Future<void> _logUsage(final String processType) async {
-  //   try {
-  //     final HttpsCallable callable = _functions.httpsCallable('logUsage');
-  //     await callable.call<void>({'processType': processType});
-  //   } catch (e) {
-  //     print('Error logging usage: ${e.toString()}');
-  //     // Burada hatayı yutuyoruz çünkü bu işlem kullanıcı deneyimini etkilememeli
-  //   }
-  // }
-
   }
-
 }
