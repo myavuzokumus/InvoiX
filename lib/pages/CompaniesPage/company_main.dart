@@ -104,7 +104,7 @@ class _CompanyPageState extends ConsumerState<CompanyPage>
                         InvoixAICard(
                           children: <Widget>[
                             Text("I'm InvoiX, your AI assistant.\n"
-                                "Just click on the invoice add icon to get started."),
+                                "Click to see insights on your invoices."),
                           ],
                         ),
                         InvoixAICard(

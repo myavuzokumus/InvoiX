@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:invoix/models/invoice_data.dart';
+import 'package:invoix/pages/CompaniesPage/invox_ai_card.dart';
 import 'package:invoix/pages/InvoicesPage/invoice_main.dart';
 import 'package:invoix/services/invoice_data_service.dart';
 import 'package:invoix/states/invoice_data_state.dart';
@@ -43,10 +44,10 @@ class _CompanyListState extends ConsumerState<CompanyList> with _CompanyListMixi
             // Check if there is any invoice data
             if (invoiceDataService.invoiceDataBox.values.isEmpty) {
               return const Center(
-                child: Text(
-                  "No invoice added yet.",
-                  textAlign: TextAlign.center,
-                  style: TextStyle(fontSize: 28),
+                child: InvoixAICard(
+                  children: <Widget>[
+                    Text("Just click on the invoice add icon to get started"),
+                  ],
                 ),
               );
             } else {
