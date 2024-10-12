@@ -13,6 +13,7 @@ import 'package:invoix/widgets/settings_button.dart';
 import 'package:invoix/widgets/status/loading_animation.dart';
 import 'package:invoix/widgets/status/show_current_status.dart';
 import 'package:invoix/widgets/toast.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class ProfileDropdown extends ConsumerWidget {
   final Color glowColor;
@@ -24,6 +25,7 @@ class ProfileDropdown extends ConsumerWidget {
 
   @override
   Widget build(final BuildContext context, final WidgetRef ref) {
+
     final localizations = AppLocalizations.of(context)!;
     final firebaseService = ref.watch(firebaseServiceProvider);
     final authState = ref.watch(authStateProvider);
@@ -54,6 +56,19 @@ class ProfileDropdown extends ConsumerWidget {
                           child: CircleAvatar(
                             radius: 40,
                             backgroundImage: NetworkImage(user.photoURL ?? ''),
+                            child: ClipOval(
+                              child: FadeInImage.assetNetwork(
+                                placeholder: '', // Path to your loading icon
+                                image: user.photoURL ?? '',
+                                fit: BoxFit.cover,
+                                placeholderErrorBuilder: (final context, final error, final stackTrace) {
+                                  return const Center(child: CircularProgressIndicator());
+                                },
+                                imageErrorBuilder: (final context, final error, final stackTrace) {
+                                  return const Icon(Icons.error); // Display an error icon if the image fails to load
+                                },
+                              ),
+                            ),
                           ),
                         ),
                         const SizedBox(height: 8),
@@ -75,7 +90,18 @@ class ProfileDropdown extends ConsumerWidget {
                 if (user != null) ...[
                   _buildUserSubscriptionInfo(firebaseService, localizations),
                 ] else ...[
-                  const NewUserOffer(),
+                  // Policy and terms
+                  _buildPolicyAndTerms(),
+                  // New user offer
+                  FutureBuilder<SharedPreferences>(future: SharedPreferences.getInstance(), builder: (final context, final snapshot) {
+                    if (snapshot.connectionState == ConnectionState.done) {
+                      final bool isFirstLogin = snapshot.data!.getBool('isFirstLogin') ?? true;
+                      if (isFirstLogin) {
+                        return const NewUserOffer();
+                      }
+                    }
+                    return const SizedBox();
+                  }),
                 ],
                 Divider(color: Colors.grey[700]),
                 Padding(
@@ -161,6 +187,25 @@ class ProfileDropdown extends ConsumerWidget {
       Toast(context,
           text: AppLocalizations.of(context)!.loginError(e.toString()));
     }
+  }
+
+  Widget _buildPolicyAndTerms() {
+    return Column(
+      children: [
+        Text('By logging in, you agree to our',
+            style: TextStyle(color: Colors.grey[400])),
+        TextButton(
+          onPressed: () {},
+          child: const Text('Privacy Policy',
+              style: TextStyle(color: Colors.white)),
+        ),
+        TextButton(
+          onPressed: () {},
+          child: const Text('Terms of Service',
+              style: TextStyle(color: Colors.white)),
+        ),
+      ],
+    );
   }
 
   Widget _buildUserSubscriptionInfo(final FirebaseService firebaseService,
