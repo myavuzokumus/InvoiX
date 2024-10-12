@@ -1,5 +1,8 @@
 ![logo_banner.png](design%2Flogo_banner.png)
 
+> [!IMPORTANT]
+> Implementing firebase backend to add subscription system to use ai systems for users right now. So, still work in progress.
+
 ## Overview 🧾
 - Artificial intelligence supported invoice reading application. It categorizes and saves them on a company basis according to the information in the invoice. It can analyze the impact of the products in the invoices on the person and the environment and can save time on financial transactions by taking Excel output.
 
