@@ -11,6 +11,9 @@ import 'package:firebase_vertexai/firebase_vertexai.dart';
 import 'package:flutter/foundation.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:invoix/firebase_options.dart';
+import 'package:invoix/l10n/localization_extension.dart';
+import 'package:invoix/states/global_provider.dart';
+import 'package:invoix/states/language_state.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 enum ProcessType {
@@ -83,6 +86,10 @@ class FirebaseService {
 
   User? getUser() {
     return _auth.currentUser;
+  }
+
+  Stream<User?> authStateChanges() {
+    return _auth.authStateChanges();
   }
 
   Future<User?> signInWithGoogle() async {
@@ -255,8 +262,13 @@ class FirebaseService {
     final imageBytes = await imgFile.readAsBytes();
 
     try {
+      final currentLocale = GlobalProviderContainer.get().read(localeProvider);
+
       final response = await (_model.generateContent([
-        Content.multi([TextPart(prompt), DataPart('image/jpeg', imageBytes)])
+        Content.multi([
+          TextPart(prompt),
+          TextPart("Target response language: ${LocalizationManager.instance.getLanguageName(currentLocale)}"),
+          DataPart('image/jpeg', imageBytes)])
       ]));
 
       final HttpsCallable callable =
@@ -275,7 +287,24 @@ class FirebaseService {
     }
   }
 
-  Stream<User?> authStateChanges() {
-    return _auth.authStateChanges();
+  Future<void> deleteAccount() async {
+    try {
+      final user = _auth.currentUser;
+      if (user == null) {
+        throw Exception('No authenticated user found');
+      }
+
+      final HttpsCallable callable = _functions.httpsCallable('deleteAccount', options: _options);
+      final result = await callable.call<Map<String, dynamic>>({});
+
+      if (result.data['success'] == true) {
+        await signOut();
+      } else {
+        throw Exception(result.data['message'] ?? 'Unknown error occurred while deleting account');
+      }
+    } catch (e) {
+      print('Error deleting account: ${e.toString()}');
+      rethrow;
+    }
   }
 }
