@@ -1,8 +1,11 @@
 part of 'summary_main.dart';
 
+enum SortType { amount, date }
+
 mixin _SummaryMainMixin on ConsumerState<SummaryMain> {
 
   final ValueNotifier<double> touchedPercentageNotifier = ValueNotifier<double>(-1);
+  final ValueNotifier<bool> filterPanelVisibleNotifier = ValueNotifier<bool>(false);
 
   late DateTimeRange initialDateTime;
   late List<InvoiceData> selectedInvoices;
@@ -99,5 +102,3 @@ mixin _SummaryMainMixin on ConsumerState<SummaryMain> {
   }
 
 }
-
-enum SortType { amount, date }

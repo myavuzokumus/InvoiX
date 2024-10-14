@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:invoix/models/invoice_data.dart';
 import 'package:invoix/services/invoice_data_service.dart';
+import 'package:invoix/states/filter_state.dart';
 import 'package:invoix/states/invoice_data_state.dart';
 import 'package:invoix/states/list_length_state.dart';
 import 'package:invoix/states/selection_state.dart';
@@ -104,15 +105,30 @@ class _GeneralPageState extends ConsumerState<ListPageScaffold>
               //else add Icons for other actions
               else ...[
                 if (widget.type != ListType.company)
-                  Padding(
-                    padding: const EdgeInsets.only(right: 12.0),
-                    child: Badge(
-                        label: Text(
-                          listLengthState.length.toString(),
-                          style: const TextStyle(
-                              color: Colors.white, fontSize: 18),
-                        ),
-                        largeSize: 24),
+                  Badge(
+                      label: Text(
+                        listLengthState.length.toString(),
+                        style: const TextStyle(
+                            color: Colors.white, fontSize: 18),
+                      ),
+                      largeSize: 24),
+                if (widget.type != ListType.company)
+                  ValueListenableBuilder(
+                    valueListenable: ref.read(filterPanelVisibleProvider),
+                    builder: (final BuildContext context, final value, final Widget? child) {
+                      return IconButton(
+                        icon: const Icon(Icons.filter_list),
+                        color: value
+                            ? Theme.of(context).colorScheme.primary
+                            : null,
+                        onPressed: () {
+                          setState(() {
+                            ref.read(filterPanelVisibleProvider).value =
+                            !ref.read(filterPanelVisibleProvider).value;
+                          });
+                        },
+                      );
+                    },
                   ),
                 const Padding(
                   padding: EdgeInsets.only(right: 12.0),

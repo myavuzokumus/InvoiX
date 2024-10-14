@@ -1,15 +1,8 @@
 part of 'list_page_scaffold.dart';
 
 mixin _ListPageScaffoldMixin on ConsumerState<ListPageScaffold> {
-  final ValueNotifier<bool> _excelExportingNotifier = ValueNotifier(false);
-  final ValueNotifier<bool> _deleteProcessingNotifier = ValueNotifier(false);
-
-  @override
-  void initState() {
-    super.initState();
-    _excelExportingNotifier.value = false;
-    _deleteProcessingNotifier.value = false;
-  }
+  final ValueNotifier<bool> _excelExportingNotifier = ValueNotifier<bool>(false);
+  final ValueNotifier<bool> _deleteProcessingNotifier = ValueNotifier<bool>(false);
 
   Future<void> onDelete() async {
     _deleteProcessingNotifier.value = true;

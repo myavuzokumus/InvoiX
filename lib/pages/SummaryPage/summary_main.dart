@@ -28,50 +28,84 @@ class _SummaryMainState extends ConsumerState<SummaryMain>
     super.build(context);
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Summary'),
+        title: const Text('Summary', style: TextStyle(fontWeight: FontWeight.bold)),
         centerTitle: true,
+        backgroundColor: Colors.transparent,
+        flexibleSpace: Container(
+          decoration: BoxDecoration(
+            color: Theme.of(context).scaffoldBackgroundColor,
+          ),
+        ),
+        actions: [
+          ValueListenableBuilder(
+            valueListenable: filterPanelVisibleNotifier,
+            builder: (final BuildContext context, final value, final Widget? child) {
+              return IconButton(
+                icon: const Icon(Icons.filter_list),
+                color: value
+                    ? Theme.of(context).colorScheme.primary
+                    : null,
+                onPressed: () {
+                  filterPanelVisibleNotifier.value =
+                  !filterPanelVisibleNotifier.value;
+                },
+              );
+            },
+          ),
+        ],
       ),
       body: Column(
         children: [
-          FilterPanel(
-            children: [
-              CustomDateRangePicker(
-                initialTimeRange: initialDateTime,
-                onDateRangeChanged:
-                    (final DateTime startDate, final DateTime endDate) {
+          ValueListenableBuilder(
+            valueListenable: filterPanelVisibleNotifier,
+            builder: (final BuildContext context, value, final Widget? child) {
+              return FilterPanel(
+                isExpanded: value,
+                onToggle: () {
                   setState(() {
-                    this.startDate = startDate;
-                    this.endDate = endDate;
-                    initialDateTime = DateTimeRange(
-                      start: startDate,
-                      end: endDate,
-                    );
-                    topCategoriesFuture =
-                        calculateTopCategories(startDate, endDate);
+                    value = !value;
                   });
                 },
-              ),
-              DropdownButtonFormField<PriceUnit>(
-                value: priceUnit,
-                alignment: Alignment.centerRight,
-                menuMaxHeight: 225,
-                hint: const Text("Unit"),
-                iconSize: 0,
-                items: PriceUnit.values.map((final PriceUnit value) {
-                  return DropdownMenuItem<PriceUnit>(
-                    value: value,
-                    child: Text(value.name),
-                  );
-                }).toList(),
-                onChanged: (final PriceUnit? value) {
-                  setState(() {
-                    priceUnit = value ?? PriceUnit.Others;
-                    topCategoriesFuture =
-                        calculateTopCategories(startDate, endDate);
-                  });
-                },
-              ),
-            ],
+                children: [
+                  CustomDateRangePicker(
+                    initialTimeRange: initialDateTime,
+                    onDateRangeChanged:
+                        (final DateTime startDate, final DateTime endDate) {
+                      setState(() {
+                        this.startDate = startDate;
+                        this.endDate = endDate;
+                        initialDateTime = DateTimeRange(
+                          start: startDate,
+                          end: endDate,
+                        );
+                        topCategoriesFuture =
+                            calculateTopCategories(startDate, endDate);
+                      });
+                    },
+                  ),
+                  DropdownButtonFormField<PriceUnit>(
+                    value: priceUnit,
+                    alignment: Alignment.centerRight,
+                    menuMaxHeight: 225,
+                    hint: const Text("Unit"),
+                    iconSize: 0,
+                    items: PriceUnit.values.map((final PriceUnit value) {
+                      return DropdownMenuItem<PriceUnit>(
+                        value: value,
+                        child: Text(value.name),
+                      );
+                    }).toList(),
+                    onChanged: (final PriceUnit? value) {
+                      setState(() {
+                        priceUnit = value ?? PriceUnit.Others;
+                        topCategoriesFuture =
+                            calculateTopCategories(startDate, endDate);
+                      });
+                    },
+                  ),
+                ],
+              );
+            },
           ),
           Expanded(
             child: ValueListenableBuilder<Box>(
@@ -285,10 +319,11 @@ class _SummaryMainState extends ConsumerState<SummaryMain>
         switch (_selection.first) {
           case SortType.amount:
             selectedInvoices.sort(
-                  (final a, final b) => b.totalAmount.compareTo(a.totalAmount));
+                (final a, final b) => b.totalAmount.compareTo(a.totalAmount));
             break;
           case SortType.date:
-            selectedInvoices.sort((final a, final b) => b.date.compareTo(a.date));
+            selectedInvoices
+                .sort((final a, final b) => b.date.compareTo(a.date));
             break;
         }
 
