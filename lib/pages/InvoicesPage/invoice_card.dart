@@ -30,6 +30,13 @@ class InvoiceCard extends ConsumerWidget {
             stops: [0.20, 0.5, 0.65],
             colors: [Color(0xBF614385), Color(0x59C2E9FB), Color(0xBF516395)],
           ),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.white.withOpacity(0.3),
+              blurRadius: 12,
+              offset: const Offset(0, 4),
+            ),
+          ],
         ),
         child: Material(
           type: MaterialType.transparency,

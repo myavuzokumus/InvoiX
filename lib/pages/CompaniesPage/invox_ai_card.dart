@@ -18,6 +18,13 @@ class InvoixAICard extends StatelessWidget {
           colors: [Color(0xFFDA0000),Color(
               0xFFFF8F00),Color(0x66880202)],
         ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.white.withOpacity(0.3),
+            blurRadius: 12,
+            offset: const Offset(0, 4),
+          ),
+        ],
       ),
       child: Material(
         type: MaterialType.transparency,
