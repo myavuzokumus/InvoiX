@@ -17,6 +17,7 @@ class CompanySearchBar extends ConsumerWidget {
       padding: const EdgeInsets.symmetric(horizontal: 8),
       child: TextField(
         controller: _controller,
+        focusNode: FocusNode(),
         autofocus: false,
         onChanged: (final newQuery) {
           ref.read(queryProvider.notifier).updateQuery(newQuery);
