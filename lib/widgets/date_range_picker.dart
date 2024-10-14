@@ -57,6 +57,17 @@ class _CustomDateRangePickerState extends State<CustomDateRangePicker> {
           initialDateRange: initialDateTime,
           firstDate: DateTime(1900),
           lastDate: DateTime.now(),
+          builder: (final BuildContext context, final Widget? child) {
+            return Center(
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(maxHeight: 525.0, maxWidth: 325),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(16.0),
+                  child: child,
+                ),
+              ),
+            );
+          },
         );
         if (pickedDate != null) {
           final List<String> formattedDate = [
