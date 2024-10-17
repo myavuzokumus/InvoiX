@@ -2,6 +2,7 @@ import 'package:cross_file/cross_file.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
+import 'package:invoix/l10n/localization_extension.dart';
 import 'package:invoix/models/invoice_data.dart';
 import 'package:invoix/pages/InvoiceEditPage/invoice_edit.dart';
 import 'package:invoix/pages/InvoicesPage/ai_button.dart';
@@ -71,16 +72,16 @@ class InvoiceCard extends ConsumerWidget {
                       physics: const NeverScrollableScrollPhysics(),
                       shrinkWrap: true,
                       children: <Widget>[
-                        if (selectionMode != null) Text("Company Name\n${invoiceData.companyName}", overflow: TextOverflow.ellipsis,),
+                        if (selectionMode != null) Text("${context.l10n.invoice_companyName}\n${invoiceData.companyName}", overflow: TextOverflow.ellipsis,),
                         if (selectionMode != null) const Divider(height: 2),
-                        Text("Date\n${DateFormat("dd-MM-yyyy").format(invoiceData.date)}"),
+                        Text("${context.l10n.invoice_date}\n${DateFormat("dd-MM-yyyy").format(invoiceData.date)}"),
                         const Divider(height: 2),
                         Row(
                           mainAxisAlignment: MainAxisAlignment.start,
                           children: [
-                            Text("Total\n${invoiceData.unit} ${invoiceData.totalAmount}"),
+                            Text("${context.l10n.invoice_totalAmount}\n${invoiceData.unit} ${invoiceData.totalAmount}"),
                             const SizedBox(width: 16),
-                            Text("Tax\n${invoiceData.unit} ${invoiceData.taxAmount}"),
+                            Text("${context.l10n.invoice_taxAmount}\n${invoiceData.unit} ${invoiceData.taxAmount}"),
                           ],
                         ),
                       ],

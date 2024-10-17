@@ -1,6 +1,216 @@
 {
   "@@locale": "tr",
 
+  "auth_loginError": "Giriş yapılırken bir hata oluştu: {error}",
+  "@auth_loginError": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "auth_loginToUseAI": "Yapay zeka özelliklerine erişmek için giriş yapın.",
+  "auth_logOut": "Çıkış Yap",
+
+  "subsplan_selectPlan": "Planını Seç",
+  "subsplan_individualUser": "Bireysel Kullanıcı",
+  "subsplan_advancedUser": "İleri Kullanıcı",
+  "subsplan_corporateUser": "Kurumsal Kullanıcı",
+  "subsplan_subscribe": "Abone Ol",
+  "subsplan_contactUs": "İletişime Geç",
+  "subsplan_individualPrice": "3€ / Aylık",
+  "subsplan_advancedPrice": "15€ / Aylık",
+  "subsplan_corporatePrice": "??? / Aylık",
+  "subsplan_individualFeatures_1": "1000 AI fatura okutma",
+  "subsplan_individualFeatures_2": "1000 AI fatura analizi yapma",
+  "subsplan_individualFeatures_3": "Kişiselleştirilmiş Stok takibi",
+  "subsplan_advancedFeatures_1": "10000 AI Fatura Okutma",
+  "subsplan_advancedFeatures_2": "10000 AI fatura analizi yapma",
+  "subsplan_advancedFeatures_3": "Kişiselleştirilmiş stok takibi",
+  "subsplan_corporateFeatures": "Kullanımına bağlı fiyatlandırma",
+  "subsplan_newUserOffer": "Yeni Kullanıcı Teklifi",
+  "subsplan_newUserOfferDetails": "İlk kullanıma özel 30 AI Fatura okutma ve 10 AI fatura analizi ücretsiz!",
+  "subsplan_plans": "Planlar",
+
+  "profile_remainingInvoiceReads": "Kalan Fatura Okumaları",
+  "profile_remainingInvoiceAnalyses": "Kalan Fatura Analizleri",
+  "profile_invoiceReads": "Fatura Okumaları",
+  "profile_invoiceAnalyses": "Fatura Analizleri",
+  "profile_subscriptionExpiryDate": "Abonelik Bitiş Tarihi",
+  "profile_subscriptionStatus": "Abonelik Durumu",
+  "profile_noData": "Abonelik verisi mevcut değil.",
+
+  "settings_settings": "Ayarlar",
+  "settings_language": "Dil",
+  "settings_welcomePage": "Hoş Geldin Sayfası",
+  "settings_privacyPolicy": "Gizlilik Politikası",
+  "settings_termsOfService": "Hizmet Şartları",
+  "settings_changeLanguage": "Dili Değiştir",
+  "settings_selectLanguage": "Dil Seç",
+  "settings_deleteAccount": "Hesabı Sil",
+  "settings_deleteAccountConfirmTitle": "Hesabı Sil",
+  "settings_deleteAccountConfirmMessage": "Hesabınızı silmek istediğinizden emin misiniz?\nBu işlem geri alınamaz.",
+  "settings_deleteAccountConfirmYes": "Evet, Hesabı Sil",
+  "settings_deleteAccountError": "Hesabınızı silerken bir hata oluştu.",
+  "settings_deleteAccountSuccess": "Hesabınız başarıyla silindi.",
+  "settings_cancel": "Hayır, İptal",
+
+
+  "status_noInternetConnection": "İnternet Bağlantısı Yok!",
+  "status_noUsageRights": "Yapay zeka özelliklerini kullanma hakkınız kalmadı.",
+  "status_noLogin": "Giriş yapmadınız.",
+  "status_somethingWentWrong": "Bir şeyler yanlış gitti.",
+
+  "loading_data" : "Processing Data...",
+  "loading_success" : "Data Processed!",
+
+  "aiinsights_name" : "AI Öngörüleri",
+  "aiinsights_juststart" : "Başlamak için fatura ekle simgesine tıklayın.",
+  "aiinsights_new" : "Ben InvoiX, yapay zeka asistanınızım.\nFaturalarınızla ilgili öngörüleri görmek için tıklayın.",
+  "aiinsights_selectable" : "Çoklu faturaları seçebilir ve silme veya excel çıktısı alabilirsiniz.",
+  "aiinsights_soon": "AI Öngörüleri yalnızca aboneler için çok yakında kullanılabilir. Çalışmalar devam ediyor.",
+
+  "aianalyze_title" : "Faturayı yapay zeka ile analiz et",
+  "aianalyze_purchasedProducts" : "Satın alınan ürünler",
+  "aianalyze_warn" : "Sağlanan bilgiler bazen yanlış olabilir.\nLütfen bunu göz önünde bulundurun ve tavsiyelere dikkat edin.",
+  "aianalyze_harmfulHuman" : "Satın alınan ürünler insan sağlığına zararlı mı?",
+  "aianalyze_harmfulEnvironment" : "Satın alınan ürünler çevreye zararlı mı?",
+  "aianalyze_alternatives" : "Satın alınan ürünlerin alternatifleri nelerdir?",
+  "aianalyze_conscious" : "Daha bilinçli tüketim için neler önerilebilir??",
+  "aianalyze_valueChanged" : "Satın alınan ürünlerin piyasa değeri nedir? Bu değer geçen yıl nasıl değişti?",
+
+  "summary_title": "Özet",
+  "summary_top5": "En İyi 5 Fatura",
+  "summary_notFound": "Fatura verileri bulunamadı.\n\nFiltre ayarlarını değiştirmeyi deneyin.",
+
+  "selectionMode_delete": "Silme",
+  "selectionMode_output": "Çıktı",
+  "selectionMode_error": "{action} için {type} seçilirken bir hata oluştu!",
+  "@selectionMode_error": {
+    "placeholders": {
+      "type": {
+        "type": "String"
+      },
+      "action": {
+        "type": "String"
+      }
+    }
+  },
+  "selectionMode_noSelection": "{action} için {type} seçilmedi!",
+  "@selectionMode_noSelection": {
+    "placeholders": {
+      "type": {
+        "type": "String"
+      },
+      "action": {
+        "type": "String"
+      }
+    }
+  },
+
+  "changeCompanyName_title" : "Yeni şirket adınızı ne olarak değiştirmek istersiniz?",
+  "changeCompanyName_label" : "Yeni Şirket adı:",
+  "changeCompanyName_enterName" : "Yeni şirket adını girin.",
+
+  "similarity_title" : "Benzer Şirket Bulundu!",
+  "similarity_message" : "Birleşmek ister misiniz?",
+
+  "message_blurChecker": "Resim yeterince net değil.\nDoğru okunmayabilir.",
+  "message_noInvoices" : "Fatura bulunamadı.",
+  "message_analyzing": "Fatura analiz ediliyor...",
+  "message_invalidId": "Geçersiz ürün numarası.",
+  "message_cooldown": "Faturayı tekrar analiz etmeden önce lütfen {remainingTime} saniye bekleyin.",
+  "@message_cooldown": {
+    "placeholders": {
+      "remainingTime": {
+        "type": "Integer"
+      }
+    }
+  },
+
+  "invoice_companyType" : "Şirket Tipi",
+  "invoice_companyName" : "Şirket Adı",
+  "invoice_companyId" : "Şirket Numarası",
+  "invoice_invoiceNo" : "Fatura Numarası",
+  "invoice_unit" : "Birim",
+  "invoice_date" : "Tarih",
+  "invoice_category" : "Kategori",
+  "invoice_totalAmount" : "Toplam Tutar",
+  "invoice_taxAmount" : "Vergi Tutarı",
+
+  "error_validInput" : "Lütfen geçerli bir {input} girin.",
+  "@error_validInput": {
+    "placeholders": {
+      "input": {
+        "type": "String"
+      }
+    }
+  },
+  "error_pleaseSelect" : "Lütfen bir {input} seçin.",
+  "@error_pleaseSelect": {
+    "placeholders": {
+      "input": {
+        "type": "String"
+      }
+    }
+  },
+  "error_pleaseEnterText" : "Lütfen metin girin.",
+  "error_switchingMode" : "Eski moda geçiş yapılıyor...",
+
+  "warn_pleaseSelect" : "Bir {input} seçmelisiniz.",
+  "@warn_pleaseSelect": {
+    "placeholders": {
+      "input": {
+        "type": "String"
+      }
+    }
+  },
+
+  "success_companyNameChanged" : "Şirket adı başarıyla değiştirildi.",
+  "success_output" : "{text} {type}(s) listesi indirme dosyasında excel çıktısı olarak kaydedildi.",
+  "@success_output": {
+    "placeholders": {
+      "text": {
+        "type": "String"
+      },
+      "type": {
+        "type": "String"
+      }
+    }
+  },
+
+  "button_save" : "Kaydet",
+  "button_yes" : "Evet",
+  "button_cancel" : "İptal",
+  "button_change" : "Değiştir",
+  "button_start" : "Başla",
+  "button_skip" : "Atla",
+
+  "page_editinvoice_zoom": "Görüntü detaylarını görmek için yakınlaştırın ve uzaklaştırın.",
+
+  "welcomePage_title_1": "InvoiX'e Hoş Geldiniz!",
+  "welcomePage_description_1": "InvoiX, yapay zeka teknolojisini kullanarak kapsamlı fatura analizi sağlar.",
+
+  "welcomePage_title_2": "Yapay Zeka Destekli Fatura Analizi",
+  "welcomePage_description_2": "Yapay zekayı kullanarak detaylı öngörüler elde edin ve fatura işlemlerinizi kolaylaştırın.",
+
+  "welcomePage_title_3": "Fatura Yönetiminizi Optimize Edin",
+  "welcomePage_description_3": "Faturalarınızı yapay zeka ile analiz ederek verimliliği ve doğruluğu artırın.",
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
   "apiErrorUserNotFound": "Kullanıcı bulunamadı.",
   "apiErrorWrongPassword": "Yanlış şifre.",
   "apiErrorUserDisabled": "Kullanıcı hesabı devre dışı bırakılmış.",
@@ -49,14 +259,6 @@
       }
     }
   },
-  "loginError": "Giriş yapılırken bir hata oluştu: {error}",
-  "@loginError": {
-    "placeholders": {
-      "error": {
-        "type": "String"
-      }
-    }
-  },
   "send": "Gönder",
   "passwordResetEmailSent": "{email} adresine şifre sıfırlama e-postası gönderildi.",
   "@passwordResetEmailSent": {
@@ -76,38 +278,5 @@
   },
   "username": "Kullanıcı Adı",
   "pleaseEnterYourUsername": "Lütfen kullanıcı adınızı giriniz",
-  "pleaseConfirmYourPassword": "Lütfen şifrenizi onaylayınız",
-
-  "selectPlan": "Planını Seç",
-  "individualUser": "Bireysel Kullanıcı",
-  "advancedUser": "İleri Kullanıcı",
-  "corporateUser": "Kurumsal Kullanıcı",
-  "subscribe": "Abone Ol",
-  "contactUs": "İletişime Geç",
-  "individualPrice": "3€ / Aylık",
-  "advancedPrice": "15€ / Aylık",
-  "corporatePrice": "??? / Aylık",
-  "individualFeatures_1": "1000 AI fatura okutma",
-  "individualFeatures_2": "1000 AI fatura analizi yapma",
-  "individualFeatures_3": "Kişiselleştirilmiş Stok takibi",
-  "advancedFeatures_1": "10000 AI Fatura Okutma",
-  "advancedFeatures_2": "10000 AI fatura analizi yapma",
-  "advancedFeatures_3": "Kişiselleştirilmiş stok takibi",
-  "corporateFeatures": "Kullanımına bağlı fiyatlandırma",
-  "newUserOffer": "Yeni Kullanıcı Teklifi",
-  "newUserOfferDetails": "İlk kullanıma özel 30 AI Fatura okutma ve 10 AI fatura analizi ücretsiz!",
-
-  "loginToUseAI": "Yapay zeka özelliklerine erişmek için giriş yapın.",
-  "logOut": "Çıkış Yap",
-
-  "remainingInvoiceReads": "Kalan Fatura Okumaları",
-  "remainingInvoiceAnalyses": "Kalan Fatura Analizleri",
-  "invoiceReads": "Fatura Okumaları",
-  "invoiceAnalyses": "Fatura Analizleri",
-  "subscriptionExpiryDate": "Abonelik Bitiş Tarihi",
-  "subscriptionStatus": "Abonelik Durumu",
-  "plans": "Planlar"
-
-
-
+  "pleaseConfirmYourPassword": "Lütfen şifrenizi onaylayınız"
 }

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:invoix/l10n/localization_extension.dart';
 import 'package:invoix/pages/SubscriptionPage/subscription_card.dart';
 import 'package:invoix/services/in_app_purchase_service.dart';
 
@@ -15,7 +15,6 @@ class SubscriptionTab extends StatelessWidget {
 
   @override
   Widget build(final BuildContext context) {
-    final localizations = AppLocalizations.of(context)!;
     final product = inAppPurchaseService.getProductById(productId);
 
     if (product == null) {
@@ -30,28 +29,28 @@ class SubscriptionTab extends StatelessWidget {
 
     switch (productId) {
       case 'individual_subscription':
-        title = localizations.individualUser;
-        buttonText = localizations.subscribe;
-        features = [localizations.individualFeatures_1, localizations.individualFeatures_2, localizations.individualFeatures_3];
+        title = context.l10n.subsplan_individualUser;
+        buttonText = context.l10n.subsplan_subscribe;
+        features = [context.l10n.subsplan_individualFeatures_1, context.l10n.subsplan_individualFeatures_2, context.l10n.subsplan_individualFeatures_3];
         icon = Icons.person;
         glowColor = Colors.blue;
         break;
       case 'advanced_subscription':
-        title = localizations.advancedUser;
-        buttonText = localizations.subscribe;
-        features = [localizations.advancedFeatures_1, localizations.advancedFeatures_2, localizations.advancedFeatures_3];
+        title = context.l10n.subsplan_advancedUser;
+        buttonText = context.l10n.subsplan_subscribe;
+        features = [context.l10n.subsplan_advancedFeatures_1, context.l10n.subsplan_advancedFeatures_2, context.l10n.subsplan_advancedFeatures_3];
         icon = Icons.people;
         glowColor = Colors.purple;
         break;
       case 'corporate_subscription':
-        title = localizations.corporateUser;
-        buttonText = localizations.contactUs;
-        features = [localizations.corporateFeatures];
+        title = context.l10n.subsplan_corporateUser;
+        buttonText = context.l10n.subsplan_contactUs;
+        features = [context.l10n.subsplan_corporateFeatures];
         icon = Icons.business;
         glowColor = Colors.orange;
         break;
       default:
-        return const Center(child: Text('Invalid product ID'));
+        return Center(child: Text(context.l10n.message_invalidId));
     }
     
     return Center(

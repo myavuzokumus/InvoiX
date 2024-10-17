@@ -27,7 +27,6 @@ class ProfileDropdown extends ConsumerWidget {
   @override
   Widget build(final BuildContext context, final WidgetRef ref) {
 
-    final localizations = AppLocalizations.of(context)!;
     final firebaseService = ref.watch(firebaseServiceProvider);
     final authState = ref.watch(authStateProvider);
 
@@ -80,7 +79,7 @@ class ProfileDropdown extends ConsumerWidget {
                                 fontWeight: FontWeight.bold)),
                       ] else ...[
                         _buildGoogleLoginButton(context, firebaseService),
-                        Text(localizations.loginToUseAI,
+                        Text(context.l10n.auth_loginToUseAI,
                             textAlign: TextAlign.center,
                             style: const TextStyle(fontSize: 18)),
                       ],
@@ -89,7 +88,7 @@ class ProfileDropdown extends ConsumerWidget {
                 ),
                 Divider(color: Colors.grey[700]),
                 if (user != null) ...[
-                  _buildUserSubscriptionInfo(firebaseService, localizations),
+                  _buildUserSubscriptionInfo(firebaseService),
                 ] else ...[
                   // Policy and terms
                   _buildPolicyAndTerms(),
@@ -112,7 +111,7 @@ class ProfileDropdown extends ConsumerWidget {
                     children: [
                       SettingsButton(
                         icon: Icons.shopping_cart,
-                        label: localizations.plans,
+                        label: context.l10n.subsplan_plans,
                         onPressed: () {
                           Navigator.push(
                             context,
@@ -138,7 +137,7 @@ class ProfileDropdown extends ConsumerWidget {
                       if (user != null)
                         SettingsButton(
                           icon: Icons.exit_to_app,
-                          label: localizations.logOut,
+                          label: context.l10n.auth_logOut,
                           onPressed: () async {
                             await firebaseService.signOut();
                           },
@@ -186,7 +185,7 @@ class ProfileDropdown extends ConsumerWidget {
       await firebaseService.signInWithGoogle();
     } catch (e) {
       Toast(context,
-          text: context.l10n.loginError(await currentStatusChecker("").then((final value) => value.name)));
+          text: context.l10n.auth_loginError(await currentStatusChecker().then((final value) => value.name)));
     }
   }
 
@@ -209,8 +208,7 @@ class ProfileDropdown extends ConsumerWidget {
     );
   }
 
-  Widget _buildUserSubscriptionInfo(final FirebaseService firebaseService,
-      final AppLocalizations localizations) {
+  Widget _buildUserSubscriptionInfo(final FirebaseService firebaseService) {
     return StreamBuilder<DocumentSnapshot?>(
       stream: firebaseService.getUserSubscriptionStream(),
       builder: (final context, final snapshot) {
@@ -222,18 +220,18 @@ class ProfileDropdown extends ConsumerWidget {
               style: const TextStyle(color: Colors.red));
         }
         if (!snapshot.hasData || !snapshot.data!.exists) {
-          return const Text('No subscription data available',
-              style: TextStyle(color: Colors.white));
+          return Text(context.l10n.profile_noData,
+              style: const TextStyle(color: Colors.white));
         }
         final userData = snapshot.data!.data()! as Map<String, dynamic>;
         return Column(
           children: [
             _buildInfoTile("Plan", '${userData['subscriptionId'] ?? 'None'}'),
-            _buildInfoTile(localizations.remainingInvoiceReads,
+            _buildInfoTile(context.l10n.profile_remainingInvoiceReads,
                 '${userData['aiInvoiceReads'] ?? 0}'),
-            _buildInfoTile(localizations.remainingInvoiceAnalyses,
+            _buildInfoTile(context.l10n.profile_remainingInvoiceAnalyses,
                 '${userData['aiInvoiceAnalyses'] ?? 0}'),
-            _buildInfoTile(localizations.subscriptionExpiryDate,
+            _buildInfoTile(context.l10n.profile_subscriptionExpiryDate,
                 _formatDate(userData['subscriptionExpiryDate'])),
           ],
         );

@@ -20,14 +20,15 @@ mixin _ListPageScaffoldMixin on ConsumerState<ListPageScaffold> {
       } else {
         Toast(
           context,
-          text: "No ${widget.type.name} selected for deletion!",
+          text: context.l10n.selectionMode_noSelection(widget.type.name, context.l10n.selectionMode_delete),
           color: Colors.redAccent,
         );
       }
     } catch (e) {
+      print("Error in onDelete: $e");
       Toast(
         context,
-        text: "An error occurred while deleting ${widget.type.name}!\n$e",
+        text: context.l10n.selectionMode_error(widget.type.name, context.l10n.selectionMode_delete),
         color: Colors.redAccent,
       );
     }
@@ -84,18 +85,20 @@ mixin _ListPageScaffoldMixin on ConsumerState<ListPageScaffold> {
 
         Toast(context,
             text:
-                "$text ${widget.type.name}(s) lists saved as excel output in Download file.",
+                context.l10n.success_output(text, widget.type.name),
             color: Colors.green);
       } else {
         Toast(
           context,
-          text: "No ${widget.type.name}(s) selected to Excel output!",
+          text: context.l10n.selectionMode_noSelection(widget.type.name, context.l10n.selectionMode_output),
           color: Colors.redAccent,
         );
       }
     } catch (e) {
-      Toast(context, text: e.toString(), color: Colors.redAccent);
       print("Error in onExcelOutput: $e");
+      Toast(context,
+          text: context.l10n.selectionMode_error(widget.type.name, context.l10n.selectionMode_output),
+          color: Colors.redAccent);
     } finally {
       _excelExportingNotifier.value = false;
     }

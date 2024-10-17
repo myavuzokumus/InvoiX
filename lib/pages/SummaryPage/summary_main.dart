@@ -2,6 +2,7 @@ import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive_flutter/hive_flutter.dart';
+import 'package:invoix/l10n/localization_extension.dart';
 import 'package:invoix/models/invoice_data.dart';
 import 'package:invoix/pages/CompaniesPage/invox_ai_card.dart';
 import 'package:invoix/pages/InvoicesPage/invoice_card.dart';
@@ -28,7 +29,7 @@ class _SummaryMainState extends ConsumerState<SummaryMain>
     super.build(context);
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Summary', style: TextStyle(fontWeight: FontWeight.bold)),
+        title: Text(context.l10n.summary_title, style: TextStyle(fontWeight: FontWeight.bold)),
         centerTitle: true,
         backgroundColor: Colors.transparent,
         flexibleSpace: Container(
@@ -87,7 +88,7 @@ class _SummaryMainState extends ConsumerState<SummaryMain>
                     value: priceUnit,
                     alignment: Alignment.centerRight,
                     menuMaxHeight: 225,
-                    hint: const Text("Unit"),
+                    hint: Text(context.l10n.invoice_unit),
                     iconSize: 0,
                     items: PriceUnit.values.map((final PriceUnit value) {
                       return DropdownMenuItem<PriceUnit>(
@@ -134,10 +135,9 @@ class _SummaryMainState extends ConsumerState<SummaryMain>
                                                 startDate, endDate);
                                       });
                                     },
-                                    children: const <Widget>[
+                                    children: <Widget>[
                                       Text(
-                                          "Invoice data couldn't be found.\n"
-                                          "\nTry to change filter settings.",
+                                          context.l10n.summary_notFound,
                                           style: TextStyle(
                                               fontWeight: FontWeight.bold)),
                                     ],
@@ -185,7 +185,7 @@ class _SummaryMainState extends ConsumerState<SummaryMain>
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Expanded(
-                    child: Text("Top 5 Invoices",
+                    child: Text(context.l10n.summary_top5,
                         style: Theme.of(context).textTheme.titleLarge),
                   ),
                   sortType(setModalState),
@@ -301,14 +301,14 @@ class _SummaryMainState extends ConsumerState<SummaryMain>
   Widget sortType(final void Function(void Function() p1) setModalState) {
     return SegmentedButton<SortType>(
       showSelectedIcon: false,
-      segments: const <ButtonSegment<SortType>>[
+      segments: <ButtonSegment<SortType>>[
         ButtonSegment<SortType>(
           value: SortType.amount,
-          label: Text('Amount'),
+          label: Text(context.l10n.invoice_totalAmount),
         ),
         ButtonSegment<SortType>(
           value: SortType.date,
-          label: Text('Date'),
+          label: Text(context.l10n.invoice_date),
         ),
       ],
       selected: _selection,

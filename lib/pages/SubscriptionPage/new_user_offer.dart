@@ -1,12 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:invoix/l10n/localization_extension.dart';
 
 class NewUserOffer extends StatelessWidget {
   const NewUserOffer({super.key});
 
   @override
   Widget build(final BuildContext context) {
-    final localizations = AppLocalizations.of(context)!;
     return Padding(
       padding: const EdgeInsets.all(18.0),
       child: Container(
@@ -26,12 +25,12 @@ class NewUserOffer extends StatelessWidget {
         child: Column(
           children: [
             Text(
-              localizations.newUserOffer,
+              context.l10n.subsplan_newUserOffer,
               style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.white),
             ),
             const SizedBox(height: 16),
             Text(
-              localizations.newUserOfferDetails,
+              context.l10n.subsplan_newUserOfferDetails,
               style: const TextStyle(color: Colors.white, fontSize: 18),
               textAlign: TextAlign.center,
             ),

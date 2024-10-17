@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive_flutter/hive_flutter.dart';
+import 'package:invoix/invoix_main.dart';
+import 'package:invoix/l10n/localization_extension.dart';
 import 'package:invoix/models/invoice_data.dart';
 import 'package:invoix/pages/InvoicesPage/invoice_card.dart';
 import 'package:invoix/pages/SummaryPage/summary_main.dart';
 import 'package:invoix/services/invoice_data_service.dart';
+import 'package:invoix/states/filter_state.dart';
 import 'package:invoix/states/invoice_data_state.dart';
 import 'package:invoix/states/list_length_state.dart';
 import 'package:invoix/widgets/amount_range_slider.dart';
@@ -25,49 +28,57 @@ class InvoiceList extends ConsumerStatefulWidget {
 
 class _InvoiceListState extends ConsumerState<InvoiceList>
     with _InvoiceListMixin {
-
   @override
   Widget build(final BuildContext context) {
-
     return Column(
       children: [
-        FilterPanel(children: [
-          CustomDateRangePicker(
-            initialTimeRange: initialDateTime,
-            onDateRangeChanged: (final DateTime startDate,
-                final DateTime endDate) {
-              setState(() {
-                this.startDate = startDate;
-                this.endDate = endDate;
-                initialDateTime = DateTimeRange(
-                  start: startDate,
-                  end: endDate,
-                );
-                originalInvoicesFuture =
-                    retrieveInvoicesAccordingDate(
-                        startDate, endDate, widget.companyName);
-                filteredInvoicesFuture = originalInvoicesFuture;
-              });
-            },
-          ),
-          AmountRangeSlider(
-            minAmount: minAmount,
-            maxAmount: maxAmount,
-            onAmountRangeChanged:
-                (final double minAmount, final double maxAmount) {
-              setState(() {
-                filteredInvoicesFuture = originalInvoicesFuture
-                    .then((final List<InvoiceData> invoices) =>
-                    invoices.where((final invoice) {
-                      return (invoice.totalAmount >=
-                          minAmount &&
-                          invoice.totalAmount <= maxAmount);
-                    }).toList());
-              });
-            },
-          ),
-          sortType(),
-        ]),
+        ValueListenableBuilder(
+          valueListenable: ref.read(filterPanelVisibleProvider),
+          builder: (final BuildContext context, value, final Widget? child) {
+            return FilterPanel(
+                isExpanded: value,
+                onToggle: () {
+                  setState(() {
+                    value = !value;
+                  });
+                },
+                children: [
+                  CustomDateRangePicker(
+                    initialTimeRange: initialDateTime,
+                    onDateRangeChanged:
+                        (final DateTime startDate, final DateTime endDate) {
+                      setState(() {
+                        this.startDate = startDate;
+                        this.endDate = endDate;
+                        initialDateTime = DateTimeRange(
+                          start: startDate,
+                          end: endDate,
+                        );
+                        originalInvoicesFuture = retrieveInvoicesAccordingDate(
+                            startDate, endDate, widget.companyName);
+                        filteredInvoicesFuture = originalInvoicesFuture;
+                      });
+                    },
+                  ),
+                  AmountRangeSlider(
+                    minAmount: minAmount,
+                    maxAmount: maxAmount,
+                    onAmountRangeChanged:
+                        (final double minAmount, final double maxAmount) {
+                      setState(() {
+                        filteredInvoicesFuture = originalInvoicesFuture.then(
+                            (final List<InvoiceData> invoices) =>
+                                invoices.where((final invoice) {
+                                  return (invoice.totalAmount >= minAmount &&
+                                      invoice.totalAmount <= maxAmount);
+                                }).toList());
+                      });
+                    },
+                  ),
+                  sortType(),
+                ]);
+          },
+        ),
         const SizedBox(
           height: 10,
         ),
@@ -93,8 +104,8 @@ class _InvoiceListState extends ConsumerState<InvoiceList>
       });
 
       if (invoiceList.isEmpty) {
-        return const Center(
-          child: Text('No invoices found.'),
+        return Center(
+          child: Text(context.l10n.message_noInvoices),
         );
       }
 
@@ -143,25 +154,25 @@ class _InvoiceListState extends ConsumerState<InvoiceList>
   Widget sortType() {
     return SegmentedButton<SortType>(
       showSelectedIcon: false,
-      segments: const <ButtonSegment<SortType>>[
+      segments: <ButtonSegment<SortType>>[
         ButtonSegment<SortType>(
           value: SortType.amount,
-          label: Text('Amount'),
+          label: Text(context.l10n.invoice_totalAmount),
         ),
         ButtonSegment<SortType>(
           value: SortType.date,
-          label: Text('Date'),
+          label: Text(context.l10n.invoice_date),
         ),
       ],
       selected: _selection,
       onSelectionChanged: (final Set<SortType> newSelection) async {
-
         _selection = newSelection;
         final List<InvoiceData> sortedInvoices = await filteredInvoicesFuture;
         switch (_selection.first) {
           case SortType.amount:
-            filteredInvoicesFuture = Future.value(sortedInvoices..sort(
-                      (final a, final b) => b.totalAmount.compareTo(a.totalAmount)));
+            filteredInvoicesFuture = Future.value(sortedInvoices
+              ..sort((final a, final b) =>
+                  b.totalAmount.compareTo(a.totalAmount)));
             break;
           case SortType.date:
             filteredInvoicesFuture = Future.value(sortedInvoices
@@ -169,11 +180,8 @@ class _InvoiceListState extends ConsumerState<InvoiceList>
             break;
         }
 
-        setState(() {
-
-        });
+        setState(() {});
       },
     );
   }
-
 }

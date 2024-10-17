@@ -36,7 +36,7 @@ mixin _InvoiceListMixin on ConsumerState<InvoiceList>{
     final List<InvoiceData> invoices = (await invoiceDataService
         .getInvoicesBetweenDates(startDate, endDate))
         .where((final invoice) => invoice.companyName == companyName)
-        .toList()..sort((a, b) => a.date.compareTo(b.date));
+        .toList()..sort((final a, final b) => a.date.compareTo(b.date));
 
     calculateMinMaxAmounts(invoices);
 

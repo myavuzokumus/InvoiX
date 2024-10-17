@@ -3,6 +3,8 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive_flutter/hive_flutter.dart';
+import 'package:invoix/invoix_main.dart';
+import 'package:invoix/l10n/localization_extension.dart';
 import 'package:invoix/models/invoice_data.dart';
 import 'package:invoix/pages/CompaniesPage/invox_ai_card.dart';
 import 'package:invoix/pages/InvoicesPage/invoice_main.dart';
@@ -43,12 +45,12 @@ class _CompanyListState extends ConsumerState<CompanyList> with _CompanyListMixi
               final Widget? child) {
             // Check if there is any invoice data
             if (invoiceDataService.invoiceDataBox.values.isEmpty) {
-              return const Center(
+              return Center(
                 child: Padding(
-                  padding: EdgeInsets.all(32),
+                  padding: const EdgeInsets.all(32),
                   child: InvoixAICard(
                     children: <Widget>[
-                      Text("Just click on the invoice add icon to get started."),
+                      Text(context.l10n.aiinsights_juststart),
                     ],
                   ),
                 ),
@@ -225,7 +227,7 @@ class _CompanyListState extends ConsumerState<CompanyList> with _CompanyListMixi
       content: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          const Text("What would you like to change new company name?"),
+          Text(context.l10n.changeCompanyName_title),
           const SizedBox(height: 12),
           Form(
             key: _companyNameformKey,
@@ -234,9 +236,9 @@ class _CompanyListState extends ConsumerState<CompanyList> with _CompanyListMixi
               maxLength: 100,
               controller: companyTextController,
               decoration: InputDecoration(
-                  labelText: "New Company name:",
+                  labelText: context.l10n.changeCompanyName_label,
                   labelStyle: const TextStyle(fontSize: 16),
-                  hintText: "Enter new company name",
+                  hintText: context.l10n.changeCompanyName_enterName,
                   suffixIcon: Row(
                     mainAxisSize: MainAxisSize.min,
                     mainAxisAlignment:
@@ -250,7 +252,7 @@ class _CompanyListState extends ConsumerState<CompanyList> with _CompanyListMixi
                           value: companySuffix,
                           alignment: Alignment.center,
                           menuMaxHeight: 225,
-                          hint: const Text("Type"),
+                          hint: Text(context.l10n.invoice_companyType),
                           iconSize: 0,
                           items: CompanyType.values.map(
                                   (final CompanyType value) {
@@ -271,25 +273,25 @@ class _CompanyListState extends ConsumerState<CompanyList> with _CompanyListMixi
                           ),
                           validator: (final value) {
                             if (value == null) {
-                              return 'Please select company type.';
+                              return context.l10n.error_pleaseSelect(context.l10n.invoice_companyType);
                             }
                             return null;
                           },
                         ),
 
                       ),
-                      const Padding(
-                        padding: EdgeInsets.only(right: 12.0, left: 4.0),
+                      Padding(
+                        padding: const EdgeInsets.only(right: 12.0, left: 4.0),
                         child: WarnIcon(
                             message:
-                            "You must choose a company type."),
+                            context.l10n.warn_pleaseSelect(context.l10n.invoice_companyType)),
                       ),
                     ],
                   )),
               validator: (final value) {
                 if (value == null ||
                     value.isEmpty) {
-                  return 'Please enter some text';
+                  return context.l10n.error_pleaseEnterText;
                 }
                 return null;
               },
@@ -302,7 +304,7 @@ class _CompanyListState extends ConsumerState<CompanyList> with _CompanyListMixi
           onPressed: () {
             Navigator.pop(context);
           },
-          child: const Text("Cancel"),
+          child: Text(context.l10n.button_cancel),
         ),
         TextButton(
           onPressed: () async {
@@ -334,16 +336,16 @@ class _CompanyListState extends ConsumerState<CompanyList> with _CompanyListMixi
               }
               Navigator.pop(context);
               Toast(context,
-                  text: "Company name has been changed successfully.",
+                  text: context.l10n.success_companyNameChanged,
                   color: Colors.greenAccent);
             } else {
               Toast(context,
-                  text: "Please enter a valid company name.",
+                  text: context.l10n.error_validInput(context.l10n.invoice_companyName),
                   color: Colors.redAccent
               );
             }
           },
-          child: const Text("Change"),
+          child: Text(context.l10n.button_save),
         ),
       ],
     );

@@ -1,6 +1,5 @@
 {
   "en": [
-    "auth_loginError",
     "apiErrorUserNotFound",
     "apiErrorWrongPassword",
     "apiErrorUserDisabled",

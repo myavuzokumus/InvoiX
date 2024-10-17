@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:invoix/l10n/localization_extension.dart';
 import 'package:invoix/pages/SubscriptionPage/new_user_offer.dart';
 import 'package:invoix/pages/SubscriptionPage/subscription_tab.dart';
 import 'package:invoix/services/in_app_purchase_service.dart';
@@ -40,7 +41,6 @@ class _SubscriptionPageState extends ConsumerState<SubscriptionPage> {
 
   @override
   Widget build(final BuildContext context) {
-    final localizations = AppLocalizations.of(context)!;
     final isPortrait =
         MediaQuery.of(context).orientation == Orientation.portrait;
 
@@ -51,15 +51,15 @@ class _SubscriptionPageState extends ConsumerState<SubscriptionPage> {
           backgroundColor: Colors.transparent,
           centerTitle: true,
           title: Text(
-            localizations.selectPlan,
+            context.l10n.subsplan_selectPlan,
             style: const TextStyle(
                 fontSize: 28, fontWeight: FontWeight.bold, color: Colors.white),
           ),
           bottom: TabBar(
                   tabs: [
-                    Tab(text: localizations.individualUser),
-                    Tab(text: localizations.advancedUser),
-                    Tab(text: localizations.corporateUser),
+                    Tab(text: context.l10n.subsplan_individualUser),
+                    Tab(text: context.l10n.subsplan_advancedUser),
+                    Tab(text: context.l10n.subsplan_corporateUser),
                   ],
                 ),
         ),

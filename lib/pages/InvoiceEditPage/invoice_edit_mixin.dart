@@ -74,7 +74,7 @@ mixin _InvoiceEditPageMixin on ConsumerState<InvoiceEditPage> {
   Future<void> analyzeNewData() async {
     if (await blurDetection(imageFile.path, 10) && mounted) {
       Toast(context,
-          text: "The image is not clear enough.\nIt may not be read properly.",
+          text: context.l10n.message_blurChecker,
           color: Colors.redAccent);
     }
     await imageFilter(imageFile);
@@ -95,7 +95,7 @@ mixin _InvoiceEditPageMixin on ConsumerState<InvoiceEditPage> {
 
         ref.read(loadingProvider.notifier).state = ref
             .read(loadingProvider)
-            .copyWith(message: "$error\nSwitching to Legacy Mode...");
+            .copyWith(message: "$error\n${context.l10n.error_switchingMode}");
 
         await Future.delayed(const Duration(seconds: 3));
 
@@ -171,17 +171,16 @@ mixin _InvoiceEditPageMixin on ConsumerState<InvoiceEditPage> {
                 barrierDismissible: false,
                 context: context,
                 builder: (final BuildContext context) => AlertDialog(
-                  title: const Text(
-                    'Similar Company Found!',
-                    style: TextStyle(color: Colors.redAccent),
+                  title: Text(context.l10n.similarity_title,
+                    style: const TextStyle(color: Colors.redAccent),
                   ),
                   content: SingleChildScrollView(
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        const Text('Do you want to merge with it?',
-                            style: TextStyle(
+                        Text(context.l10n.similarity_message,
+                            style: const TextStyle(
                                 fontSize: 16, fontWeight: FontWeight.bold)),
                         FilledButton(
                           onPressed: () {},
@@ -200,11 +199,11 @@ mixin _InvoiceEditPageMixin on ConsumerState<InvoiceEditPage> {
                   actions: <Widget>[
                     TextButton(
                       onPressed: () => Navigator.pop(context, false),
-                      child: const Text('Cancel'),
+                      child: Text(context.l10n.button_cancel),
                     ),
                     TextButton(
                       onPressed: () => Navigator.pop(context, true),
-                      child: const Text('Yes!'),
+                      child: Text(context.l10n.button_yes),
                     ),
                   ],
                 ),
@@ -222,7 +221,7 @@ mixin _InvoiceEditPageMixin on ConsumerState<InvoiceEditPage> {
 
         if (mounted) {
           Toast(context,
-              text: "Processing Data...", color: Colors.yellowAccent);
+              text: context.l10n.loading_data, color: Colors.yellowAccent);
         }
 
         final data = InvoiceData(
@@ -242,12 +241,12 @@ mixin _InvoiceEditPageMixin on ConsumerState<InvoiceEditPage> {
         _isFileSaved = true;
 
         if (mounted) {
-          Toast(context, text: "Data Processed!", color: Colors.greenAccent);
+          Toast(context, text: context.l10n.loading_success, color: Colors.greenAccent);
           Navigator.pop(context);
         }
       } catch (e) {
         Toast(context,
-            text: "Something went wrong.\n$e", color: Colors.redAccent);
+            text: "${context.l10n.status_somethingWentWrong}:\n$e", color: Colors.redAccent);
       } finally {
         setState(() {
           _saveButtonState.value = false;

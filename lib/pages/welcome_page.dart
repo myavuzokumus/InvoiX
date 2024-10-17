@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:invoix/l10n/localization_extension.dart';
 
 class WelcomePage extends StatefulWidget {
   final VoidCallback onDone;
@@ -12,26 +13,31 @@ class WelcomePage extends StatefulWidget {
 class _WelcomePageState extends State<WelcomePage> {
   final PageController _pageController = PageController(initialPage: 0);
   int _currentPage = 0;
+  late final List<Map<String, String>> welcomeData;
 
-  List<Map<String, String>> welcomeData = [
-    {
-      "title": "Kolay Kullanım",
-      "description":
-          "Uygulamamız kullanıcı dostu arayüzü ile size en iyi deneyimi sunar.",
-      "image": "assets/icons/welcome/easy_use.png",
-    },
-    {
-      "title": "Hızlı İşlem",
-      "description":
-          "İşlemlerinizi saniyeler içinde tamamlayın ve zamandan tasarruf edin.",
-      "image": "assets/icons/welcome/fast_process.png",
-    },
-    {
-      "title": "Güvenli Altyapı",
-      "description": "Verileriniz en üst düzey güvenlik önlemleriyle korunur.",
-      "image": "assets/icons/welcome/secure_infrastructure.png",
-    },
-  ];
+  @override
+  initState() {
+
+    welcomeData = [
+      {
+        "title": context.l10n.welcomePage_title_1,
+        "description": context.l10n.welcomePage_description_1,
+        "image": "assets/icons/welcome/easy_use.png",
+      },
+      {
+        "title": context.l10n.welcomePage_title_2,
+        "description": context.l10n.welcomePage_description_2,
+        "image": "assets/icons/welcome/fast_process.png",
+      },
+      {
+        "title": context.l10n.welcomePage_title_3,
+        "description": context.l10n.welcomePage_description_3,
+        "image": "assets/icons/welcome/secure_infrastructure.png",
+      },
+    ];
+
+    super.initState();
+  }
 
   @override
   Widget build(final BuildContext context) {
@@ -67,13 +73,13 @@ class _WelcomePageState extends State<WelcomePage> {
             right: 20.0,
             child: _currentPage == welcomeData.length - 1
                 ? ElevatedButton(
-                    child: const Text("Başla"),
+                    child: Text(context.l10n.button_start),
                     onPressed: () {
                       widget.onDone();
                     },
                   )
                 : TextButton(
-                    child: const Text("Atla"),
+                    child: Text(context.l10n.button_skip),
                     onPressed: () {
                       _pageController.animateToPage(
                         welcomeData.length - 1,

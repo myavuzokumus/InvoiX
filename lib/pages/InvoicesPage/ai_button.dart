@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:invoix/l10n/localization_extension.dart';
 import 'package:invoix/models/invoice_analysis.dart';
 import 'package:invoix/models/invoice_data.dart';
 import 'package:invoix/services/firebase_service.dart';
@@ -24,6 +25,7 @@ class AIButton extends ConsumerWidget {
 
   @override
   Widget build(final BuildContext context, final WidgetRef ref) {
+    print(context.l10n.invoice_date);
     return IconButton.outlined(
       style: OutlinedButton.styleFrom(
         backgroundColor: Colors.black.withOpacity(0.35),
@@ -56,7 +58,7 @@ class AIButton extends ConsumerWidget {
             constraints: BoxConstraints(
               maxHeight: MediaQuery.of(context).size.height * 0.75,
             ),
-            builder: (final BuildContext context) {
+            builder: (final BuildContext modalContext) {
               return LayoutBuilder(
                 builder: (final BuildContext context,
                     final BoxConstraints constraints) {
@@ -83,7 +85,7 @@ class AIButton extends ConsumerWidget {
                                       children: [
                                         LoadingAnimation(
                                             message:
-                                                "The invoice is being analyzed...",
+                                                context.l10n.message_analyzing,
                                             customHeight:
                                                 constraints.maxHeight - 110),
                                       ],
@@ -145,7 +147,7 @@ class AIButton extends ConsumerWidget {
                                     children: [
                                       LoadingAnimation(
                                           message:
-                                              "The invoice is being analyzed...",
+                                            context.l10n.message_analyzing,
                                           customHeight:
                                               constraints.maxHeight - 72),
                                     ],
@@ -163,11 +165,11 @@ class AIButton extends ConsumerWidget {
         } else {
           Toast(context,
               text:
-                  "Please wait ${30 - remainingTime} seconds before analyze the invoice again.");
+                  context.l10n.message_cooldown({30 - remainingTime}));
         }
       },
       icon: const Text("✨", style: TextStyle(fontSize: 17)),
-      tooltip: 'Analyze the invoice with AI',
+      tooltip: context.l10n.aianalyze_title,
     );
   }
 
@@ -183,15 +185,15 @@ class AIButton extends ConsumerWidget {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            const Text("Purchased products",
-                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            Text(context.l10n.aianalyze_purchasedProducts,
+                style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                 textAlign: TextAlign.left),
             Row(
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
-                const WarnIcon(
+                WarnIcon(
                     message:
-                        "The information provided may sometimes be incorrect.\nPlease take this into consideration and pay attention to the recommendations."),
+                context.l10n.aianalyze_warn),
                 IconButton(
                     onPressed: () {
                       setModalState(() {
@@ -228,9 +230,9 @@ class AIButton extends ConsumerWidget {
         ),
         ExpansionTile(
           initiallyExpanded: true,
-          title: const Text(
-              "Are the products purchased harmful to human health?",
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+          title: Text(
+              context.l10n.harmfulHuman,
+              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
           children: [
             Padding(
               padding: const EdgeInsets.only(left: 12, top: 8, bottom: 8),
@@ -240,9 +242,8 @@ class AIButton extends ConsumerWidget {
           ],
         ),
         ExpansionTile(
-          title: const Text(
-              "Are the purchased products harmful to the environment?",
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+          title:  Text(context.l10n.aianalyze_harmfulEnvironment,
+              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
           children: [
             Padding(
               padding: const EdgeInsets.only(left: 12, top: 8, bottom: 8),
@@ -252,9 +253,8 @@ class AIButton extends ConsumerWidget {
           ],
         ),
         ExpansionTile(
-          title: const Text(
-              "What are the alternatives to the products purchased?",
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+          title: Text(context.l10n.aianalyze_alternatives,
+              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
           children: [
             Padding(
               padding: const EdgeInsets.only(left: 12, top: 8, bottom: 8),
@@ -281,9 +281,9 @@ class AIButton extends ConsumerWidget {
           ],
         ),
         ExpansionTile(
-          title: const Text(
-              "What can be suggested for more conscious consumption?",
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+          title: Text(
+              context.l10n.aianalyze_conscious,
+              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
           children: [
             Padding(
               padding: const EdgeInsets.only(left: 12, top: 8, bottom: 8),
@@ -293,9 +293,9 @@ class AIButton extends ConsumerWidget {
           ],
         ),
         ExpansionTile(
-          title: const Text(
-              "What is the market value of the products purchased? How has this value changed in the last year?",
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+          title: Text(
+              context.l10n.aianalyze_valueChanged,
+              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
           children: [
             Padding(
               padding: const EdgeInsets.only(left: 12, top: 8, bottom: 8),

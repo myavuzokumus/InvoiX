@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 
+// Global olarak tanımlanmış key
+final GlobalKey<_ToastContentState> _toastKey = GlobalKey<_ToastContentState>();
+
 void Toast(final BuildContext context,
     {required final String text, final Color color = Colors.deepOrangeAccent, final Duration duration = const Duration(milliseconds: 10000)}) {
-
-  // its prevent reset animation when page change
-  final GlobalKey<_ToastContentState> _toastKey = GlobalKey<_ToastContentState>();
 
   ScaffoldMessenger.of(context).hideCurrentSnackBar();
   final snackBar = SnackBar(

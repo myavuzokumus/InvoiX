@@ -9,34 +9,191 @@
       }
     }
   },
+  "auth_loginToUseAI": "Sign in to access AI features.",
+  "auth_logOut": "Log Out",
 
-  "selectPlan": "Select Your Plan",
-  "individualUser": "Individual User",
-  "advancedUser": "Advanced User",
-  "corporateUser": "Corporate User",
-  "subscribe": "Subscribe",
-  "contactUs": "Contact Us",
-  "individualPrice": "3€ / Monthly",
-  "advancedPrice": "15€ / Monthly",
-  "corporatePrice": "??? / Monthly",
-  "individualFeatures_1": "1000 AI invoice scans",
-  "individualFeatures_2": "1000 AI invoice analyses",
-  "individualFeatures_3": "Personalized stock tracking",
-  "advancedFeatures_1": "10000 AI invoice scans",
-  "advancedFeatures_2": "10000 AI invoice analyses",
-  "advancedFeatures_3": "Personalized stock tracking",
-  "corporateFeatures": "Usage-based pricing",
-  "newUserOffer": "New User Offer",
-  "newUserOfferDetails": "30 AI invoice scans and 10 AI invoice analyses free for first-time use!",
+  "subsplan_selectPlan": "Select Your Plan",
+  "subsplan_individualUser": "Individual User",
+  "subsplan_advancedUser": "Advanced User",
+  "subsplan_corporateUser": "Corporate User",
+  "subsplan_subscribe": "Subscribe",
+  "subsplan_contactUs": "Contact Us",
+  "subsplan_individualPrice": "3€ / Monthly",
+  "subsplan_advancedPrice": "15€ / Monthly",
+  "subsplan_corporatePrice": "??? / Monthly",
+  "subsplan_individualFeatures_1": "1000 AI invoice scans",
+  "subsplan_individualFeatures_2": "1000 AI invoice analyses",
+  "subsplan_individualFeatures_3": "Personalized stock tracking",
+  "subsplan_advancedFeatures_1": "10000 AI invoice scans",
+  "subsplan_advancedFeatures_2": "10000 AI invoice analyses",
+  "subsplan_advancedFeatures_3": "Personalized stock tracking",
+  "subsplan_corporateFeatures": "Usage-based pricing",
+  "subsplan_newUserOffer": "New User Offer",
+  "subsplan_newUserOfferDetails": "30 AI invoice scans and 10 AI invoice analyses free for first-time use!",
+  "subsplan_plans": "Plans",
 
-  "loginToUseAI": "Sign in to access AI features.",
-  "logOut": "Log Out",
+  "profile_remainingInvoiceReads": "Remaining Invoice Reads",
+  "profile_remainingInvoiceAnalyses": "Remaining Invoice Analyses",
+  "profile_invoiceReads": "Invoice Reads",
+  "profile_invoiceAnalyses": "Invoice Analyses",
+  "profile_subscriptionExpiryDate": "Subscription Expiry Date",
+  "profile_subscriptionStatus": "Subscription Status",
+  "profile_noData": "No subscription data available.",
 
-  "remainingInvoiceReads": "Remaining Invoice Reads",
-  "remainingInvoiceAnalyses": "Remaining Invoice Analyses",
-  "invoiceReads": "Invoice Reads",
-   "invoiceAnalyses": "Invoice Analyses",
-  "subscriptionExpiryDate": "Subscription Expiry Date",
-  "subscriptionStatus": "Subscription Status",
-  "plans": "Plans"
+  "settings_settings": "Settings",
+  "settings_language": "Language",
+  "settings_welcomePage": "Welcome Page",
+  "settings_privacyPolicy": "Privacy Policy",
+  "settings_termsOfService": "Terms of Service",
+  "settings_changeLanguage": "Change Language",
+  "settings_selectLanguage": "Select Language",
+  "settings_deleteAccount": "Delete Account",
+  "settings_deleteAccountConfirmTitle": "Delete Account",
+  "settings_deleteAccountConfirmMessage": "Are you sure you want to delete your account?\nThis action cannot be undone.",
+  "settings_deleteAccountConfirmYes": "Yes, Delete Account",
+  "settings_deleteAccountError": "An error occurred while deleting your account.",
+  "settings_deleteAccountSuccess": "Your account has been successfully deleted.",
+  "settings_cancel": "No, Cancel",
+
+  "status_noInternetConnection": "No Internet Connection!",
+  "status_noUsageRights": "You have no more rights to use AI features.",
+  "status_noLogin": "You are not logged in.",
+  "status_somethingWentWrong": "Something went wrong.",
+
+  "loading_data" : "Processing Data...",
+  "loading_success" : "Data Processed!",
+
+  "aiinsights_name" : "AI Insights",
+  "aiinsights_juststart" : "Just click on the invoice add icon to get started.",
+  "aiinsights_new" : "I'm InvoiX, your AI assistant.\nClick to see insights on your invoices.",
+  "aiinsights_selectable" : "You can select multiple invoices to delete or excel output them.",
+  "aiinsights_soon": "AI Insights are available for subscribers only very soon. Work in progress.",
+
+  "aianalyze_title" : "Analyze the invoice with AI",
+  "aianalyze_purchasedProducts" : "Purchased products",
+  "aianalyze_warn" : "The information provided may sometimes be incorrect.\nPlease take this into consideration and pay attention to the recommendations.",
+  "aianalyze_harmfulHuman" : "Are the products purchased harmful to human health?",
+  "aianalyze_harmfulEnvironment" : "Are the purchased products harmful to the environment?",
+  "aianalyze_alternatives" : "What are the alternatives to the products purchased?",
+  "aianalyze_conscious" : "What can be suggested for more conscious consumption?",
+  "aianalyze_valueChanged" : "What is the market value of the products purchased? How has this value changed in the last year?",
+
+  "summary_title": "Summary",
+  "summary_top5": "Top 5 Invoices",
+  "summary_notFound": "Invoice data couldn't be found.\n\nnTry to change filter settings.",
+
+  "selectionMode_delete": "deletion",
+  "selectionMode_output": "output",
+  "selectionMode_error": "An error occurred while selecting {type} for {action}!",
+  "@selectionMode_error": {
+      "placeholders": {
+      "type": {
+          "type": "String"
+        },
+      "action": {
+        "type": "String"
+        }
+      }
+  },
+  "selectionMode_noSelection": "No {type} selected for {action}!",
+  "@selectionMode_noSelection": {
+    "placeholders": {
+      "type": {
+        "type": "String"
+      },
+      "action": {
+        "type": "String"
+      }
+    }
+  },
+
+  "changeCompanyName_title" : "What would you like to change new company name?",
+  "changeCompanyName_label" : "New Company name:",
+  "changeCompanyName_enterName" : "Enter new company name",
+
+  "similarity_title" : "Similar Company Found!",
+  "similarity_message" : "Do you want to merge with it?",
+
+  "message_blurChecker": "The image is not clear enough.\nIt may not be read properly.",
+  "message_noInvoices" : "No invoices found.",
+  "message_analyzing": "The invoice is being analyzed...",
+  "message_invalidId": "Invalid product id.",
+  "message_cooldown": "Please wait {remainingTime} seconds before analyze the invoice again.",
+  "@message_cooldown": {
+      "placeholders": {
+      "remainingTime": {
+          "type": "Integer"
+        }
+      }
+  },
+
+  "invoice_companyType" : "Company Type",
+  "invoice_companyName" : "Company Name",
+  "invoice_companyId" : "Company Id",
+  "invoice_invoiceNo" : "Invoice No",
+  "invoice_unit" : "Unit",
+  "invoice_date" : "Date",
+  "invoice_category" : "Category",
+  "invoice_totalAmount" : "Total Amount",
+  "invoice_taxAmount" : "Tax Amount",
+
+  "error_validInput" : "Please enter valid a {input}.",
+  "@error_validInput": {
+    "placeholders": {
+      "input": {
+        "type": "String"
+      }
+    }
+  },
+  "error_pleaseSelect" : "Please select a {input}.",
+  "@error_pleaseSelect": {
+    "placeholders": {
+      "input": {
+        "type": "String"
+      }
+    }
+  },
+  "error_pleaseEnterText" : "Please enter text.",
+  "error_switchingMode" : "Switching to legacy mode...",
+
+  "warn_pleaseSelect" : "You must choose a {input}.",
+  "@warn_pleaseSelect": {
+    "placeholders": {
+      "input": {
+        "type": "String"
+      }
+    }
+  },
+
+  "success_companyNameChanged" : "Company name changed successfully.",
+  "success_output" : "{text} {type}(s) lists saved as excel output in download file.",
+  "@success_output": {
+      "placeholders": {
+      "text": {
+          "type": "String"
+      },
+      "type": {
+          "type": "String"
+      }
+      }
+  },
+
+  "button_save" : "Save",
+  "button_yes" : "Yes",
+  "button_cancel" : "Cancel",
+  "button_change" : "Change",
+  "button_start" : "Start",
+  "button_skip" : "Skip",
+
+  "page_editinvoice_zoom": "Zoom in and out to see the image details.",
+
+  "welcomePage_title_1": "Welcome to InvoiX!",
+  "welcomePage_description_1": "InvoiX leverages AI technology to provide comprehensive invoice analysis.",
+
+  "welcomePage_title_2": "AI-Powered Invoice Analysis",
+  "welcomePage_description_2": "Utilize AI to gain detailed insights and streamline your invoice processing.",
+
+  "welcomePage_title_3": "Optimize Your Invoice Management",
+  "welcomePage_description_3": "Analyze your invoices with AI to enhance efficiency and accuracy."
+
 }

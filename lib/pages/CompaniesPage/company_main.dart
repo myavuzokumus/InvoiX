@@ -4,6 +4,8 @@ import 'package:cross_file/cross_file.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_mlkit_document_scanner/google_mlkit_document_scanner.dart';
+import 'package:invoix/invoix_main.dart';
+import 'package:invoix/l10n/localization_extension.dart';
 import 'package:invoix/pages/CompaniesPage/company_list.dart';
 import 'package:invoix/pages/CompaniesPage/invox_ai_card.dart';
 import 'package:invoix/pages/InvoiceEditPage/invoice_edit.dart';
@@ -87,15 +89,15 @@ class _CompanyPageState extends ConsumerState<CompanyPage>
                 onExpansionChanged: (final bool isExpanded) {
                   prefs.setBool('isAITurnOff', isExpanded);
                 },
-                title: const Text("AI Insights",
+                title: Text(context.l10n.aiinsights_name,
                     textAlign: TextAlign.left,
                     style:
-                        TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
-                children: const [
+                        const TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
+                children: [
                   SizedBox(
                     height: 128,
                     child: CarouselView(
-                      padding: EdgeInsets.only(
+                      padding: const EdgeInsets.only(
                           top: 8, bottom: 20, right: 8, left: 8),
                       itemSnapping: true,
                       itemExtent: 328,
@@ -103,20 +105,17 @@ class _CompanyPageState extends ConsumerState<CompanyPage>
                       children: [
                         InvoixAICard(
                           children: <Widget>[
-                            Text("I'm InvoiX, your AI assistant.\n"
-                                "Click to see insights on your invoices."),
+                            Text(context.l10n.aiinsights_new),
                           ],
                         ),
                         InvoixAICard(
                           children: <Widget>[
-                            Text(
-                                "You can also select multiple invoices to delete or excel output them."),
+                            Text(context.l10n.aiinsights_selectable),
                           ],
                         ),
                         InvoixAICard(
                           children: <Widget>[
-                            Text(
-                                "AI Insights are available for subscribers only very soon. Work in progress."),
+                            Text(context.l10n.aiinsights_soon),
                           ],
                         ),
                       ],

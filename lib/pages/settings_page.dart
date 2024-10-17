@@ -8,7 +8,7 @@ import 'package:invoix/widgets/settings_button.dart';
 import 'package:invoix/widgets/toast.dart';
 
 class SettingsPage extends ConsumerWidget {
-  const SettingsPage({final Key? key}) : super(key: key);
+  const SettingsPage({super.key});
 
   @override
   Widget build(final BuildContext context, final WidgetRef ref) {
