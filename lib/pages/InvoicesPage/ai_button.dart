@@ -109,7 +109,7 @@ class AIButton extends ConsumerWidget {
                                           invoiceAnalysis,
                                           firebaseService,
                                           setModalState);
-                                    } on Exception catch (e) {
+                                    } on Exception {
                                       return FutureBuilder<Status>(
                                         future: currentStatusChecker(
                                             "aiInvoiceAnalyses"),

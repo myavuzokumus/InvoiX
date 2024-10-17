@@ -4,7 +4,6 @@ import 'package:cross_file/cross_file.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_mlkit_document_scanner/google_mlkit_document_scanner.dart';
-import 'package:invoix/invoix_main.dart';
 import 'package:invoix/l10n/localization_extension.dart';
 import 'package:invoix/pages/CompaniesPage/company_list.dart';
 import 'package:invoix/pages/CompaniesPage/invox_ai_card.dart';
@@ -32,6 +31,7 @@ class _CompanyPageState extends ConsumerState<CompanyPage>
 
   @override
   Widget build(final BuildContext context) {
+    super.build(context);
     final selectionState = ref.watch(companySelectionProvider);
 
     return PopScope(
