@@ -1,52 +1,34 @@
 part of 'list_page_scaffold.dart';
 
 mixin _ListPageScaffoldMixin on ConsumerState<ListPageScaffold> {
-
-  final ValueNotifier<bool> _excelExportingNotifier = ValueNotifier(false);
-  final ValueNotifier<bool> _deleteProcessingNotifier = ValueNotifier(false);
-
-  @override
-  void initState() {
-    super.initState();
-    _excelExportingNotifier.value = false;
-    _deleteProcessingNotifier.value = false;
-  }
+  final ValueNotifier<bool> _excelExportingNotifier = ValueNotifier<bool>(false);
+  final ValueNotifier<bool> _deleteProcessingNotifier = ValueNotifier<bool>(false);
 
   Future<void> onDelete() async {
     _deleteProcessingNotifier.value = true;
     try {
-    if (ref.read(widget.selectionProvider).selectedItems.isNotEmpty) {
-      await showDialog(
-        context: context,
-        builder: (final BuildContext context) {
-          return DeletionDialog(
-              type: widget.type, companyName: widget.companyName, selectionProvider: widget.selectionProvider);
-        },
-      );
-    } else {
-      Toast(
-        context,
-        text: "No ${widget.type.name} selected for deletion!",
+      if (ref.read(widget.selectionProvider).selectedItems.isNotEmpty) {
+        await showDialog(
+          context: context,
+          builder: (final BuildContext context) {
+            return DeletionDialog(
+                type: widget.type,
+                companyName: widget.companyName,
+                selectionProvider: widget.selectionProvider);
+          },
+        );
+      } else {
+        showToast(text: context.l10n.selectionMode_noSelection(widget.type.name, context.l10n.selectionMode_delete),
+          color: Colors.redAccent,
+        );
+      }
+    } catch (e) {
+      print("Error in onDelete: $e");
+      showToast(text: context.l10n.selectionMode_error(widget.type.name, context.l10n.selectionMode_delete),
         color: Colors.redAccent,
       );
     }
-  } catch (e) {
-    Toast(
-      context,
-      text: "An error occurred while deleting ${widget.type.name}!\n$e",
-      color: Colors.redAccent,
-    );
-  }
     _deleteProcessingNotifier.value = false;
-  }
-
-  // Function to be run in a separate isolate
-  Future<void> exportToExcelInIsolate(final Map<String, dynamic> params) async {
-    await exportToExcel(
-      listType: params['listType'],
-      companyName: params['companyName'],
-      outputList: params['outputList'],
-    );
   }
 
   // Modified onExcelOutput function
@@ -54,36 +36,62 @@ mixin _ListPageScaffoldMixin on ConsumerState<ListPageScaffold> {
     _excelExportingNotifier.value = true;
     final String text = widget.type == ListType.invoice
         ? "${widget.companyName!}'s ${ref.read(widget.selectionProvider).selectedItems[widget.companyName]!.length}"
-        : ref.read(widget.selectionProvider).selectedItems.keys.length.toString();
+        : ref
+            .read(widget.selectionProvider)
+            .selectedItems
+            .keys
+            .length
+            .toString();
     try {
-      if ((widget.type == ListType.invoice && ref.read(widget.selectionProvider).selectedItems[widget.companyName]!.isNotEmpty) ||
-          (widget.type != ListType.invoice && ref.read(widget.selectionProvider).selectedItems.isNotEmpty)) {
+      if ((widget.type == ListType.invoice &&
+              ref
+                  .read(widget.selectionProvider)
+                  .selectedItems[widget.companyName]!
+                  .isNotEmpty) ||
+          (widget.type != ListType.invoice &&
+              ref.read(widget.selectionProvider).selectedItems.isNotEmpty)) {
 
-        // Prepare parameters for the isolate
-        final params = {
-          'listType': widget.type,
-          'companyName': widget.companyName,
-          'outputList': ref.read(widget.selectionProvider).selectedItems,
-        };
+        final Map<String, List<Map<String, dynamic>>> inputList = Map.from({});
+
+        for (final entry in ref.read(widget.selectionProvider).selectedItems.entries) {
+          final key = entry.key;
+          final value = entry.value;
+          final List<InvoiceData> a;
+          if (value.isEmpty) {
+            a = await ref.read(invoiceDataServiceProvider).getInvoiceList(key);
+          } else {
+            a = value;
+          }
+          inputList[key] = a.map((e) {
+            return e.toJson();
+          }).toList();
+        }
+
+
+        final downloadDirectoryPath =
+            (await download.getDownloadDirectory()).path;
 
         // Run exportToExcel in a separate isolate
-        await compute(exportToExcelInIsolate, params);
+        await compute(exportToExcel, {
+          'listType': widget.type,
+          'companyName': widget.companyName,
+          'inputList': inputList,
+          'path': downloadDirectoryPath,
+        });
 
-        Toast(context,
-            text: "$text ${widget.type.name}(s) lists saved as excel output in Download file.",
+        showToast(text: context.l10n.success_output(text, widget.type.name),
             color: Colors.green);
       } else {
-        Toast(
-          context,
-          text: "No ${widget.type.name}(s) selected to Excel output!",
+        showToast(text: context.l10n.selectionMode_noSelection(widget.type.name, context.l10n.selectionMode_output),
           color: Colors.redAccent,
         );
       }
     } catch (e) {
-      Toast(context, text: e.toString(), color: Colors.redAccent);
+      print("Error in onExcelOutput: $e");
+      showToast(text: context.l10n.selectionMode_error(widget.type.name, context.l10n.selectionMode_output),
+          color: Colors.redAccent);
     } finally {
       _excelExportingNotifier.value = false;
     }
   }
-
 }

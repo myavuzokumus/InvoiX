@@ -9,7 +9,7 @@ class InvoiceData extends HiveObject {
   @HiveField(0)
   final String imagePath;
   @HiveField(1)
-  late String _id;
+  late String _id; //Attention!
   @HiveField(2)
   final String companyName;
   @HiveField(3)
@@ -22,6 +22,12 @@ class InvoiceData extends HiveObject {
   final double taxAmount;
   @HiveField(7, defaultValue: "Others")
   final String category;
+  @HiveField(8, defaultValue: "EUR")
+  final String unit;
+  @HiveField(9, defaultValue: "")
+  final String companyId;
+  @HiveField(10, defaultValue: {})
+  late Map<String, dynamic> contentCache;
 
   String get id => _id;
 
@@ -33,8 +39,12 @@ class InvoiceData extends HiveObject {
       required this.totalAmount,
       required this.taxAmount,
       required this.category,
+      required this.unit,
+      required this.companyId,
+      final Map<String, dynamic>? contentCache,
       final String? id}) {
     id != null ? _id = id : _id = const Uuid().v4();
+    contentCache != null ? this.contentCache = contentCache : this.contentCache = <String, dynamic>{};
   }
 
   InvoiceData.fromJson(final Map<String, dynamic> json)
@@ -44,16 +54,51 @@ class InvoiceData extends HiveObject {
         date = dateParser(json["date"] ?? DateTime.now().toString()),
         category = json["category"] ?? "",
         _id = const Uuid().v4(),
-        totalAmount = _parseAmount(json["totalAmount"] ?? "0"),
-        taxAmount = _parseAmount(json["taxAmount"] ?? "0");
+        totalAmount = _parseAmount(json["totalAmount"].toString()),
+        taxAmount = _parseAmount(json["taxAmount"].toString()),
+        unit = json["unit"] ?? "EUR",
+        companyId = json["companyId"] ?? "",
+        contentCache = <String, dynamic>{};
 
-  static double _parseAmount(String amount) {
-    if (amount[amount.length - 3] == ".") {
-      final List<String> charList = amount.split('');
-      charList[charList.length - 3] = ",";
-      amount = charList.join();
-    }
-    return double.tryParse(amount.replaceAll(".", "").replaceAll(",", ".")) ?? 0;
+  Map<String, dynamic> toJson() {
+    return {
+      "ImagePath": imagePath,
+      "companyName": companyName,
+      "invoiceNo": invoiceNo,
+      "date": date.toString(),
+      "totalAmount": totalAmount,
+      "taxAmount": taxAmount,
+      "category": category,
+      "unit": unit,
+      "companyId": companyId,
+      "contentCache": contentCache,
+      "id": _id,
+    };
+  }
+
+  static double _parseAmount(final String amount) {
+
+    // Fix decimal brackets
+    final newAmount = amount.replaceAllMapped(
+        RegExp(r'(\d+)([.,])(\d{1,2})$'),
+            (final Match m) => '${m[1]}${"."}${m[3]}'
+    );
+
+    final String reversedText = newAmount.split('').reversed.join('');
+
+    // Find the first point and split the text in two
+    final int lastDotIndex = reversedText.indexOf('.');
+    String beforeLastDot = reversedText.substring(lastDotIndex + 1);
+    final String afterLastDot = reversedText.substring(0, lastDotIndex + 1);
+
+    // Remove the dots and reassemble the text
+    beforeLastDot = beforeLastDot.replaceAll('.', '');
+    String result = beforeLastDot + afterLastDot;
+
+    result = result.split('').reversed.join('');
+
+    // Reverse the text again
+    return double.tryParse(newAmount.replaceAll(",", ".")) ?? 0;
   }
 
   InvoiceData copyWith({
@@ -64,6 +109,9 @@ class InvoiceData extends HiveObject {
     final double? totalAmount,
     final double? taxAmount,
     final String? category,
+    final String? unit,
+    final String? companyId,
+    final Map<String, dynamic>? contentCache,
     final String? id,
   }) {
     return InvoiceData(
@@ -74,6 +122,9 @@ class InvoiceData extends HiveObject {
       totalAmount: totalAmount ?? this.totalAmount,
       taxAmount: taxAmount ?? this.taxAmount,
       category: category ?? this.category,
+      unit: unit ?? this.unit,
+      companyId: companyId ?? this.companyId,
+      contentCache: contentCache ?? this.contentCache,
       id: id ?? _id,
     );
   }

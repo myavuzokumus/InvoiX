@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:invoix/models/selection_state.dart';
 import 'package:invoix/pages/InvoicesPage/invoice_list.dart';
 import 'package:invoix/pages/list_page_scaffold.dart';
-import 'package:invoix/utils/invoice_data_service.dart';
+import 'package:invoix/services/invoice_data_service.dart';
+import 'package:invoix/states/selection_state.dart';
 
 
 class InvoicePage extends ConsumerWidget {
@@ -14,17 +14,17 @@ class InvoicePage extends ConsumerWidget {
   @override
   Widget build(final BuildContext context, final WidgetRef ref) {
 
-    final selectionState = ref.watch(invoiceProvider);
+    final selectionState = ref.watch(invoiceSelectionProvider);
 
     return PopScope(
       canPop: !selectionState.isSelectionMode,
-      onPopInvoked: (final bool bool) {
+      onPopInvokedWithResult: (final bool bool, final dynamic result) {
         if (selectionState.isSelectionMode) {
-          ref.read(invoiceProvider.notifier).toggleSelectionMode();
+          ref.read(invoiceSelectionProvider.notifier).toggleSelectionMode();
         }
       },
       child: ListPageScaffold(
-          selectionProvider: invoiceProvider,
+          selectionProvider: invoiceSelectionProvider,
           title: "InvoiX\n",
           type: ListType.invoice,
           companyName: companyName,

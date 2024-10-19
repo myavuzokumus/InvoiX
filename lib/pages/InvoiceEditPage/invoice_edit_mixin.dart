@@ -10,10 +10,12 @@ mixin _InvoiceEditPageMixin on ConsumerState<InvoiceEditPage> {
 
   late CompanyType companySuffix = CompanyType.LTD;
   late InvoiceCategory invoiceCategory = InvoiceCategory.Others;
+  late PriceUnit priceUnit = PriceUnit.EUR;
 
   //TextLabelControllers
   late final TextEditingController companyTextController;
   late final TextEditingController invoiceNoTextController;
+  late final TextEditingController companyIdTextController;
   late final TextEditingController dateTextController;
   late final TextEditingController totalAmountTextController;
   late final TextEditingController taxAmountTextController;
@@ -23,8 +25,14 @@ mixin _InvoiceEditPageMixin on ConsumerState<InvoiceEditPage> {
 
   late Future<dynamic> _future;
 
+  late final InvoiceDataService invoiceDataService;
+  late final FirebaseService firebaseService;
+
   @override
   void initState() {
+    invoiceDataService = ref.read(invoiceDataServiceProvider);
+    firebaseService = ref.read(firebaseServiceProvider);
+
     _saveButtonState.value = true;
     _isFileSaved = false;
 
@@ -32,6 +40,7 @@ mixin _InvoiceEditPageMixin on ConsumerState<InvoiceEditPage> {
     readMode = widget.readMode;
 
     companyTextController = TextEditingController();
+    companyIdTextController = TextEditingController();
     invoiceNoTextController = TextEditingController();
     dateTextController = TextEditingController();
     totalAmountTextController = TextEditingController();
@@ -48,6 +57,7 @@ mixin _InvoiceEditPageMixin on ConsumerState<InvoiceEditPage> {
   @override
   void dispose() {
     companyTextController.dispose();
+    companyIdTextController.dispose();
     invoiceNoTextController.dispose();
     dateTextController.dispose();
     totalAmountTextController.dispose();
@@ -63,8 +73,7 @@ mixin _InvoiceEditPageMixin on ConsumerState<InvoiceEditPage> {
 
   Future<void> analyzeNewData() async {
     if (await blurDetection(imageFile.path, 10) && mounted) {
-      Toast(context,
-          text: "The image is not clear enough.\nIt may not be read properly.",
+      showToast(text: context.l10n.message_blurChecker,
           color: Colors.redAccent);
     }
     await imageFilter(imageFile);
@@ -75,18 +84,19 @@ mixin _InvoiceEditPageMixin on ConsumerState<InvoiceEditPage> {
     } else if (readMode == ReadMode.ai) {
       try {
         await fetchInvoiceData(
-            outPut: await GeminiAPI().describeImage(
-                imgFile: File(imageFile.path), prompt: identifyInvoicePrompt));
+            outPut: await firebaseService.describeImageWithAI(
+                imgFile: File(imageFile.path), type: ProcessType.scan));
       } catch (e) {
         String error = e.toString();
-        if (!(await isInternetConnected())) {
-          error = "No Internet Connection!";
-        }
+        final status = await currentStatusChecker("aiInvoiceReads");
 
-        ref.read(errorProvider.notifier).state =
-            ref.read(errorProvider).copyWith(errorMessage: "$error\nSwitching to Legacy Mode...");
+        error = status.name;
 
-        await Future.delayed(const Duration(seconds: 2));
+        ref.read(loadingProvider.notifier).state = ref
+            .read(loadingProvider)
+            .copyWith(message: "$error\n${context.l10n.error_switchingMode}");
+
+        await Future.delayed(const Duration(seconds: 3));
 
         await fetchInvoiceData(
             outPut: parseInvoiceData(await getScannedText(imageFile)));
@@ -98,7 +108,6 @@ mixin _InvoiceEditPageMixin on ConsumerState<InvoiceEditPage> {
 
   Future<void> fetchInvoiceData({final String? outPut}) async {
     final InvoiceData item;
-    final InvoiceDataService invoiceDataService = InvoiceDataService();
 
     if (outPut == null) {
       item = invoiceDataService.getInvoiceData(widget.invoiceData!)!;
@@ -109,10 +118,15 @@ mixin _InvoiceEditPageMixin on ConsumerState<InvoiceEditPage> {
     companySuffix = invoiceDataService.companyTypeFinder(item.companyName);
     invoiceCategory =
         InvoiceCategory.parse(item.category) ?? InvoiceCategory.Others;
+    priceUnit =
+        PriceUnit.parse(item.unit) ?? PriceUnit.Others;
+
     companyTextController.text =
         invoiceDataService.companyTypeExtractor(item.companyName);
     companyTextController.text = invoiceDataService
         .invalidCompanyTypeExtractor(companyTextController.text);
+
+    companyIdTextController.text = item.companyId;
     invoiceNoTextController.text = item.invoiceNo;
     dateTextController.text = updateYear(dateFormat.format(item.date));
     totalAmountTextController.text = item.totalAmount.toString();
@@ -127,8 +141,6 @@ mixin _InvoiceEditPageMixin on ConsumerState<InvoiceEditPage> {
 
         // If the form is valid, display a snack bar. In the real world,
         // you'd often call a server or save the information in a database.
-
-        final InvoiceDataService invoiceDataService = InvoiceDataService();
 
         final List<String> companyList =
             await invoiceDataService.getCompanyList();
@@ -158,25 +170,27 @@ mixin _InvoiceEditPageMixin on ConsumerState<InvoiceEditPage> {
                 barrierDismissible: false,
                 context: context,
                 builder: (final BuildContext context) => AlertDialog(
-                  title: const Text(
-                    'Similar Company Found!',
-                    style: TextStyle(color: Colors.redAccent),
+                  title: Text(context.l10n.similarity_title,
+                    style: const TextStyle(color: Colors.redAccent),
                   ),
                   content: SingleChildScrollView(
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        const Text('Do you want to merge with it?', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                        Text(context.l10n.similarity_message,
+                            style: const TextStyle(
+                                fontSize: 16, fontWeight: FontWeight.bold)),
                         FilledButton(
                           onPressed: () {},
                           child: Text(companyTextController.text),
                         ),
-                        const Text("↓", style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold)),
+                        const Text("↓",
+                            style: TextStyle(
+                                fontSize: 32, fontWeight: FontWeight.bold)),
                         FilledButton(
                           onPressed: () {},
-                          child:
-                              Text(companyName),
+                          child: Text(companyName),
                         ),
                       ],
                     ),
@@ -184,11 +198,11 @@ mixin _InvoiceEditPageMixin on ConsumerState<InvoiceEditPage> {
                   actions: <Widget>[
                     TextButton(
                       onPressed: () => Navigator.pop(context, false),
-                      child: const Text('Cancel'),
+                      child: Text(context.l10n.button_cancel),
                     ),
                     TextButton(
                       onPressed: () => Navigator.pop(context, true),
-                      child: const Text('Yes!'),
+                      child: Text(context.l10n.button_yes),
                     ),
                   ],
                 ),
@@ -205,8 +219,7 @@ mixin _InvoiceEditPageMixin on ConsumerState<InvoiceEditPage> {
         }
 
         if (mounted) {
-          Toast(context,
-              text: "Processing Data...", color: Colors.yellowAccent);
+          showToast(text: context.l10n.loading_data, color: Colors.yellowAccent);
         }
 
         final data = InvoiceData(
@@ -217,19 +230,20 @@ mixin _InvoiceEditPageMixin on ConsumerState<InvoiceEditPage> {
             totalAmount: double.parse(totalAmountTextController.text),
             taxAmount: double.parse(taxAmountTextController.text),
             category: invoiceCategory.name,
+            unit: priceUnit.name,
+            companyId: companyIdTextController.text,
             id: widget.invoiceData?.id);
 
-        await InvoiceDataService().saveInvoiceData(data);
+        await invoiceDataService.saveInvoiceData(data);
 
         _isFileSaved = true;
 
         if (mounted) {
-          Toast(context, text: "Data Processed!", color: Colors.greenAccent);
+          showToast(text: context.l10n.loading_success, color: Colors.greenAccent);
           Navigator.pop(context);
         }
       } catch (e) {
-        Toast(context,
-            text: "Something went wrong.\n$e", color: Colors.redAccent);
+        showToast(text: "${context.l10n.status_somethingWentWrong}:\n$e", color: Colors.redAccent);
       } finally {
         setState(() {
           _saveButtonState.value = false;

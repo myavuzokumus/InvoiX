@@ -1,14 +1,23 @@
 part of 'summary_main.dart';
 
-mixin _SummaryMainMixin on State<SummaryMain> {
+enum SortType { amount, date }
+
+mixin _SummaryMainMixin on ConsumerState<SummaryMain> {
 
   final ValueNotifier<double> touchedPercentageNotifier = ValueNotifier<double>(-1);
+  final ValueNotifier<bool> filterPanelVisibleNotifier = ValueNotifier<bool>(false);
 
   late DateTimeRange initialDateTime;
-  late List<InvoiceData> top5Invoices;
+  late List<InvoiceData> selectedInvoices;
+  late List<InvoiceData> selected5Invoices;
   late Future<Map<InvoiceCategory, double>> topCategoriesFuture;
   late DateTime startDate;
   late DateTime endDate;
+
+  late final InvoiceDataService invoiceDataService;
+
+  Set<SortType> _selection = {SortType.amount};
+  late PriceUnit priceUnit = PriceUnit.Others;
 
   @override
   void initState() {
@@ -20,15 +29,23 @@ mixin _SummaryMainMixin on State<SummaryMain> {
     startDate = DateTime(1900);
     endDate = today;
     topCategoriesFuture = calculateTopCategories(today.subtract(const Duration(days: 30)), today);
+
+    invoiceDataService = ref.read(invoiceDataServiceProvider);
+
     super.initState();
   }
 
   // Calculate total amounts on filtered invoices and find the 5 invoice categories with the highest amounts
   Future<Map<InvoiceCategory, double>> calculateTopCategories(final DateTime startDate,
       final DateTime endDate) async {
-    final List<InvoiceData> invoices = await InvoiceDataService().getInvoicesBetweenDates(
+
+    List<InvoiceData> invoices = await invoiceDataService.getInvoicesBetweenDates(
         startDate, endDate);
 
+    // Sort invoices based on the selected price unit
+    if (priceUnit != PriceUnit.Others) {
+      invoices = invoices.where((final invoice) => invoice.unit == priceUnit.name).toList();
+    }
     final Map<InvoiceCategory, double> categoryTotals = {};
     for (final invoice in invoices) {
       final InvoiceCategory category = InvoiceCategory.values.firstWhere((final InvoiceCategory e) => e.name.contains(invoice.category));
@@ -41,13 +58,22 @@ mixin _SummaryMainMixin on State<SummaryMain> {
       }
     }
 
-    final List<InvoiceData> sortedInvoices = invoices
-      ..sort((final a, final b) => b.totalAmount.compareTo(a.totalAmount));
+    selectedInvoices = invoices;
 
-    top5Invoices = sortedInvoices.take(5).toList();
+    switch (_selection.first) {
+      case SortType.amount:
+        selectedInvoices.sort((final a, final b) => b.totalAmount.compareTo(a.totalAmount));
+        break;
+      case SortType.date:
+        selectedInvoices.sort((final a, final b) => b.date.compareTo(a.date));
+        break;
+    }
+
+    selected5Invoices = selectedInvoices.take(5).toList();
 
     return categoryTotals;
   }
+
 
   List<Widget> getIndicators(final Map<InvoiceCategory, double> categoryTotals) {
 

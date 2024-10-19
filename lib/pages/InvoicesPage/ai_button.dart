@@ -1,131 +1,220 @@
-import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:hive/hive.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:invoix/l10n/localization_extension.dart';
 import 'package:invoix/models/invoice_analysis.dart';
-import 'package:invoix/utils/ai_mode/gemini_api.dart';
-import 'package:invoix/utils/ai_mode/prompts.dart';
-import 'package:invoix/widgets/loading_animation.dart';
+import 'package:invoix/models/invoice_data.dart';
+import 'package:invoix/services/firebase_service.dart';
+import 'package:invoix/states/firebase_state.dart';
+import 'package:invoix/states/invoice_data_state.dart';
+import 'package:invoix/utils/cooldown.dart';
+import 'package:invoix/utils/status/current_status_checker.dart';
+import 'package:invoix/widgets/status/loading_animation.dart';
+import 'package:invoix/widgets/status/show_current_status.dart';
 import 'package:invoix/widgets/toast.dart';
 import 'package:invoix/widgets/warn_icon.dart';
 
-class AIButton extends StatelessWidget {
-  const AIButton({super.key, required this.invoiceImage});
 
-  final File invoiceImage;
+class AIButton extends ConsumerStatefulWidget {
+  const AIButton({super.key, required this.invoice});
+
+  final InvoiceData invoice;
 
   @override
-  Widget build(final BuildContext context) {
+  ConsumerState<AIButton> createState() => _AIButtonState();
+}
+
+class _AIButtonState extends ConsumerState<AIButton> {
+  late Future<String> _future;
+  late final InvoiceData invoice;
+
+  @override
+  void initState() {
+    invoice = widget.invoice;
+    super.initState();
+  }
+
+  @override
+  Widget build(final BuildContext mainContext) {
     return IconButton.outlined(
       style: OutlinedButton.styleFrom(
         backgroundColor: Colors.black.withOpacity(0.35),
         side: const BorderSide(width: 1.5, color: Colors.orangeAccent),
       ),
       onPressed: () async {
-        final Box<int> box = await Hive.openBox<int>('remainingTimeBox');
-        int remainingTime = box.get(invoiceImage.path) ?? 0;
+        final invoiceDataService = ref.read(invoiceDataServiceProvider);
+        final firebaseService = ref.read(firebaseServiceProvider);
 
-        if (remainingTime == 0) {
-          Timer.periodic(const Duration(seconds: 1), (final t) async {
-            remainingTime += 1;
+        final int remainingTime =
+            invoiceDataService.remainingTimeBox.get(invoice.imagePath) ?? 0;
 
-            if (remainingTime >= 30) {
-              remainingTime = 0;
-              t.cancel();
-            }
-            await box.put(invoiceImage.path, remainingTime);
-          });
+        if (remainingTime == 0 || invoice.contentCache.isNotEmpty) {
+          if (invoice.contentCache.isEmpty) {
+            await cooldown(
+                remainingTime, invoice.imagePath, invoiceDataService);
+          }
+
+          _future = invoice.contentCache.isEmpty
+              ? firebaseService.describeImageWithAI(
+                  imgFile: File(invoice.imagePath), type: ProcessType.describe)
+              : Future.value(jsonEncode(invoice.contentCache));
 
           await showModalBottomSheet<void>(
+            context: mainContext,
+            isScrollControlled: true,
+            useSafeArea: true,
+            enableDrag: true,
             showDragHandle: true,
-            context: context,
+            constraints: BoxConstraints(
+              maxHeight: MediaQuery.of(context).size.height * 0.75,
+            ),
             builder: (final BuildContext context) {
-              return SizedBox(
-                height: 425,
-                width: double.infinity,
-                child: Padding(
-                  padding:
-                      const EdgeInsets.only(left: 24, bottom: 24, right: 24),
-                  child: LayoutBuilder(
-                    builder: (final BuildContext context,
-                        final BoxConstraints constraints) {
-                      return Card(
-                          color: const Color(0xff442a22),
-                          elevation: 16,
-                          child: Padding(
-                            padding: const EdgeInsets.all(12.0),
-                            child: FutureBuilder(
-                              future: GeminiAPI().describeImage(
-                                  imgFile: invoiceImage,
-                                  prompt: describeInvoicePrompt),
-                              builder: (final BuildContext context,
-                                  final AsyncSnapshot<String> snapshot) {
-                                if (snapshot.hasData) {
-                                  final Map<String, dynamic> decodedData =
-                                      jsonDecode(snapshot.data!);
-                                  final InvoiceAnalysis invoiceAnalysis =
-                                      InvoiceAnalysis.fromJson(decodedData);
+              return LayoutBuilder(
+                builder: (final BuildContext context,
+                    final BoxConstraints constraints) {
+                  return StatefulBuilder(builder: (final BuildContext context,
+                      final void Function(void Function()) setModalState) {
+                    return SizedBox(
+                      height: constraints.maxHeight - 38,
+                      width: double.infinity,
+                      child: Padding(
+                        padding: const EdgeInsets.only(
+                            left: 24, bottom: 24, right: 24),
+                        child: Card(
+                            color: const Color(0xff442a22),
+                            elevation: 16,
+                            child: Padding(
+                              padding: const EdgeInsets.all(12.0),
+                              child: FutureBuilder(
+                                future: _future,
+                                builder: (final BuildContext context,
+                                    final AsyncSnapshot<String> snapshot) {
+                                  if (snapshot.connectionState !=
+                                      ConnectionState.done) {
+                                    return Column(
+                                      children: [
+                                        LoadingAnimation(
+                                            message:
+                                                mainContext.l10n.message_analyzing,
+                                            customHeight:
+                                                constraints.maxHeight - 110),
+                                      ],
+                                    );
+                                  } else if (snapshot.hasData &&
+                                      snapshot.connectionState ==
+                                          ConnectionState.done) {
+                                    try {
+                                      final Map<String, dynamic> decodedData =
+                                          jsonDecode(snapshot.data!);
 
-                                  return describedWidget(invoiceAnalysis);
-                                } else if (snapshot.hasError) {
-                                  return const Column(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceEvenly,
+                                      invoice.contentCache = decodedData;
+                                      invoiceDataService
+                                          .saveInvoiceData(invoice);
+
+                                      final InvoiceAnalysis invoiceAnalysis =
+                                          InvoiceAnalysis.fromJson(decodedData);
+
+                                      return describedWidget(
+                                          mainContext,
+                                          invoiceAnalysis,
+                                          firebaseService,
+                                          setModalState);
+                                    } on Exception {
+                                      return FutureBuilder<Status>(
+                                        future: currentStatusChecker(
+                                            "aiInvoiceAnalyses"),
+                                        builder: (final context,
+                                            final statusSnapshot) {
+                                          if (statusSnapshot.connectionState ==
+                                              ConnectionState.done) {
+                                            return ShowCurrentStatus(
+                                                status: statusSnapshot.data!,
+                                                customHeight:
+                                                    constraints.maxHeight - 72);
+                                          }
+                                          return const LoadingAnimation();
+                                        },
+                                      );
+                                    }
+                                  } else if (snapshot.hasError) {
+                                    return FutureBuilder<Status>(
+                                      future: currentStatusChecker(
+                                          "aiInvoiceAnalyses"),
+                                      builder: (final context,
+                                          final statusSnapshot) {
+                                        if (statusSnapshot.connectionState ==
+                                            ConnectionState.done) {
+                                          return ShowCurrentStatus(
+                                              status: statusSnapshot.data!,
+                                              customHeight:
+                                                  constraints.maxHeight - 72);
+                                        }
+                                        return const LoadingAnimation();
+                                      },
+                                    );
+                                  }
+                                  return Column(
                                     children: [
-                                      Icon(Icons.phonelink_erase_rounded,
-                                          size: 92, color: Colors.red),
-                                      Text('No Internet Connection',
-                                          textAlign: TextAlign.center,
-                                          style: TextStyle(
-                                              fontSize: 24,
-                                              fontWeight: FontWeight.bold)),
+                                      LoadingAnimation(
+                                          message:
+                                            mainContext.l10n.message_analyzing,
+                                          customHeight:
+                                              constraints.maxHeight - 72),
                                     ],
                                   );
-                                }
-                                return Column(
-                                  children: [
-                                    LoadingAnimation(
-                                        customHeight:
-                                            constraints.maxHeight - 72),
-                                    const Text(
-                                        'The invoice is being analyzed...',
-                                        textAlign: TextAlign.center, style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-                                  ],
-                                );
-                              },
-                            ),
-                          ));
-                    },
-                  ),
-                ),
+                                },
+                              ),
+                            )),
+                      ),
+                    );
+                  });
+                },
               );
             },
           );
         } else {
-          Toast(context,
-              text: "Please wait ${30 - remainingTime} seconds before analyze the invoice again.");
+          showToast(text: mainContext.l10n.message_cooldown(30 - remainingTime));
         }
       },
       icon: const Text("✨", style: TextStyle(fontSize: 17)),
-      tooltip: 'Analyze it with AI',
+      tooltip: mainContext.l10n.aianalyze_title,
     );
   }
 
   //This is ridiculous, I know, but I did it this way to improve the application.
-  Widget describedWidget(final InvoiceAnalysis invoiceAnalysis) {
+  Widget describedWidget(
+      final BuildContext context,
+      final InvoiceAnalysis invoiceAnalysis,
+      final firebaseService,
+      final void Function(void Function() p1) setModalState) {
     return ListView(
+      shrinkWrap: true,
       children: [
-        const Row(
+        Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text("Purchased products",
-                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            Text(context.l10n.aianalyze_purchasedProducts,
+                style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                 textAlign: TextAlign.left),
-            WarnIcon(
-                message:
-                    "The information provided may sometimes be incorrect. Please take this into consideration and pay attention to the recommendations.")
+            Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                WarnIcon(
+                    message:
+                context.l10n.aianalyze_warn),
+                IconButton(
+                    onPressed: () {
+                      setModalState(() {
+                        _future = firebaseService.describeImageWithAI(
+                            imgFile: File(invoice.imagePath),
+                            type: ProcessType.describe);
+                      });
+                    },
+                    icon: const Icon(Icons.refresh_outlined)),
+              ],
+            ),
           ],
         ),
         Padding(
@@ -151,9 +240,9 @@ class AIButton extends StatelessWidget {
         ),
         ExpansionTile(
           initiallyExpanded: true,
-          title: const Text(
-              "Are the products purchased harmful to human health?",
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+          title: Text(
+              context.l10n.aianalyze_harmfulHuman,
+              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
           children: [
             Padding(
               padding: const EdgeInsets.only(left: 12, top: 8, bottom: 8),
@@ -163,9 +252,8 @@ class AIButton extends StatelessWidget {
           ],
         ),
         ExpansionTile(
-          title: const Text(
-              "Are the purchased products harmful to the environment?",
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+          title:  Text(context.l10n.aianalyze_harmfulEnvironment,
+              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
           children: [
             Padding(
               padding: const EdgeInsets.only(left: 12, top: 8, bottom: 8),
@@ -175,9 +263,8 @@ class AIButton extends StatelessWidget {
           ],
         ),
         ExpansionTile(
-          title: const Text(
-              "What are the alternatives to the products purchased?",
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+          title: Text(context.l10n.aianalyze_alternatives,
+              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
           children: [
             Padding(
               padding: const EdgeInsets.only(left: 12, top: 8, bottom: 8),
@@ -204,9 +291,9 @@ class AIButton extends StatelessWidget {
           ],
         ),
         ExpansionTile(
-          title: const Text(
-              "What can be suggested for more conscious consumption?",
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+          title: Text(
+              context.l10n.aianalyze_conscious,
+              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
           children: [
             Padding(
               padding: const EdgeInsets.only(left: 12, top: 8, bottom: 8),
@@ -216,9 +303,9 @@ class AIButton extends StatelessWidget {
           ],
         ),
         ExpansionTile(
-          title: const Text(
-              "What is the market value of the products purchased? How has this value changed in the last year?",
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+          title: Text(
+              context.l10n.aianalyze_valueChanged,
+              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
           children: [
             Padding(
               padding: const EdgeInsets.only(left: 12, top: 8, bottom: 8),

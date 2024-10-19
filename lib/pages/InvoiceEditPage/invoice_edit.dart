@@ -6,22 +6,23 @@ import 'package:cross_file/cross_file.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:intl/intl.dart';
+import 'package:invoix/l10n/localization_extension.dart';
 import 'package:invoix/models/invoice_data.dart';
 import 'package:invoix/pages/CompaniesPage/company_list.dart';
-import 'package:invoix/pages/InvoiceEditPage/date_format.dart';
-import 'package:invoix/utils/ai_mode/gemini_api.dart';
-import 'package:invoix/utils/ai_mode/prompts.dart';
+import 'package:invoix/services/firebase_service.dart';
+import 'package:invoix/services/invoice_data_service.dart';
+import 'package:invoix/states/firebase_state.dart';
+import 'package:invoix/states/invoice_data_state.dart';
+import 'package:invoix/states/loading_state.dart';
 import 'package:invoix/utils/blur_detector.dart';
 import 'package:invoix/utils/date_parser.dart';
 import 'package:invoix/utils/image_filter.dart';
-import 'package:invoix/utils/invoice_data_service.dart';
 import 'package:invoix/utils/legacy_mode/invoice_parser.dart';
 import 'package:invoix/utils/legacy_mode/text_extraction.dart';
 import 'package:invoix/utils/legacy_mode/text_to_invoicedata_regex.dart';
-import 'package:invoix/utils/network_check.dart';
 import 'package:invoix/utils/read_mode.dart';
-import 'package:invoix/widgets/loading_animation.dart';
+import 'package:invoix/utils/status/current_status_checker.dart';
+import 'package:invoix/widgets/status/loading_animation.dart';
 import 'package:invoix/widgets/toast.dart';
 import 'package:invoix/widgets/warn_icon.dart';
 import 'package:string_similarity/string_similarity.dart';
@@ -42,7 +43,6 @@ class InvoiceEditPage extends ConsumerStatefulWidget {
 
 class _InvoiceEditPageState extends ConsumerState<InvoiceEditPage>
     with _InvoiceEditPageMixin {
-
   @override
   Widget build(final BuildContext context) {
     return SafeArea(
@@ -57,7 +57,7 @@ class _InvoiceEditPageState extends ConsumerState<InvoiceEditPage>
                 item = item.replaceAll(companyRegex, "");
                 setState(() {
                   companyTextController.text = item;
-                  companySuffix = InvoiceDataService().companyTypeFinder(item);
+                  companySuffix = invoiceDataService.companyTypeFinder(item);
                 });
               },
             )
@@ -67,26 +67,34 @@ class _InvoiceEditPageState extends ConsumerState<InvoiceEditPage>
           onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
           child: CustomScrollView(slivers: [
             SliverAppBar(
-              actions: const [
+              actions: [
                 Tooltip(
                   triggerMode: TooltipTriggerMode.tap,
-                  showDuration: Duration(seconds: 3),
-                  message: "Zoom in and out to see the image details.",
-                  child: Icon(Icons.zoom_out_map, size: 28),
+                  showDuration: const Duration(seconds: 3),
+                  message: context.l10n.page_editinvoice_zoom,
+                  child: const Icon(Icons.zoom_out_map, size: 28),
                 )
               ],
               expandedHeight: 350,
               flexibleSpace: FlexibleSpaceBar(
-                background: InteractiveViewer(
-                  child: Hero(
-                    tag: imageFile.path,
-                    child: AspectRatio(
-                        aspectRatio: 1,
-                        child: Image.file(
-                          File(imageFile.path),
-                          fit: BoxFit.fitHeight,
-                          width: double.maxFinite,
-                        )),
+                background: Container(
+                  margin: const EdgeInsets.all(24),
+                  clipBehavior: Clip.antiAlias,
+                  decoration: BoxDecoration(
+                    color: Theme.of(context).indicatorColor,
+                    borderRadius: const BorderRadius.all(Radius.circular(25)),
+                  ),
+                  child: InteractiveViewer(
+                    child: Hero(
+                      tag: imageFile.path,
+                      child: AspectRatio(
+                          aspectRatio: 1,
+                          child: Image.file(
+                            File(imageFile.path),
+                            fit: BoxFit.fitHeight,
+                            width: double.maxFinite,
+                          )),
+                    ),
                   ),
                 ),
               ),
@@ -97,42 +105,18 @@ class _InvoiceEditPageState extends ConsumerState<InvoiceEditPage>
                   builder: (final BuildContext context,
                       final AsyncSnapshot<dynamic> snapshot) {
                     if (snapshot.connectionState == ConnectionState.done) {
-
                       if (snapshot.hasError) {
-                        Future(() {Toast(context, text: snapshot.error.toString(), color: Colors.red);});
+                        Future(() {
+                          showToast(text: snapshot.error.toString(),
+                              color: Colors.red);
+                        });
                       }
 
                       return Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          const Divider(height: 20),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                            children: [
-                              IconButton.filledTonal(
-                                  onPressed: () {
-                                    _scaffoldKey.currentState!.openEndDrawer();
-                                  },
-                                  icon: const Icon(Icons.search)),
-                              DateFormatSegmented(onChange: (final value) {
-                                if (dateTextController.text == "") {
-                                  return;
-                                }
-                                if (value == DateFormatSegment.uk) {
-                                  dateTextController.text =
-                                      DateFormat("dd-MM-yyyy").format(
-                                          DateFormat("MM-dd-yyyy")
-                                              .parse(dateTextController.text));
-                                } else if (value == DateFormatSegment.us) {
-                                  dateTextController.text =
-                                      DateFormat("MM-dd-yyyy").format(
-                                          DateFormat("dd-MM-yyyy")
-                                              .parse(dateTextController.text));
-                                }
-                              }),
-                            ],
-                          ),
+                          const Divider(height: 1),
                           Form(
                             autovalidateMode:
                                 AutovalidateMode.onUserInteraction,
@@ -143,85 +127,136 @@ class _InvoiceEditPageState extends ConsumerState<InvoiceEditPage>
                               child: Wrap(
                                 runSpacing: 16.0,
                                 children: [
-                                  TextFormField(
-                                    maxLength: 100,
-                                    controller: companyTextController,
-                                    decoration: InputDecoration(
-                                        labelText: "Company name:",
-                                        suffixIcon: Row(
-                                          mainAxisSize: MainAxisSize.min,
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.end,
-                                          children: [
-                                            SizedBox(
-                                              width: 70,
-                                              height: 35,
-                                              child: DropdownButtonFormField<
-                                                  CompanyType>(
-                                                value: companySuffix,
-                                                alignment: Alignment.center,
-                                                menuMaxHeight: 225,
-                                                hint: const Text("Type"),
-                                                iconSize: 0,
-                                                items: CompanyType.values.map(
-                                                    (final CompanyType value) {
-                                                  return DropdownMenuItem<
+                                  Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Expanded(
+                                        child: TextFormField(
+                                          maxLength: 100,
+                                          controller: companyTextController,
+                                          decoration: InputDecoration(
+                                              labelText: context.l10n.invoice_companyName,
+                                              suffixIconConstraints:
+                                                  const BoxConstraints(
+                                                      maxWidth: 82, maxHeight: 30),
+                                              suffixIcon: Center(
+                                                child: Padding(
+                                                  padding: const EdgeInsets.only(
+                                                      right: 8),
+                                                  child: DropdownButtonFormField<
                                                       CompanyType>(
-                                                    value: value,
+                                                    value: companySuffix,
                                                     alignment: Alignment.center,
-                                                    child: Text(value.name),
-                                                  );
-                                                }).toList(),
-                                                onChanged:
-                                                    (final CompanyType? value) {
-                                                  companySuffix = value!;
-                                                },
-                                                decoration:
-                                                    const InputDecoration(
-                                                  contentPadding:
-                                                      EdgeInsets.symmetric(
-                                                          vertical: 4,
-                                                          horizontal: 12),
-                                                  filled: true,
+                                                    menuMaxHeight: 225,
+                                                    hint: Text(context.l10n.invoice_companyType),
+                                                    iconSize: 0,
+                                                    items: CompanyType.values.map(
+                                                        (final CompanyType value) {
+                                                      return DropdownMenuItem<
+                                                          CompanyType>(
+                                                        value: value,
+                                                        child: Text(value.name),
+                                                      );
+                                                    }).toList(),
+                                                    onChanged:
+                                                        (final CompanyType? value) {
+                                                      companySuffix = value!;
+                                                    },
+                                                    decoration:
+                                                        const InputDecoration(
+                                                      contentPadding:
+                                                      EdgeInsets.symmetric(vertical: 4),
+                                                      filled: true,
+                                                    ),
+                                                    validator: (final value) {
+                                                      if (value == null) {
+                                                        return context.l10n.error_pleaseSelect(context.l10n.invoice_companyType);
+                                                      }
+                                                      return null;
+                                                    },
+                                                  ),
                                                 ),
-                                                validator: (final value) {
-                                                  if (value == null) {
-                                                    return 'Please select company type.';
-                                                  }
-                                                  return null;
-                                                },
-                                              ),
-                                            ),
-                                            const Padding(
-                                              padding: EdgeInsets.only(
-                                                  right: 12.0, left: 4.0),
-                                              child: WarnIcon(
-                                                  message:
-                                                      "You must choose a company type."),
-                                            ),
-                                          ],
-                                        )),
-                                    validator: (final value) {
-                                      if (value == null || value.isEmpty) {
-                                        return 'Please enter some text';
-                                      }
-                                      return null;
-                                    },
+                                              )),
+                                          validator: (final value) {
+                                            if (value == null || value.isEmpty) {
+                                              return context.l10n.error_pleaseEnterText;
+                                            }
+                                            return null;
+                                          },
+                                        ),
+                                      ),
+                                      IconButton.filledTonal(
+                                          onPressed: () {
+                                            _scaffoldKey.currentState!.openEndDrawer();
+                                          },
+                                          icon: const Icon(Icons.search)),
+                                    ],
                                   ),
                                   TextFormField(
                                     maxLength: 50,
-                                    controller: invoiceNoTextController,
-                                    decoration: const InputDecoration(
-                                        labelText: "Invoice No:",
-                                        suffixIcon: WarnIcon(
-                                            message:
-                                                "You must enter a valid invoice no.")),
-                                    validator: (final value) {
-                                      if (value == null || value.isEmpty) {
-                                        return 'Please enter some text';
-                                      }
-                                      return null;
-                                    },
+                                    controller: companyIdTextController,
+                                    decoration: InputDecoration(
+                                        labelText: context.l10n.invoice_companyId),
+                                  ),
+                                  Row(
+                                    mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                    crossAxisAlignment:
+                                    CrossAxisAlignment.start,
+                                    children: [
+                                      Expanded(
+                                        child: TextFormField(
+                                          maxLength: 50,
+                                          controller: invoiceNoTextController,
+                                          decoration: InputDecoration(
+                                              labelText: context.l10n.invoice_invoiceNo,
+                                              suffixIcon: WarnIcon(
+                                                  message: context.l10n.error_validInput(context.l10n.invoice_invoiceNo))),
+                                          validator: (final value) {
+                                            if (value == null || value.isEmpty) {
+                                              return context.l10n.error_pleaseEnterText;
+                                            }
+                                            return null;
+                                          },
+                                        ),
+                                      ),
+                                      const SizedBox(width: 16),
+                                      Flexible(
+                                        child: DropdownButtonFormField<
+                                            PriceUnit>(
+                                          value: priceUnit,
+                                          menuMaxHeight: 225,
+                                          hint: Text(context.l10n.invoice_unit),
+                                          iconSize: 0,
+                                          items: PriceUnit.values.map(
+                                                  (final PriceUnit value) {
+                                                return DropdownMenuItem<
+                                                    PriceUnit>(
+                                                  value: value,
+                                                  child: Text(value.name),
+                                                );
+                                              }).toList(),
+                                          onChanged:
+                                              (final PriceUnit? value) {
+                                                priceUnit =
+                                                value ?? PriceUnit.Others;
+                                          },
+                                          decoration: InputDecoration(
+                                            labelText: context.l10n.invoice_unit,
+                                            isDense: true,
+                                            filled: true,
+                                          ),
+                                          validator: (final value) {
+                                            if (value == null) {
+                                              return context.l10n.error_pleaseSelect(context.l10n.invoice_unit);
+                                            }
+                                            return null;
+                                          },
+                                        ),
+                                      ),
+                                    ],
                                   ),
                                   Row(
                                     mainAxisAlignment:
@@ -234,11 +269,11 @@ class _InvoiceEditPageState extends ConsumerState<InvoiceEditPage>
                                           maxLength: 50,
                                           controller: dateTextController,
                                           readOnly: true,
-                                          decoration: const InputDecoration(
-                                              labelText: "Date:",
+                                          decoration: InputDecoration(
+                                              labelText: context.l10n.invoice_date,
                                               suffixIcon: WarnIcon(
                                                   message:
-                                                      "You must enter a valid date.")),
+                                                      context.l10n.error_validInput(context.l10n.invoice_date))),
                                           onTap: () async {
                                             final DateTime today =
                                                 DateTime.now();
@@ -275,39 +310,35 @@ class _InvoiceEditPageState extends ConsumerState<InvoiceEditPage>
                                         ),
                                       ),
                                       const SizedBox(width: 16),
-                                      Expanded(
+                                      Flexible(
                                         child: DropdownButtonFormField<
                                             InvoiceCategory>(
                                           value: invoiceCategory,
-                                          alignment: Alignment.centerRight,
                                           menuMaxHeight: 225,
-                                          hint: const Text("Type"),
+                                          hint: Text(context.l10n.invoice_category, overflow: TextOverflow.ellipsis),
                                           iconSize: 0,
                                           items: InvoiceCategory.values.map(
                                               (final InvoiceCategory value) {
                                             return DropdownMenuItem<
                                                 InvoiceCategory>(
                                               value: value,
-                                              child: Text(value.name),
+                                              child: Text(value.translatedName, overflow: TextOverflow.ellipsis),
                                             );
                                           }).toList(),
                                           onChanged:
                                               (final InvoiceCategory? value) {
-                                            invoiceCategory = value ?? InvoiceCategory.Others;
+                                            invoiceCategory =
+                                                value ?? InvoiceCategory.Others;
                                           },
-                                          decoration: const InputDecoration(
+
+                                          decoration: InputDecoration(
+                                            labelText: context.l10n.invoice_category,
                                             isDense: true,
-                                            contentPadding:
-                                                EdgeInsets.symmetric(
-                                                    horizontal: -8.0),
-                                            suffixIcon: WarnIcon(
-                                                message:
-                                                    "You must choose a invoice category."),
                                             filled: true,
                                           ),
                                           validator: (final value) {
                                             if (value == null) {
-                                              return 'Please select invoice category.';
+                                              return context.l10n.error_pleaseSelect(context.l10n.invoice_category);
                                             }
                                             return null;
                                           },
@@ -338,14 +369,11 @@ class _InvoiceEditPageState extends ConsumerState<InvoiceEditPage>
                                             }
                                             return null;
                                           },
-                                          decoration: const InputDecoration(
-                                              labelText: "Total Amount:",
+                                          decoration: InputDecoration(
+                                              labelText: context.l10n.invoice_totalAmount,
                                               suffixIcon: WarnIcon(
                                                   message:
-                                                      "You must enter a valid amount."),
-                                              labelStyle: TextStyle(
-                                                  fontSize: 15,
-                                                  fontWeight: FontWeight.bold)),
+                                                      context.l10n.error_validInput(context.l10n.invoice_totalAmount))),
                                         ),
                                       ),
                                       const SizedBox(width: 16),
@@ -367,14 +395,11 @@ class _InvoiceEditPageState extends ConsumerState<InvoiceEditPage>
                                             }
                                             return null;
                                           },
-                                          decoration: const InputDecoration(
-                                              labelText: "Tax Amount:",
+                                          decoration: InputDecoration(
+                                              labelText: context.l10n.invoice_taxAmount,
                                               suffixIcon: WarnIcon(
                                                   message:
-                                                      "You must enter a valid amount."),
-                                              labelStyle: TextStyle(
-                                                  fontSize: 15,
-                                                  fontWeight: FontWeight.bold)),
+                                                      context.l10n.error_validInput(context.l10n.invoice_taxAmount))),
                                         ),
                                       ),
                                     ],
@@ -399,7 +424,7 @@ class _InvoiceEditPageState extends ConsumerState<InvoiceEditPage>
                     }
 
                     return LoadingAnimation(
-                        customHeight: MediaQuery.of(context).size.height - 350, subsControl: true);
+                        customHeight: MediaQuery.of(context).size.height - 375);
                   }),
             ),
           ]),

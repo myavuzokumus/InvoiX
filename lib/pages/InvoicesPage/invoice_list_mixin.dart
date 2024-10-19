@@ -1,6 +1,6 @@
 part of 'invoice_list.dart';
 
-mixin _InvoiceListMixin on State<InvoiceList>{
+mixin _InvoiceListMixin on ConsumerState<InvoiceList>{
 
   late Future<List<InvoiceData>> originalInvoicesFuture;
   late Future<List<InvoiceData>> filteredInvoicesFuture;
@@ -12,12 +12,13 @@ mixin _InvoiceListMixin on State<InvoiceList>{
 
   double minAmount = 0;
   double maxAmount = 0;
+  Set<SortType> _selection = {SortType.date};
 
   @override
   void initState() {
-    invoiceDataService = InvoiceDataService();
+    invoiceDataService = ref.read(invoiceDataServiceProvider);
 
-    endDate = DateTime.now();
+    endDate = DateTime.now().add(const Duration(days: 3650));
     startDate = DateTime(0000);
 
     originalInvoicesFuture =
@@ -32,10 +33,10 @@ mixin _InvoiceListMixin on State<InvoiceList>{
       final DateTime startDate,
       final DateTime endDate,
       final String companyName) async {
-    final List<InvoiceData> invoices = (await InvoiceDataService()
+    final List<InvoiceData> invoices = (await invoiceDataService
         .getInvoicesBetweenDates(startDate, endDate))
         .where((final invoice) => invoice.companyName == companyName)
-        .toList();
+        .toList()..sort((final a, final b) => a.date.compareTo(b.date));
 
     calculateMinMaxAmounts(invoices);
 

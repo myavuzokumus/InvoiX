@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
+import 'package:invoix/l10n/localization_extension.dart';
 import 'package:invoix/models/invoice_data.dart';
+import 'package:invoix/services/hive_service.dart';
 import 'package:invoix/utils/legacy_mode/text_to_invoicedata_regex.dart';
 import 'package:string_similarity/string_similarity.dart';
 
@@ -10,9 +12,9 @@ extension ListTypeExtension on ListType {
   String get name {
     switch (this) {
       case ListType.company:
-        return 'Company';
+        return LocalizationManager.instance.appLocalization.listType_company;
       case ListType.invoice:
-        return 'Invoice';
+        return LocalizationManager.instance.appLocalization.listType_invoice;
     }
   }
 }
@@ -23,22 +25,22 @@ extension CompanyTypeExtension on CompanyType {
   String get name {
     switch (this) {
       case CompanyType.SP:
-        return 'SP';
+        return LocalizationManager.instance.appLocalization.companyType_SP;
       case CompanyType.CORP:
-        return 'Corp';
+        return LocalizationManager.instance.appLocalization.companyType_Corp;
       case CompanyType.LLC:
-        return 'LLC';
+        return LocalizationManager.instance.appLocalization.companyType_LLC;
       case CompanyType.PLC:
-        return 'PLC';
+        return LocalizationManager.instance.appLocalization.companyType_PLC;
       case CompanyType.INC:
-        return 'INC';
+        return LocalizationManager.instance.appLocalization.companyType_INC;
       case CompanyType.GMBH:
-        return 'GmbH';
+        return LocalizationManager.instance.appLocalization.companyType_GmbH;
       case CompanyType.JSC:
-        return 'JSC';
+        return LocalizationManager.instance.appLocalization.companyType_JSC;
       case CompanyType.LTD:
-        return 'LTD';
-      }
+        return LocalizationManager.instance.appLocalization.companyType_LTD;
+    }
   }
 }
 
@@ -55,14 +57,40 @@ enum InvoiceCategory {
 
   static InvoiceCategory? parse(final String category) {
     return InvoiceCategory.values.firstWhere(
-        (final InvoiceCategory e) => category.contains(e.name), orElse: () {
+            (final InvoiceCategory e) => category.contains(e.name), orElse: () {
       //print('Invalid category name: $category');
       return InvoiceCategory.Others;
     });
   }
 }
 
+
+
 extension InvoiceCategoryExtension on InvoiceCategory {
+
+  String get translatedName {
+    switch (this) {
+      case InvoiceCategory.Food:
+        return LocalizationManager.instance.appLocalization.category_food;
+      case InvoiceCategory.Clothing:
+        return LocalizationManager.instance.appLocalization.category_clothing;
+      case InvoiceCategory.Electronics:
+        return LocalizationManager.instance.appLocalization.category_electronics;
+      case InvoiceCategory.Health:
+        return LocalizationManager.instance.appLocalization.category_health;
+      case InvoiceCategory.Education:
+        return LocalizationManager.instance.appLocalization.category_education;
+      case InvoiceCategory.Transportation:
+        return LocalizationManager.instance.appLocalization.category_transportation;
+      case InvoiceCategory.Entertainment:
+        return LocalizationManager.instance.appLocalization.category_entertainment;
+      case InvoiceCategory.Shopping:
+        return LocalizationManager.instance.appLocalization.category_shopping;
+      case InvoiceCategory.Others:
+        return LocalizationManager.instance.appLocalization.category_others;
+    }
+  }
+
   Color get color {
     switch (this) {
       case InvoiceCategory.Food:
@@ -110,15 +138,51 @@ extension InvoiceCategoryExtension on InvoiceCategory {
   }
 }
 
-final Box<InvoiceData> invoiceDataBox = Hive.box<InvoiceData>('InvoiceData');
+enum PriceUnit {
+  EUR,
+  USD,
+  TRY,
+  GBP,
+  JPY,
+  CNY,
+  RUB,
+  AUD,
+  CAD,
+  Others;
+
+  static PriceUnit? parse(final String category) {
+    return PriceUnit.values.firstWhere(
+            (final PriceUnit e) => category.contains(e.name), orElse: () {
+      //print('Invalid category name: $category');
+      return PriceUnit.Others;
+    });
+  }
+}
+
+
 
 class InvoiceDataService {
+  static final InvoiceDataService _instance = InvoiceDataService._internal();
+
+  factory InvoiceDataService() {
+    return _instance;
+  }
+
+  InvoiceDataService._internal();
+
+  late final Box<InvoiceData> invoiceDataBox;
+  late final Box<int> remainingTimeBox;
+
+  Future<void> initialize() async {
+    invoiceDataBox = await HiveService().openBox<InvoiceData>('InvoiceData');
+    remainingTimeBox = await HiveService().openBox<int>('remainingTimeBox');
+  }
+
   Future<void> saveInvoiceData(final InvoiceData invoiceData) async {
     await invoiceDataBox.put(invoiceData.id, invoiceData);
   }
 
   Future<void> deleteInvoiceData(final List<InvoiceData> invoiceData) async {
-    final Box<int> remainingTimeBox = Hive.box<int>('remainingTimeBox');
     await remainingTimeBox.deleteAll(
         invoiceData.map((final invoiceData) => invoiceData.imagePath));
     await invoiceDataBox
@@ -126,11 +190,10 @@ class InvoiceDataService {
   }
 
   Future<void> deleteCompany(final String companyName) async {
-    await getInvoiceList(companyName).then((final List<InvoiceData> invoices) {
-      for (final InvoiceData invoice in invoices) {
-        deleteInvoiceData([invoice]);
-      }
-    });
+    final invoices = await getInvoiceList(companyName);
+    for (final invoice in invoices) {
+      await deleteInvoiceData([invoice]);
+    }
   }
 
   InvoiceData? getInvoiceData(final InvoiceData invoiceData) {
@@ -138,22 +201,20 @@ class InvoiceDataService {
   }
 
   Future<List<InvoiceData>> getInvoiceList(final String companyName) async {
-    final Iterable<InvoiceData> savedList =
-        invoiceDataBox.values.cast<InvoiceData>();
-
-    return savedList
+    return invoiceDataBox.values
         .where((final element) => companyName == element.companyName)
         .toList();
   }
 
   Future<List<String>> getCompanyList() async {
-    final Iterable<InvoiceData> savedList =
-        invoiceDataBox.values.cast<InvoiceData>();
-    return savedList.map((final item) => item.companyName).toSet().toList();
+    return invoiceDataBox.values
+        .map((final item) => item.companyName)
+        .toSet()
+        .toList();
   }
 
   Future<List<InvoiceData>> getAllInvoices() async {
-    return invoiceDataBox.values.cast<InvoiceData>().toList();
+    return invoiceDataBox.values.toList();
   }
 
   CompanyType companyTypeFinder(String companyName) {
@@ -165,36 +226,32 @@ class InvoiceDataService {
       }
 
       final List matchList =
-          companyRegex.allMatches(companyName).toList();
+      companyRegex.allMatches(companyName).toList();
       final RegExpMatch? pairedType =
-          matchList.isNotEmpty ? matchList.last : null;
+      matchList.isNotEmpty ? matchList.last : null;
       if (pairedType == null) {
         return false;
       }
 
       return companyName
-              .substring(pairedType.start, pairedType.end)
-              .similarityTo(e.name) >
+          .substring(pairedType.start, pairedType.end)
+          .similarityTo(e.name) >
           0.3;
     }, orElse: () => CompanyType.LTD);
   }
 
-  // Filter invoices by date range
   Future<List<InvoiceData>> getInvoicesBetweenDates(
       final DateTime startDate, final DateTime endDate) async {
-    final List<InvoiceData> allInvoices =
-        await InvoiceDataService().getAllInvoices();
+    final allInvoices = await getAllInvoices();
     return allInvoices
-        .where((final invoice) =>
-            isInvoiceBetweenDates(invoice, startDate, endDate))
+        .where((final invoice) => isInvoiceBetweenDates(invoice, startDate, endDate))
         .toList();
   }
 
   bool isInvoiceBetweenDates(final InvoiceData invoice,
       final DateTime startDate, final DateTime endDate) {
-    return ((invoice.date.isAfter(startDate) || invoice.date.isAtSameMomentAs(startDate))&&
-        (invoice.date.isBefore(endDate) ||
-            invoice.date.isAtSameMomentAs(endDate)));
+    return ((invoice.date.isAfter(startDate) || invoice.date.isAtSameMomentAs(startDate)) &&
+        (invoice.date.isBefore(endDate) || invoice.date.isAtSameMomentAs(endDate)));
   }
 
   bool isSameInvoice(

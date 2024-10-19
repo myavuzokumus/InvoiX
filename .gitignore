@@ -45,8 +45,16 @@ app.*.map.json
 /android/app/debug
 /android/app/profile
 /android/app/release
+/android/app/google-services.json
+/functions/keys/
+/functions/node_modules/
+
+# IOS
+ios/Runner
+ios/Runner.xcodeproj
+ios/Runner/GoogleService-Info.plist
 
 # IDX
 monospace.json
 /firebase.json
-/android/app/google-services.json
+

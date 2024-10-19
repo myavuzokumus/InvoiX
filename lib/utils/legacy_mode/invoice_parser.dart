@@ -1,7 +1,7 @@
 import 'dart:convert';
 
+import 'package:invoix/services/invoice_data_service.dart';
 import 'package:invoix/utils/date_parser.dart';
-import 'package:invoix/utils/invoice_data_service.dart';
 import 'package:invoix/utils/legacy_mode/text_to_invoicedata_regex.dart';
 
 String parseInvoiceData(final List<String> listText) {

@@ -1,5 +1,6 @@
 {
   "en": [
+    "auth_loginError",
     "apiErrorUserNotFound",
     "apiErrorWrongPassword",
     "apiErrorUserDisabled",
@@ -26,7 +27,6 @@
     "pleaseEnterYourEmail",
     "pleaseEnterYourPassword",
     "loginSuccessful",
-    "loginError",
     "send",
     "passwordResetEmailSent",
     "error",

@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:invoix/l10n/localization_extension.dart';
 import 'package:invoix/pages/CompaniesPage/company_main.dart';
 import 'package:invoix/pages/SummaryPage/summary_main.dart';
+import 'package:invoix/utils/navigation_utils.dart';
+import 'package:invoix/utils/read_mode.dart';
+import 'package:invoix/widgets/status/loading_animation.dart';
 
 class MainPage extends StatefulWidget {
   const MainPage({super.key});
@@ -16,39 +20,72 @@ class _MainPageState extends State<MainPage> {
     const SummaryMain(),
   ];
 
+  final ValueNotifier<bool> _isLoadingNotifier = ValueNotifier(false);
+  final PageController _pageController = PageController();
+  late ReadMode readMode = ReadMode.ai; // Initialize readMode here
+
   void onTabTapped(final int index) {
     setState(() {
       _currentIndex = index;
     });
-    // onTap event'inde, PageController'ın animateToPage metodunu çağırın
-    _pageController.animateToPage(index,
-        duration: const Duration(milliseconds: 500), curve: Curves.easeOutCubic);
+    _pageController.animateToPage(index, duration: const Duration(milliseconds: 500), curve: Curves.easeOutCubic);
   }
 
-  final PageController _pageController = PageController();
+  @override
+  void initState() {
+    super.initState();
+  }
 
   @override
   Widget build(final BuildContext context) {
     return Scaffold(
-      body: PageView(
-        onPageChanged: onTabTapped,
-        controller: _pageController,
-        children: _children,
+      resizeToAvoidBottomInset: false,
+      body: Stack(
+        children: [
+          PageView(
+            onPageChanged: onTabTapped,
+            controller: _pageController,
+            children: _children,
+          ),
+          ValueListenableBuilder(
+            valueListenable: _isLoadingNotifier,
+            builder: (final BuildContext context, final value, final Widget? child) {
+              return value == true
+                  ? Container(
+                  height: double.infinity,
+                  width: double.infinity,
+                  color: Colors.black38,
+                  child: const Center(child: LoadingAnimation()))
+                  : const SizedBox();
+            },
+          )
+        ],
       ),
       bottomNavigationBar: BottomNavigationBar(
+        backgroundColor: Theme.of(context).colorScheme.onSecondary,
         onTap: onTabTapped,
         currentIndex: _currentIndex,
-        items: const [
+        items: [
           BottomNavigationBarItem(
-            icon: Icon(Icons.business),
-            label: 'Companies',
+            icon: const Icon(Icons.business),
+            label: context.l10n.listType_company,
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.pie_chart),
-            label: 'Summary',
+            icon: const Icon(Icons.pie_chart),
+            label: context.l10n.summary_title,
           ),
         ],
       ),
+      floatingActionButton: Badge(
+        label: const Icon(Icons.add, color: Colors.white, size: 20),
+        largeSize: 28,
+        backgroundColor: Colors.red,
+        offset: const Offset(10, -10),
+        child: FloatingActionButton(
+            onPressed: () => nextPage(context, _isLoadingNotifier, readMode),
+            child: const Icon(Icons.receipt_long, size: 46)),
+      ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
     );
   }
 }
