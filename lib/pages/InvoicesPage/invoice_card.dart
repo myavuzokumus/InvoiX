@@ -67,21 +67,21 @@ class InvoiceCard extends ConsumerWidget {
               children: [
                 Expanded(
                   child: Padding(
-                    padding: const EdgeInsets.only(left: 16, right: 16),
+                    padding: const EdgeInsets.only(left: 16),
                     child: ListView(
                       physics: const NeverScrollableScrollPhysics(),
                       shrinkWrap: true,
                       children: <Widget>[
                         if (selectionMode != null) Text("${context.l10n.invoice_companyName}\n${invoiceData.companyName}", overflow: TextOverflow.ellipsis,),
                         if (selectionMode != null) const Divider(height: 2),
-                        Text("${context.l10n.invoice_date}\n${DateFormat("dd-MM-yyyy").format(invoiceData.date)}"),
+                        Text("${context.l10n.invoice_date}\n${DateFormat("dd-MM-yyyy").format(invoiceData.date)}", overflow: TextOverflow.ellipsis,),
                         const Divider(height: 2),
                         Row(
                           mainAxisAlignment: MainAxisAlignment.start,
                           children: [
-                            Text("${context.l10n.invoice_totalAmount}\n${invoiceData.unit} ${invoiceData.totalAmount}"),
+                            Text("${context.l10n.invoice_totalAmount}\n${invoiceData.unit} ${invoiceData.totalAmount}", overflow: TextOverflow.ellipsis,),
                             const SizedBox(width: 16),
-                            Text("${context.l10n.invoice_taxAmount}\n${invoiceData.unit} ${invoiceData.taxAmount}"),
+                            Text("${context.l10n.invoice_taxAmount}\n${invoiceData.unit} ${invoiceData.taxAmount}", overflow: TextOverflow.ellipsis,),
                           ],
                         ),
                       ],
@@ -91,7 +91,7 @@ class InvoiceCard extends ConsumerWidget {
                 Stack(
                   children: [
                     Padding(
-                      padding: const EdgeInsets.only(right: 16, bottom: 8, top: 8, left: 24),
+                      padding: const EdgeInsets.only(right: 16, bottom: 8, top: 8),
                       child: ClipRRect(
                         borderRadius: BorderRadius.circular(16),
                         child: Image(image: InvoiceCategory.parse(invoiceData.category)!.icon,

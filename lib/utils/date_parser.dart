@@ -23,8 +23,9 @@ DateTime dateParser(final String date) {
 
     if (yearIndex != -1) {
       // Year found
-      if (yearIndex == 0) format = 'yyyy-MM-dd';
-      else if (yearIndex == 2) format = 'dd-MM-yyyy';
+      if (yearIndex == 0) {
+        format = 'yyyy-MM-dd';
+      } else if (yearIndex == 2) format = 'dd-MM-yyyy';
       else format = 'MM-dd-yyyy';
     } else {
       // Year not found, default to day-month-year

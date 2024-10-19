@@ -45,85 +45,83 @@ class _CompanyPageState extends ConsumerState<CompanyPage>
         selectionProvider: companySelectionProvider,
         type: ListType.company,
         title: "InvoiX",
-        body: Column(
+        body: Stack(
           children: [
-            Expanded(
-              child: Stack(
-                children: [
-                  const CompanyList(),
-                  ValueListenableBuilder(
-                    valueListenable: _isLoadingNotifier,
-                    builder: (final BuildContext context, final value,
-                        final Widget? child) {
-                      return value == true
-                          ? Container(
-                              height: double.infinity,
-                              width: double.infinity,
-                              color: Colors.black38,
-                              child: const Center(child: LoadingAnimation()))
-                          : const SizedBox();
-                    },
-                  )
-                ],
-              ),
-            ),
-            Theme(
-              data: Theme.of(context).copyWith(
-                listTileTheme: const ListTileThemeData(
-                  shape: Border(bottom: BorderSide(color: Colors.white, width: 2)),
-                  tileColor: Colors.transparent,
-                ),
-                dividerColor: Colors.transparent,
-                expansionTileTheme: ExpansionTileThemeData(
-                  collapsedShape: const Border(bottom: BorderSide(color: Colors.white, width: 1.5)),
-                  backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-                  collapsedBackgroundColor: Theme.of(context).scaffoldBackgroundColor,
-                ),
-              ),
-              child: ExpansionTile(
-                expansionAnimationStyle: AnimationStyle(
-                  curve: Curves.easeInOut,
-                  duration: const Duration(milliseconds: 600),
-                ),
-                controller: expansionTileController,
-                onExpansionChanged: (final bool isExpanded) {
-                  prefs.setBool('isAITurnOff', isExpanded);
-                },
-                title: Text(context.l10n.aiinsights_name,
-                    textAlign: TextAlign.left,
-                    style:
-                        const TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
-                children: [
-                  SizedBox(
-                    height: 128,
-                    child: CarouselView(
-                      padding: const EdgeInsets.only(
-                          top: 8, bottom: 20, right: 8, left: 8),
-                      itemSnapping: true,
-                      itemExtent: 328,
-                      shrinkExtent: 128,
-                      children: [
-                        InvoixAICard(
-                          children: <Widget>[
-                            Text(context.l10n.aiinsights_new),
-                          ],
-                        ),
-                        InvoixAICard(
-                          children: <Widget>[
-                            Text(context.l10n.aiinsights_selectable),
-                          ],
-                        ),
-                        InvoixAICard(
-                          children: <Widget>[
-                            Text(context.l10n.aiinsights_soon),
-                          ],
-                        ),
-                      ],
+            Column(
+              children: [
+                const Expanded(child: CompanyList()),
+                Theme(
+                  data: Theme.of(context).copyWith(
+                    listTileTheme: const ListTileThemeData(
+                      shape: Border(bottom: BorderSide(color: Colors.white, width: 2)),
+                      tileColor: Colors.transparent,
                     ),
-                  )
-                ],
-              ),
+                    dividerColor: Colors.transparent,
+                    expansionTileTheme: ExpansionTileThemeData(
+                      collapsedShape: const Border(bottom: BorderSide(color: Colors.white, width: 1.5)),
+                      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+                      collapsedBackgroundColor: Theme.of(context).scaffoldBackgroundColor,
+                    ),
+                  ),
+                  child: ExpansionTile(
+                    expansionAnimationStyle: AnimationStyle(
+                      curve: Curves.easeInOut,
+                      duration: const Duration(milliseconds: 600),
+                    ),
+                    controller: expansionTileController,
+                    onExpansionChanged: (final bool isExpanded) {
+                      prefs.setBool('isAITurnOff', isExpanded);
+                    },
+                    title: Text(context.l10n.aiinsights_name,
+                        textAlign: TextAlign.left,
+                        style:
+                        const TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
+                    children: [
+                      SizedBox(
+                        height: 128,
+                        child: CarouselView(
+                          padding: const EdgeInsets.only(
+                              top: 8, bottom: 20, right: 8, left: 8),
+                          itemSnapping: true,
+                          itemExtent: 328,
+                          shrinkExtent: 128,
+                          children: [
+                            InvoixAICard(
+                              children: <Widget>[
+                                Text(context.l10n.aiinsights_new),
+                              ],
+                            ),
+                            InvoixAICard(
+                              children: <Widget>[
+                                Text(context.l10n.aiinsights_selectable),
+                              ],
+                            ),
+                            InvoixAICard(
+                              children: <Widget>[
+                                Text(context.l10n.aiinsights_soon),
+                              ],
+                            ),
+                          ],
+                        ),
+                      )
+                    ],
+                  ),
+                )
+              ],
             ),
+            ValueListenableBuilder(
+              valueListenable: _isLoadingNotifier,
+              builder: (final BuildContext context, final value,
+                  final Widget? child) {
+                return value == true
+                    ? Container(
+                        height: double.infinity,
+                        width: double.infinity,
+                        color: Colors.black38,
+                        child: const Center(child: LoadingAnimation()))
+                    : const SizedBox.shrink();
+              },
+            )
           ],
         ),
       ),

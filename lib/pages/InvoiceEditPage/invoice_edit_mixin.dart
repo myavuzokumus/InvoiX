@@ -73,8 +73,7 @@ mixin _InvoiceEditPageMixin on ConsumerState<InvoiceEditPage> {
 
   Future<void> analyzeNewData() async {
     if (await blurDetection(imageFile.path, 10) && mounted) {
-      Toast(context,
-          text: context.l10n.message_blurChecker,
+      showToast(text: context.l10n.message_blurChecker,
           color: Colors.redAccent);
     }
     await imageFilter(imageFile);
@@ -220,8 +219,7 @@ mixin _InvoiceEditPageMixin on ConsumerState<InvoiceEditPage> {
         }
 
         if (mounted) {
-          Toast(context,
-              text: context.l10n.loading_data, color: Colors.yellowAccent);
+          showToast(text: context.l10n.loading_data, color: Colors.yellowAccent);
         }
 
         final data = InvoiceData(
@@ -241,12 +239,11 @@ mixin _InvoiceEditPageMixin on ConsumerState<InvoiceEditPage> {
         _isFileSaved = true;
 
         if (mounted) {
-          Toast(context, text: context.l10n.loading_success, color: Colors.greenAccent);
+          showToast(text: context.l10n.loading_success, color: Colors.greenAccent);
           Navigator.pop(context);
         }
       } catch (e) {
-        Toast(context,
-            text: "${context.l10n.status_somethingWentWrong}:\n$e", color: Colors.redAccent);
+        showToast(text: "${context.l10n.status_somethingWentWrong}:\n$e", color: Colors.redAccent);
       } finally {
         setState(() {
           _saveButtonState.value = false;

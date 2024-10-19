@@ -107,8 +107,7 @@ class _InvoiceEditPageState extends ConsumerState<InvoiceEditPage>
                     if (snapshot.connectionState == ConnectionState.done) {
                       if (snapshot.hasError) {
                         Future(() {
-                          Toast(context,
-                              text: snapshot.error.toString(),
+                          showToast(text: snapshot.error.toString(),
                               color: Colors.red);
                         });
                       }
@@ -139,58 +138,46 @@ class _InvoiceEditPageState extends ConsumerState<InvoiceEditPage>
                                           controller: companyTextController,
                                           decoration: InputDecoration(
                                               labelText: context.l10n.invoice_companyName,
-                                              suffixIcon: Row(
-                                                mainAxisSize: MainAxisSize.min,
-                                                mainAxisAlignment:
-                                                    MainAxisAlignment.end,
-                                                children: [
-                                                  SizedBox(
-                                                    width: 70,
-                                                    height: 35,
-                                                    child: DropdownButtonFormField<
-                                                        CompanyType>(
-                                                      value: companySuffix,
-                                                      alignment: Alignment.center,
-                                                      menuMaxHeight: 225,
-                                                      hint: Text(context.l10n.invoice_companyType),
-                                                      iconSize: 0,
-                                                      items: CompanyType.values.map(
-                                                          (final CompanyType value) {
-                                                        return DropdownMenuItem<
-                                                            CompanyType>(
-                                                          value: value,
-                                                          alignment: Alignment.center,
-                                                          child: Text(value.name),
-                                                        );
-                                                      }).toList(),
-                                                      onChanged:
-                                                          (final CompanyType? value) {
-                                                        companySuffix = value!;
-                                                      },
-                                                      decoration:
-                                                          const InputDecoration(
-                                                        contentPadding:
-                                                            EdgeInsets.symmetric(
-                                                                vertical: 4,
-                                                                horizontal: 12),
-                                                        filled: true,
-                                                      ),
-                                                      validator: (final value) {
-                                                        if (value == null) {
-                                                          return context.l10n.error_pleaseSelect(context.l10n.invoice_companyType);
-                                                        }
-                                                        return null;
-                                                      },
+                                              suffixIconConstraints:
+                                                  const BoxConstraints(
+                                                      maxWidth: 82, maxHeight: 30),
+                                              suffixIcon: Center(
+                                                child: Padding(
+                                                  padding: const EdgeInsets.only(
+                                                      right: 8),
+                                                  child: DropdownButtonFormField<
+                                                      CompanyType>(
+                                                    value: companySuffix,
+                                                    alignment: Alignment.center,
+                                                    menuMaxHeight: 225,
+                                                    hint: Text(context.l10n.invoice_companyType),
+                                                    iconSize: 0,
+                                                    items: CompanyType.values.map(
+                                                        (final CompanyType value) {
+                                                      return DropdownMenuItem<
+                                                          CompanyType>(
+                                                        value: value,
+                                                        child: Text(value.name),
+                                                      );
+                                                    }).toList(),
+                                                    onChanged:
+                                                        (final CompanyType? value) {
+                                                      companySuffix = value!;
+                                                    },
+                                                    decoration:
+                                                        const InputDecoration(
+                                                      contentPadding:
+                                                      EdgeInsets.symmetric(vertical: 4),
+                                                      filled: true,
                                                     ),
+                                                    validator: (final value) {
+                                                      if (value == null) {
+                                                        return context.l10n.error_pleaseSelect(context.l10n.invoice_companyType);
+                                                      }
+                                                      return null;
+                                                    },
                                                   ),
-                                                  Padding(
-                                                    padding: const EdgeInsets.only(
-                                                        right: 12.0, left: 4.0),
-                                                    child: WarnIcon(
-                                                        message:
-                                                        context.l10n.warn_pleaseSelect(context.l10n.invoice_companyType)),
-                                                  ),
-                                                ],
+                                                ),
                                               )),
                                           validator: (final value) {
                                             if (value == null || value.isEmpty) {
@@ -210,8 +197,8 @@ class _InvoiceEditPageState extends ConsumerState<InvoiceEditPage>
                                   TextFormField(
                                     maxLength: 50,
                                     controller: companyIdTextController,
-                                    decoration: const InputDecoration(
-                                        labelText: "Company Id:"),
+                                    decoration: InputDecoration(
+                                        labelText: context.l10n.invoice_companyId),
                                   ),
                                   Row(
                                     mainAxisAlignment:
@@ -219,7 +206,7 @@ class _InvoiceEditPageState extends ConsumerState<InvoiceEditPage>
                                     crossAxisAlignment:
                                     CrossAxisAlignment.start,
                                     children: [
-                                      Flexible(
+                                      Expanded(
                                         child: TextFormField(
                                           maxLength: 50,
                                           controller: invoiceNoTextController,
@@ -236,11 +223,10 @@ class _InvoiceEditPageState extends ConsumerState<InvoiceEditPage>
                                         ),
                                       ),
                                       const SizedBox(width: 16),
-                                      Expanded(
+                                      Flexible(
                                         child: DropdownButtonFormField<
                                             PriceUnit>(
                                           value: priceUnit,
-                                          alignment: Alignment.centerRight,
                                           menuMaxHeight: 225,
                                           hint: Text(context.l10n.invoice_unit),
                                           iconSize: 0,
@@ -258,13 +244,8 @@ class _InvoiceEditPageState extends ConsumerState<InvoiceEditPage>
                                                 value ?? PriceUnit.Others;
                                           },
                                           decoration: InputDecoration(
+                                            labelText: context.l10n.invoice_unit,
                                             isDense: true,
-                                            contentPadding:
-                                            const EdgeInsets.symmetric(
-                                                horizontal: 18.0),
-                                            suffixIcon: WarnIcon(
-                                                message:
-                                                context.l10n.warn_pleaseSelect(context.l10n.invoice_unit)),
                                             filled: true,
                                           ),
                                           validator: (final value) {
@@ -329,20 +310,19 @@ class _InvoiceEditPageState extends ConsumerState<InvoiceEditPage>
                                         ),
                                       ),
                                       const SizedBox(width: 16),
-                                      Expanded(
+                                      Flexible(
                                         child: DropdownButtonFormField<
                                             InvoiceCategory>(
                                           value: invoiceCategory,
-                                          alignment: Alignment.centerRight,
                                           menuMaxHeight: 225,
-                                          hint: Text(context.l10n.invoice_category),
+                                          hint: Text(context.l10n.invoice_category, overflow: TextOverflow.ellipsis),
                                           iconSize: 0,
                                           items: InvoiceCategory.values.map(
                                               (final InvoiceCategory value) {
                                             return DropdownMenuItem<
                                                 InvoiceCategory>(
                                               value: value,
-                                              child: Text(value.name),
+                                              child: Text(value.translatedName, overflow: TextOverflow.ellipsis),
                                             );
                                           }).toList(),
                                           onChanged:
@@ -350,14 +330,10 @@ class _InvoiceEditPageState extends ConsumerState<InvoiceEditPage>
                                             invoiceCategory =
                                                 value ?? InvoiceCategory.Others;
                                           },
+
                                           decoration: InputDecoration(
+                                            labelText: context.l10n.invoice_category,
                                             isDense: true,
-                                            contentPadding:
-                                                const EdgeInsets.symmetric(
-                                                    horizontal: -8.0),
-                                            suffixIcon: WarnIcon(
-                                                message:
-                                                    context.l10n.warn_pleaseSelect(context.l10n.invoice_category)),
                                             filled: true,
                                           ),
                                           validator: (final value) {
@@ -397,10 +373,7 @@ class _InvoiceEditPageState extends ConsumerState<InvoiceEditPage>
                                               labelText: context.l10n.invoice_totalAmount,
                                               suffixIcon: WarnIcon(
                                                   message:
-                                                      context.l10n.error_validInput(context.l10n.invoice_totalAmount)),
-                                              labelStyle: const TextStyle(
-                                                  fontSize: 15,
-                                                  fontWeight: FontWeight.bold)),
+                                                      context.l10n.error_validInput(context.l10n.invoice_totalAmount))),
                                         ),
                                       ),
                                       const SizedBox(width: 16),
@@ -426,10 +399,7 @@ class _InvoiceEditPageState extends ConsumerState<InvoiceEditPage>
                                               labelText: context.l10n.invoice_taxAmount,
                                               suffixIcon: WarnIcon(
                                                   message:
-                                                      context.l10n.error_validInput(context.l10n.invoice_taxAmount)),
-                                              labelStyle: const TextStyle(
-                                                  fontSize: 15,
-                                                  fontWeight: FontWeight.bold)),
+                                                      context.l10n.error_validInput(context.l10n.invoice_taxAmount))),
                                         ),
                                       ),
                                     ],

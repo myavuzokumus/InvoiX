@@ -16,16 +16,28 @@ import 'package:invoix/widgets/status/show_current_status.dart';
 import 'package:invoix/widgets/toast.dart';
 import 'package:invoix/widgets/warn_icon.dart';
 
-class AIButton extends ConsumerWidget {
-  AIButton({super.key, required this.invoice});
+
+class AIButton extends ConsumerStatefulWidget {
+  const AIButton({super.key, required this.invoice});
 
   final InvoiceData invoice;
 
+  @override
+  ConsumerState<AIButton> createState() => _AIButtonState();
+}
+
+class _AIButtonState extends ConsumerState<AIButton> {
   late Future<String> _future;
+  late final InvoiceData invoice;
 
   @override
-  Widget build(final BuildContext context, final WidgetRef ref) {
-    print(context.l10n.invoice_date);
+  void initState() {
+    invoice = widget.invoice;
+    super.initState();
+  }
+
+  @override
+  Widget build(final BuildContext mainContext) {
     return IconButton.outlined(
       style: OutlinedButton.styleFrom(
         backgroundColor: Colors.black.withOpacity(0.35),
@@ -50,7 +62,7 @@ class AIButton extends ConsumerWidget {
               : Future.value(jsonEncode(invoice.contentCache));
 
           await showModalBottomSheet<void>(
-            context: context,
+            context: mainContext,
             isScrollControlled: true,
             useSafeArea: true,
             enableDrag: true,
@@ -58,7 +70,7 @@ class AIButton extends ConsumerWidget {
             constraints: BoxConstraints(
               maxHeight: MediaQuery.of(context).size.height * 0.75,
             ),
-            builder: (final BuildContext modalContext) {
+            builder: (final BuildContext context) {
               return LayoutBuilder(
                 builder: (final BuildContext context,
                     final BoxConstraints constraints) {
@@ -85,7 +97,7 @@ class AIButton extends ConsumerWidget {
                                       children: [
                                         LoadingAnimation(
                                             message:
-                                                context.l10n.message_analyzing,
+                                                mainContext.l10n.message_analyzing,
                                             customHeight:
                                                 constraints.maxHeight - 110),
                                       ],
@@ -105,7 +117,7 @@ class AIButton extends ConsumerWidget {
                                           InvoiceAnalysis.fromJson(decodedData);
 
                                       return describedWidget(
-                                          context,
+                                          mainContext,
                                           invoiceAnalysis,
                                           firebaseService,
                                           setModalState);
@@ -147,7 +159,7 @@ class AIButton extends ConsumerWidget {
                                     children: [
                                       LoadingAnimation(
                                           message:
-                                            context.l10n.message_analyzing,
+                                            mainContext.l10n.message_analyzing,
                                           customHeight:
                                               constraints.maxHeight - 72),
                                     ],
@@ -163,19 +175,17 @@ class AIButton extends ConsumerWidget {
             },
           );
         } else {
-          Toast(context,
-              text:
-                  context.l10n.message_cooldown({30 - remainingTime}));
+          showToast(text: mainContext.l10n.message_cooldown(30 - remainingTime));
         }
       },
       icon: const Text("✨", style: TextStyle(fontSize: 17)),
-      tooltip: context.l10n.aianalyze_title,
+      tooltip: mainContext.l10n.aianalyze_title,
     );
   }
 
   //This is ridiculous, I know, but I did it this way to improve the application.
   Widget describedWidget(
-      final context,
+      final BuildContext context,
       final InvoiceAnalysis invoiceAnalysis,
       final firebaseService,
       final void Function(void Function() p1) setModalState) {
@@ -231,7 +241,7 @@ class AIButton extends ConsumerWidget {
         ExpansionTile(
           initiallyExpanded: true,
           title: Text(
-              context.l10n.harmfulHuman,
+              context.l10n.aianalyze_harmfulHuman,
               style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
           children: [
             Padding(

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
+import 'package:invoix/l10n/localization_extension.dart';
 import 'package:invoix/models/invoice_data.dart';
 import 'package:invoix/services/hive_service.dart';
 import 'package:invoix/utils/legacy_mode/text_to_invoicedata_regex.dart';
@@ -11,9 +12,9 @@ extension ListTypeExtension on ListType {
   String get name {
     switch (this) {
       case ListType.company:
-        return 'Company';
+        return LocalizationManager.instance.appLocalization.listType_company;
       case ListType.invoice:
-        return 'Invoice';
+        return LocalizationManager.instance.appLocalization.listType_invoice;
     }
   }
 }
@@ -24,21 +25,21 @@ extension CompanyTypeExtension on CompanyType {
   String get name {
     switch (this) {
       case CompanyType.SP:
-        return 'SP';
+        return LocalizationManager.instance.appLocalization.companyType_SP;
       case CompanyType.CORP:
-        return 'Corp';
+        return LocalizationManager.instance.appLocalization.companyType_Corp;
       case CompanyType.LLC:
-        return 'LLC';
+        return LocalizationManager.instance.appLocalization.companyType_LLC;
       case CompanyType.PLC:
-        return 'PLC';
+        return LocalizationManager.instance.appLocalization.companyType_PLC;
       case CompanyType.INC:
-        return 'INC';
+        return LocalizationManager.instance.appLocalization.companyType_INC;
       case CompanyType.GMBH:
-        return 'GmbH';
+        return LocalizationManager.instance.appLocalization.companyType_GmbH;
       case CompanyType.JSC:
-        return 'JSC';
+        return LocalizationManager.instance.appLocalization.companyType_JSC;
       case CompanyType.LTD:
-        return 'LTD';
+        return LocalizationManager.instance.appLocalization.companyType_LTD;
     }
   }
 }
@@ -63,7 +64,33 @@ enum InvoiceCategory {
   }
 }
 
+
+
 extension InvoiceCategoryExtension on InvoiceCategory {
+
+  String get translatedName {
+    switch (this) {
+      case InvoiceCategory.Food:
+        return LocalizationManager.instance.appLocalization.category_food;
+      case InvoiceCategory.Clothing:
+        return LocalizationManager.instance.appLocalization.category_clothing;
+      case InvoiceCategory.Electronics:
+        return LocalizationManager.instance.appLocalization.category_electronics;
+      case InvoiceCategory.Health:
+        return LocalizationManager.instance.appLocalization.category_health;
+      case InvoiceCategory.Education:
+        return LocalizationManager.instance.appLocalization.category_education;
+      case InvoiceCategory.Transportation:
+        return LocalizationManager.instance.appLocalization.category_transportation;
+      case InvoiceCategory.Entertainment:
+        return LocalizationManager.instance.appLocalization.category_entertainment;
+      case InvoiceCategory.Shopping:
+        return LocalizationManager.instance.appLocalization.category_shopping;
+      case InvoiceCategory.Others:
+        return LocalizationManager.instance.appLocalization.category_others;
+    }
+  }
+
   Color get color {
     switch (this) {
       case InvoiceCategory.Food:

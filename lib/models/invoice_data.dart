@@ -78,28 +78,26 @@ class InvoiceData extends HiveObject {
 
   static double _parseAmount(final String amount) {
 
-    print(amount);
-    // Ondalık ayraçlarını düzelt
+    // Fix decimal brackets
     final newAmount = amount.replaceAllMapped(
         RegExp(r'(\d+)([.,])(\d{1,2})$'),
             (final Match m) => '${m[1]}${"."}${m[3]}'
     );
 
-    String reversedText = newAmount.split('').reversed.join('');
+    final String reversedText = newAmount.split('').reversed.join('');
 
-    // İlk noktayı bul ve metni ikiye ayır
-    int lastDotIndex = reversedText.indexOf('.');
+    // Find the first point and split the text in two
+    final int lastDotIndex = reversedText.indexOf('.');
     String beforeLastDot = reversedText.substring(lastDotIndex + 1);
-    String afterLastDot = reversedText.substring(0, lastDotIndex + 1);
+    final String afterLastDot = reversedText.substring(0, lastDotIndex + 1);
 
-    // Noktaları kaldır ve metni tekrar birleştir
+    // Remove the dots and reassemble the text
     beforeLastDot = beforeLastDot.replaceAll('.', '');
     String result = beforeLastDot + afterLastDot;
 
     result = result.split('').reversed.join('');
 
-    // Metni tekrar ters çevir
-    print(result.replaceAll(",", "."));
+    // Reverse the text again
     return double.tryParse(newAmount.replaceAll(",", ".")) ?? 0;
   }
 

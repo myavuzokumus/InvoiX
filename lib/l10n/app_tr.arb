@@ -61,8 +61,8 @@
   "status_noLogin": "Giriş yapmadınız.",
   "status_somethingWentWrong": "Bir şeyler yanlış gitti.",
 
-  "loading_data" : "Processing Data...",
-  "loading_success" : "Data Processed!",
+  "loading_data" : "Veri işleniyor...",
+  "loading_success" : "Veri işlendi!",
 
   "aiinsights_name" : "AI Öngörüleri",
   "aiinsights_juststart" : "Başlamak için fatura ekle simgesine tıklayın.",
@@ -107,6 +107,36 @@
       }
     }
   },
+  "selectionMode_delete_title": "{type}(leri) Sil",
+  "@selectionMode_delete_title": {
+    "placeholders": {
+      "type": {
+        "type": "String"
+      }
+    }
+  },
+  "selectionMode_delete_message": "{amount} {type}(leri) silmek istediğinizden emin misiniz?",
+  "@selectionMode_delete_message": {
+    "placeholders": {
+      "type": {
+        "type": "String"
+      },
+      "amount": {
+        "type": "int"
+      }
+    }
+  },
+  "selectionMode_delete_success": "{amount} {type}(ler) başarıyla silindi.",
+  "@selectionMode_delete_success": {
+    "placeholders": {
+      "type": {
+        "type": "String"
+      },
+      "amount": {
+        "type": "int"
+      }
+    }
+  },
 
   "changeCompanyName_title" : "Yeni şirket adınızı ne olarak değiştirmek istersiniz?",
   "changeCompanyName_label" : "Yeni Şirket adı:",
@@ -123,7 +153,7 @@
   "@message_cooldown": {
     "placeholders": {
       "remainingTime": {
-        "type": "Integer"
+        "type": "int"
       }
     }
   },
@@ -167,7 +197,7 @@
   },
 
   "success_companyNameChanged" : "Şirket adı başarıyla değiştirildi.",
-  "success_output" : "{text} {type}(s) listesi indirme dosyasında excel çıktısı olarak kaydedildi.",
+  "success_output" : "{text} {type}(ler) listesi indirme dosyasında excel çıktısı olarak kaydedildi.",
   "@success_output": {
     "placeholders": {
       "text": {
@@ -185,6 +215,7 @@
   "button_change" : "Değiştir",
   "button_start" : "Başla",
   "button_skip" : "Atla",
+  "button_delete" : "Sil",
 
   "page_editinvoice_zoom": "Görüntü detaylarını görmek için yakınlaştırın ve uzaklaştırın.",
 
@@ -197,7 +228,27 @@
   "welcomePage_title_3": "Fatura Yönetiminizi Optimize Edin",
   "welcomePage_description_3": "Faturalarınızı yapay zeka ile analiz ederek verimliliği ve doğruluğu artırın.",
 
+  "companyType_SP": "ŞT",
+  "companyType_Corp": "Korp",
+  "companyType_LLC": "LLC",
+  "companyType_PLC": "PLC",
+  "companyType_INC": "AŞ",
+  "companyType_GmbH": "GmbH",
+  "companyType_JSC": "JSC",
+  "companyType_LTD": "LTD",
 
+  "listType_company": "Şirket",
+  "listType_invoice": "Fatura",
+
+  "category_food": "Yiyecek",
+  "category_clothing": "Giyim",
+  "category_electronics": "Elektronik",
+  "category_health": "Sağlık",
+  "category_education": "Eğitim",
+  "category_transportation": "Ulaşım",
+  "category_entertainment": "Eğlence",
+  "category_shopping": "Alışveriş",
+  "category_others": "Diğerleri",
 
 
 

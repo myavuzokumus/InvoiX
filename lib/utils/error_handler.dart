@@ -12,24 +12,24 @@ final Map<String, String> errorCodeToMessageKey = {
 };
 
 extension AppLocalizationsExtension on AppLocalizations {
-  String getString(String key) {
+  String getString(final String key) {
     // This is a simplified example. You might need to implement a more complex logic
     // depending on how your localizations are structured.
     switch (key) {
       case 'apiErrorUserNotFound':
-        return this.apiErrorUserNotFound;
+        return apiErrorUserNotFound;
       case 'apiErrorWrongPassword':
-        return this.apiErrorWrongPassword;
+        return apiErrorWrongPassword;
       case 'apiErrorUserDisabled':
-        return this.apiErrorUserDisabled;
+        return apiErrorUserDisabled;
       case 'apiErrorInvalidEmail':
-        return this.apiErrorInvalidEmail;
+        return apiErrorInvalidEmail;
       case 'apiErrorChannelError':
-        return this.apiErrorChannelError;
+        return apiErrorChannelError;
       case 'apiErrorWeakPassword':
-        return this.apiErrorWeakPassword;
+        return apiErrorWeakPassword;
       case 'apiErrorInvalidCredential':
-        return this.apiErrorInvalidCredential;
+        return apiErrorInvalidCredential;
     // Add more cases as needed
       default:
         return key; // Fallback to returning the key itself if not found

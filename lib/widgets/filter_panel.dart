@@ -43,7 +43,7 @@ class _FilterPanelState extends State<FilterPanel> with SingleTickerProviderStat
   }
 
   @override
-  void didUpdateWidget(FilterPanel oldWidget) {
+  void didUpdateWidget(final FilterPanel oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (widget.isExpanded != oldWidget.isExpanded) {
       if (widget.isExpanded) {

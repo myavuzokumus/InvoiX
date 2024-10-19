@@ -35,6 +35,9 @@ class SelectionNotifier extends StateNotifier<SelectionState> {
         }
         if (state.selectedItems[company]!.contains(invoiceData)) {
           state.selectedItems[company]!.remove(invoiceData);
+          if (state.selectedItems[company]!.isEmpty) {
+            state.selectedItems.remove(company);
+          }
         } else {
           state.selectedItems[company]!.add(invoiceData);
         }
@@ -44,7 +47,7 @@ class SelectionNotifier extends StateNotifier<SelectionState> {
     final realLength = invoiceData == null
         ? await _invoiceDataService.getCompanyList()
         : await _invoiceDataService.getInvoiceList(company);
-    final currentLength = invoiceData == null ? state.selectedItems.length : state.selectedItems[company]!.length;
+    final currentLength = invoiceData == null ? state.selectedItems.length : state.selectedItems[company]?.length ?? 0;
     if (currentLength == realLength.length) {
       state.selectAll = true;
     } else {

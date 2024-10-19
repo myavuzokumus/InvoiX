@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:invoix/l10n/localization_extension.dart';
 import 'package:invoix/services/invoice_data_service.dart';
+import 'package:invoix/states/invoice_data_state.dart';
 import 'package:invoix/states/selection_state.dart';
-
 import 'package:invoix/widgets/toast.dart';
 
 class DeletionDialog extends ConsumerStatefulWidget {
@@ -27,27 +28,30 @@ class DeletionDialog extends ConsumerStatefulWidget {
 
 class _DeletionDialogState extends ConsumerState<DeletionDialog> {
   bool _isDeleting = false;
-  late final selectedItems;
+  late final dynamic selectedItems;
+  late final InvoiceDataService invoiceDataService;
 
   @override
   void initState() {
+    invoiceDataService = ref.read(invoiceDataServiceProvider);
     selectedItems = widget.type == ListType.company
         ? ref.read(widget.selectionProvider).selectedItems
         : ref.read(widget.selectionProvider).selectedItems[widget.companyName];
+
     super.initState();
   }
 
   @override
   Widget build(final BuildContext context) {
     return AlertDialog(
-      title: Text("Delete ${widget.type.name}(s)"),
-      content: Text("Are you sure you want to delete ${selectedItems.length.toString()} ${widget.type.name}(s)?"),
+      title: Text(context.l10n.selectionMode_delete_title(widget.type.name)),
+      content: Text(context.l10n.selectionMode_delete_message(widget.type.name, selectedItems.length,)),
       actions: [
         TextButton(
           onPressed: () {
             Navigator.pop(context);
           },
-          child: const Text("Cancel"),
+          child: Text(context.l10n.button_cancel),
         ),
         _isDeleting
             ? const CircularProgressIndicator()
@@ -57,10 +61,9 @@ class _DeletionDialogState extends ConsumerState<DeletionDialog> {
                     _isDeleting = true;
                   });
 
-                  Toast(
-                    context,
+                  showToast(
                     text:
-                        "${selectedItems.length.toString()} ${widget.type.name}(s) deleted successfully!",
+                        context.l10n.selectionMode_delete_success(widget.type.name, selectedItems.length),
                     color: Colors.green,
                   );
 
@@ -85,14 +88,19 @@ class _DeletionDialogState extends ConsumerState<DeletionDialog> {
                       if ((await InvoiceDataService()
                               .getInvoiceList(widget.companyName!))
                           .isEmpty) {
+                        ref
+                            .read(invoiceSelectionProvider.notifier)
+                            .toggleSelectionMode();
+
                       }
                   }
-                  Navigator.pop(context);
+                  Navigator.of(context)
+                      .popUntil((final route) => route.isFirst);
                   setState(() {
                     _isDeleting = false;
                   });
                 },
-                child: const Text("Delete"),
+                child: Text(context.l10n.button_delete),
               ),
       ],
     );

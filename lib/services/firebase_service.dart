@@ -146,7 +146,7 @@ class FirebaseService {
       await callable.call<void>({'uid': uid});
     } catch (e) {
       print('Error creating new user profile: ${e.toString()}');
-      throw e;
+      rethrow;
     }
   }
 

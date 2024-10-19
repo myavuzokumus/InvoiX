@@ -53,9 +53,16 @@ class _GeneralPageState extends ConsumerState<ListPageScaffold>
         FocusScope.of(context).unfocus();
       },
       child: Scaffold(
+        resizeToAvoidBottomInset: false,
         appBar: AppBar(
             titleSpacing: 4,
             centerTitle: widget.type != ListType.company,
+            backgroundColor: Colors.transparent,
+            flexibleSpace: Container(
+              decoration: BoxDecoration(
+                color: Theme.of(context).scaffoldBackgroundColor,
+              ),
+            ),
             title: selectionState.isSelectionMode
                 ? widget.type != ListType.company
                     ? Text(widget.companyName!,

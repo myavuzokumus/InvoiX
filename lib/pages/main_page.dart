@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:invoix/l10n/localization_extension.dart';
 import 'package:invoix/pages/CompaniesPage/company_main.dart';
 import 'package:invoix/pages/SummaryPage/summary_main.dart';
 import 'package:invoix/utils/navigation_utils.dart';
@@ -38,6 +39,7 @@ class _MainPageState extends State<MainPage> {
   @override
   Widget build(final BuildContext context) {
     return Scaffold(
+      resizeToAvoidBottomInset: false,
       body: Stack(
         children: [
           PageView(
@@ -63,14 +65,14 @@ class _MainPageState extends State<MainPage> {
         backgroundColor: Theme.of(context).colorScheme.onSecondary,
         onTap: onTabTapped,
         currentIndex: _currentIndex,
-        items: const [
+        items: [
           BottomNavigationBarItem(
-            icon: Icon(Icons.business),
-            label: 'Companies',
+            icon: const Icon(Icons.business),
+            label: context.l10n.listType_company,
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.pie_chart),
-            label: 'Summary',
+            icon: const Icon(Icons.pie_chart),
+            label: context.l10n.summary_title,
           ),
         ],
       ),

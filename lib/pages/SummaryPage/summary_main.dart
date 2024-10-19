@@ -29,7 +29,7 @@ class _SummaryMainState extends ConsumerState<SummaryMain>
     super.build(context);
     return Scaffold(
       appBar: AppBar(
-        title: Text(context.l10n.summary_title, style: TextStyle(fontWeight: FontWeight.bold)),
+        title: Text(context.l10n.summary_title, style: const TextStyle(fontWeight: FontWeight.bold)),
         centerTitle: true,
         backgroundColor: Colors.transparent,
         flexibleSpace: Container(
@@ -138,7 +138,7 @@ class _SummaryMainState extends ConsumerState<SummaryMain>
                                     children: <Widget>[
                                       Text(
                                           context.l10n.summary_notFound,
-                                          style: TextStyle(
+                                          style: const TextStyle(
                                               fontWeight: FontWeight.bold)),
                                     ],
                                   ),

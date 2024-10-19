@@ -135,13 +135,11 @@ class SettingsPage extends ConsumerWidget {
                 try {
                   final firebaseService = ref.read(firebaseServiceProvider);
                   await firebaseService.deleteAccount();
-                  Toast(context,
-                      text: context.l10n.settings_deleteAccountSuccess);
+                  showToast(text: context.l10n.settings_deleteAccountSuccess);
                   Navigator.of(context)
                       .popUntil((final route) => route.isFirst);
                 } catch (e) {
-                  Toast(context,
-                      text: context.l10n.settings_deleteAccountError);
+                  showToast(text: context.l10n.settings_deleteAccountError);
                 }
               },
             ),

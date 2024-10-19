@@ -60,8 +60,8 @@
   "status_noLogin": "You are not logged in.",
   "status_somethingWentWrong": "Something went wrong.",
 
-  "loading_data" : "Processing Data...",
-  "loading_success" : "Data Processed!",
+  "loading_data" : "Processing data...",
+  "loading_success" : "Data processed!",
 
   "aiinsights_name" : "AI Insights",
   "aiinsights_juststart" : "Just click on the invoice add icon to get started.",
@@ -80,7 +80,7 @@
 
   "summary_title": "Summary",
   "summary_top5": "Top 5 Invoices",
-  "summary_notFound": "Invoice data couldn't be found.\n\nnTry to change filter settings.",
+  "summary_notFound": "Invoice data couldn't be found.\n\nTry to change filter settings.",
 
   "selectionMode_delete": "deletion",
   "selectionMode_output": "output",
@@ -106,6 +106,36 @@
       }
     }
   },
+  "selectionMode_delete_title": "Delete {type}(s)",
+  "@selectionMode_delete_title": {
+    "placeholders": {
+      "type": {
+        "type": "String"
+      }
+    }
+  },
+  "selectionMode_delete_message": "Are you sure you want to delete {amount} {type}(s)?",
+  "@selectionMode_delete_message": {
+      "placeholders": {
+      "type": {
+          "type": "String"
+        },
+        "amount": {
+          "type": "int"
+        }
+      }
+    },
+  "selectionMode_delete_success": "{amount} {type}(s) deleted successfully.",
+  "@selectionMode_delete_success": {
+      "placeholders": {
+      "type": {
+          "type": "String"
+          },
+          "amount": {
+          "type": "int"
+          }
+      }
+  },
 
   "changeCompanyName_title" : "What would you like to change new company name?",
   "changeCompanyName_label" : "New Company name:",
@@ -122,7 +152,7 @@
   "@message_cooldown": {
       "placeholders": {
       "remainingTime": {
-          "type": "Integer"
+          "type": "int"
         }
       }
   },
@@ -184,6 +214,7 @@
   "button_change" : "Change",
   "button_start" : "Start",
   "button_skip" : "Skip",
+  "button_delete" : "Delete",
 
   "page_editinvoice_zoom": "Zoom in and out to see the image details.",
 
@@ -194,6 +225,30 @@
   "welcomePage_description_2": "Utilize AI to gain detailed insights and streamline your invoice processing.",
 
   "welcomePage_title_3": "Optimize Your Invoice Management",
-  "welcomePage_description_3": "Analyze your invoices with AI to enhance efficiency and accuracy."
+  "welcomePage_description_3": "Analyze your invoices with AI to enhance efficiency and accuracy.",
+
+  "companyType_SP": "SP",
+  "companyType_Corp": "Corp",
+  "companyType_LLC": "LLC",
+  "companyType_PLC": "PLC",
+  "companyType_INC": "INC",
+  "companyType_GmbH": "GmbH",
+  "companyType_JSC": "JSC",
+  "companyType_LTD": "LTD",
+
+  "listType_company": "Company",
+  "listType_invoice": "Invoice",
+
+  "category_food": "Food",
+  "category_clothing": "Clothing",
+  "category_electronics": "Electronics",
+  "category_health": "Health",
+  "category_education": "Education",
+  "category_transportation": "Transportation",
+  "category_entertainment": "Entertainment",
+  "category_shopping": "Shopping",
+  "category_others": "Others"
+
+
 
 }

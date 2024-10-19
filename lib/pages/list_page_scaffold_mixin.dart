@@ -18,17 +18,13 @@ mixin _ListPageScaffoldMixin on ConsumerState<ListPageScaffold> {
           },
         );
       } else {
-        Toast(
-          context,
-          text: context.l10n.selectionMode_noSelection(widget.type.name, context.l10n.selectionMode_delete),
+        showToast(text: context.l10n.selectionMode_noSelection(widget.type.name, context.l10n.selectionMode_delete),
           color: Colors.redAccent,
         );
       }
     } catch (e) {
       print("Error in onDelete: $e");
-      Toast(
-        context,
-        text: context.l10n.selectionMode_error(widget.type.name, context.l10n.selectionMode_delete),
+      showToast(text: context.l10n.selectionMode_error(widget.type.name, context.l10n.selectionMode_delete),
         color: Colors.redAccent,
       );
     }
@@ -83,21 +79,16 @@ mixin _ListPageScaffoldMixin on ConsumerState<ListPageScaffold> {
           'path': downloadDirectoryPath,
         });
 
-        Toast(context,
-            text:
-                context.l10n.success_output(text, widget.type.name),
+        showToast(text: context.l10n.success_output(text, widget.type.name),
             color: Colors.green);
       } else {
-        Toast(
-          context,
-          text: context.l10n.selectionMode_noSelection(widget.type.name, context.l10n.selectionMode_output),
+        showToast(text: context.l10n.selectionMode_noSelection(widget.type.name, context.l10n.selectionMode_output),
           color: Colors.redAccent,
         );
       }
     } catch (e) {
       print("Error in onExcelOutput: $e");
-      Toast(context,
-          text: context.l10n.selectionMode_error(widget.type.name, context.l10n.selectionMode_output),
+      showToast(text: context.l10n.selectionMode_error(widget.type.name, context.l10n.selectionMode_output),
           color: Colors.redAccent);
     } finally {
       _excelExportingNotifier.value = false;

@@ -14,8 +14,7 @@ Future<void> nextPage(final BuildContext context, final ValueNotifier<bool> isLo
 
   final DocumentScanningResult? result = await getDocumentScanner().catchError((final e) {
     if (context.mounted && e.message != "Operation cancelled") {
-      print("Error in nextPage: $e");
-      Toast(context, text: context.l10n.status_somethingWentWrong, color: Colors.redAccent);
+      showToast(text: context.l10n.status_somethingWentWrong, color: Colors.redAccent);
     }
     return null;
   });

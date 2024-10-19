@@ -9,6 +9,7 @@ import 'package:invoix/states/invoice_data_state.dart';
 import 'package:invoix/states/language_state.dart';
 import 'package:invoix/theme.dart';
 import 'package:invoix/utils/cooldown.dart';
+import 'package:invoix/widgets/toast.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 part 'invoix_main_mixin.dart';
@@ -37,6 +38,8 @@ class _InvoixMainState extends ConsumerState<InvoixMain> with _InvoixMainMixin {
 
     return MaterialApp(
       title: 'InvoiX',
+      scaffoldMessengerKey: scaffoldMessengerKey,
+
       builder: (final context, final child) {
         LocalizationManager.instance.setLocalization(context);
         return child!;

@@ -123,7 +123,7 @@ class ProfileDropdown extends ConsumerWidget {
                       const SizedBox(height: 8),
                       SettingsButton(
                           icon: Icons.settings,
-                          label: "Settings",
+                          label: context.l10n.settings_settings,
                           onPressed: () {
                             Navigator.push(
                               context,
@@ -183,7 +183,7 @@ class ProfileDropdown extends ConsumerWidget {
     try {
       await firebaseService.signInWithGoogle();
     } catch (e) {
-      Toast(context,
+      showToast(
           text: context.l10n.auth_loginError(await currentStatusChecker().then((final value) => value.name)));
     }
   }

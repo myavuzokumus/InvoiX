@@ -34,8 +34,7 @@ mixin _CompanyPageMixin on ConsumerState<CompanyPage> {
     final DocumentScanningResult? result =
         await getDocumentScanner().catchError((final e) {
       if (mounted && e.message != "Operation cancelled") {
-        Toast(context,
-            text: "${context.l10n.status_somethingWentWrong}: $e",
+        showToast(text: "${context.l10n.status_somethingWentWrong}: $e",
             color: Colors.redAccent);
       }
       return null;
