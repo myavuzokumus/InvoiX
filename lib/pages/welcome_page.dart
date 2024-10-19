@@ -16,7 +16,8 @@ class _WelcomePageState extends State<WelcomePage> {
   late final List<Map<String, String>> welcomeData;
 
   @override
-  initState() {
+  void didChangeDependencies() {
+    super.didChangeDependencies();
 
     welcomeData = [
       {
@@ -35,8 +36,6 @@ class _WelcomePageState extends State<WelcomePage> {
         "image": "assets/icons/welcome/secure_infrastructure.png",
       },
     ];
-
-    super.initState();
   }
 
   @override
@@ -107,6 +106,7 @@ class _WelcomePageState extends State<WelcomePage> {
           const SizedBox(height: 50.0),
           Text(
             data["title"]!,
+            textAlign: TextAlign.center,
             style: const TextStyle(fontSize: 24.0, fontWeight: FontWeight.bold),
           ),
           const SizedBox(height: 20.0),
