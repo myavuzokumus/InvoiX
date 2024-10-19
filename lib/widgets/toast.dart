@@ -1,50 +1,84 @@
 import 'package:flutter/material.dart';
 
-// Global olarak tanımlanmış key
-final GlobalKey<_ToastContentState> _toastKey = GlobalKey<_ToastContentState>();
+final GlobalKey<ScaffoldMessengerState> scaffoldMessengerKey = GlobalKey<ScaffoldMessengerState>();
 
-void Toast(final BuildContext context,
-    {required final String text, final Color color = Colors.deepOrangeAccent, final Duration duration = const Duration(milliseconds: 10000)}) {
+final Map<String, Duration> toastTimers = {};
 
-  ScaffoldMessenger.of(context).hideCurrentSnackBar();
+void showToast({
+  required final String text,
+  final Color color = Colors.deepOrangeAccent,
+  final Duration duration = const Duration(seconds: 10),
+}) {
+
+  scaffoldMessengerKey.currentState?.clearSnackBars();
+
   final snackBar = SnackBar(
-      content: ToastContent(key: _toastKey, text: text, duration: duration),
-      backgroundColor: color,
-      behavior: SnackBarBehavior.floating,
-      margin: const EdgeInsets.all(50),
-      elevation: 30,
-      duration: duration,
-      padding: const EdgeInsets.all(0)
+    content: ToastContent(text: text, duration: duration),
+    backgroundColor: color,
+    behavior: SnackBarBehavior.floating,
+    margin: const EdgeInsets.all(50),
+    elevation: 30,
+    duration: duration,
+    padding: EdgeInsets.zero,
   );
-  ScaffoldMessenger.of(context).showSnackBar(snackBar);
+
+  scaffoldMessengerKey.currentState?.showSnackBar(snackBar);
+
+  Future.delayed(duration, () {
+    toastTimers.remove(text);
+  });
 }
 
 class ToastContent extends StatefulWidget {
   final String text;
   final Duration duration;
 
-  const ToastContent({super.key, required this.text, required this.duration});
+  const ToastContent({super.key,
+    required this.text,
+    required this.duration,
+  });
 
   @override
   State<ToastContent> createState() => _ToastContentState();
 }
 
 class _ToastContentState extends State<ToastContent> with SingleTickerProviderStateMixin {
-  late final AnimationController _controller;
+  late AnimationController _controller;
+  Duration? newDuration;
 
   @override
   void initState() {
     super.initState();
+
+    if (toastTimers.containsKey(widget.text)) {
+      newDuration = toastTimers[widget.text]!.inSeconds > 1 ? toastTimers[widget.text] : const Duration(seconds: 10);
+    }
     _controller = AnimationController(
       vsync: this,
       duration: widget.duration,
-    )..forward();
+    )..forward(from: newDuration != null ? 1 - newDuration!.inSeconds/10 : 0);
   }
 
   @override
   void dispose() {
+    final time = ((1 - _controller.value) * 10).toInt();
+    if (Duration(seconds: time).inSeconds > 1) {
+      toastTimers[widget.text] = Duration(seconds: time);
+    }
     _controller.dispose();
     super.dispose();
+  }
+
+  @override
+  void didUpdateWidget(covariant final ToastContent oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.text != widget.text) {
+      _controller.dispose();
+      _controller = AnimationController(
+        vsync: this,
+        duration: widget.duration,
+      )..forward(from: newDuration != null ? 1 - newDuration!.inSeconds/10 : 0);
+    }
   }
 
   @override
@@ -52,14 +86,19 @@ class _ToastContentState extends State<ToastContent> with SingleTickerProviderSt
     return Column(
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.stretch,
-      mainAxisAlignment: MainAxisAlignment.end,
-      children: <Widget>[
+      children: [
         Padding(
           padding: const EdgeInsets.all(12.0),
           child: Text(widget.text, style: const TextStyle(color: Colors.white)),
         ),
-        AnimatedBuilder(animation: _controller,
-            builder: (final BuildContext context, final Widget? child) => LinearProgressIndicator(value: 1.0 - _controller.value)),
+        AnimatedBuilder(
+          animation: _controller,
+          builder: (final context, final child) {
+            return LinearProgressIndicator(
+              value: widget.duration.inSeconds/10 - _controller.value,
+            );
+          },
+        ),
       ],
     );
   }
