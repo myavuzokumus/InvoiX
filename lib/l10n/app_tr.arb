@@ -49,11 +49,12 @@
   "settings_selectLanguage": "Dil Seç",
   "settings_deleteAccount": "Hesabı Sil",
   "settings_deleteAccountConfirmTitle": "Hesabı Sil",
-  "settings_deleteAccountConfirmMessage": "Hesabınızı silmek istediğinizden emin misiniz?\nBu işlem geri alınamaz.",
+  "settings_deleteAccountConfirmMessage": "Hesabınızı silmek istediğinizden emin misiniz?\nTüm verileriniz silinecektir.\nBu işlem geri alınamaz.",
   "settings_deleteAccountConfirmYes": "Evet, Hesabı Sil",
   "settings_deleteAccountError": "Hesabınızı silerken bir hata oluştu.",
   "settings_deleteAccountSuccess": "Hesabınız başarıyla silindi.",
   "settings_cancel": "Hayır, İptal",
+  "settings_byLoginYouAgree": "By logging in, you agree to our",
 
 
   "status_noInternetConnection": "İnternet Bağlantısı Yok!",

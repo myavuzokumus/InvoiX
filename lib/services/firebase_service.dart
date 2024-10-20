@@ -35,7 +35,7 @@ class FirebaseService {
   late final FirebaseFunctions _functions;
   late final GenerativeModel _model;
   late final GoogleSignIn _googleSignIn;
-  late final FirebaseRemoteConfig _remoteConfig;
+  late final FirebaseRemoteConfig remoteConfig;
 
   late final HttpsCallableOptions _options;
 
@@ -49,24 +49,24 @@ class FirebaseService {
     _firestore = FirebaseFirestore.instanceFor(app: Firebase.app("invoix"));
     _functions = FirebaseFunctions.instanceFor(app: Firebase.app("invoix"));
     _googleSignIn = GoogleSignIn(scopes: ["profile", "email"]);
-    _remoteConfig =
+    remoteConfig =
         FirebaseRemoteConfig.instanceFor(app: Firebase.app("invoix"));
 
-    await _remoteConfig.setConfigSettings(RemoteConfigSettings(
+    await remoteConfig.setConfigSettings(RemoteConfigSettings(
       fetchTimeout: const Duration(minutes: 1),
       minimumFetchInterval: const Duration(hours: 1),
     ));
 
-    await _remoteConfig.fetchAndActivate();
+    await remoteConfig.fetchAndActivate();
     _options = HttpsCallableOptions(limitedUseAppCheckToken: true);
 
     _model = FirebaseVertexAI.instanceFor(
       appCheck: FirebaseAppCheck.instanceFor(app: Firebase.app("invoix")),
     ).generativeModel(
-      model: _remoteConfig.getString('model_name'),
+      model: remoteConfig.getString('model_name'),
       generationConfig: GenerationConfig(
           responseMimeType: 'application/json',
-          temperature: _remoteConfig.getDouble('temperature')),
+          temperature: remoteConfig.getDouble('temperature')),
     );
 
     if (!kDebugMode) {
@@ -251,7 +251,7 @@ class FirebaseService {
     final String processType =
         type == ProcessType.scan ? 'aiInvoiceReads' : 'aiInvoiceAnalyses';
 
-    final String prompt = _remoteConfig.getString(processType);
+    final String prompt = remoteConfig.getString(processType);
     final Map<String, dynamic> checkUsage =
         await checkUsageRights(processType, decrease: 1);
 

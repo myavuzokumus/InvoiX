@@ -49,11 +49,12 @@
   "settings_selectLanguage": "Select Language",
   "settings_deleteAccount": "Delete Account",
   "settings_deleteAccountConfirmTitle": "Delete Account",
-  "settings_deleteAccountConfirmMessage": "Are you sure you want to delete your account?\nThis action cannot be undone.",
+  "settings_deleteAccountConfirmMessage": "Are you sure you want to delete your account?\nAll your data will be wiped.\nThis action cannot be undone.",
   "settings_deleteAccountConfirmYes": "Yes, Delete Account",
   "settings_deleteAccountError": "An error occurred while deleting your account.",
   "settings_deleteAccountSuccess": "Your account has been successfully deleted.",
   "settings_cancel": "No, Cancel",
+  "settings_byLoginYouAgree": "By logging in, you agree to our",
 
   "status_noInternetConnection": "No Internet Connection!",
   "status_noUsageRights": "You have no more rights to use AI features.",
