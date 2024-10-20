@@ -14,6 +14,7 @@ import 'package:invoix/widgets/status/loading_animation.dart';
 import 'package:invoix/widgets/status/show_current_status.dart';
 import 'package:invoix/widgets/toast.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class ProfileDropdown extends ConsumerWidget {
   final Color glowColor;
@@ -32,7 +33,8 @@ class ProfileDropdown extends ConsumerWidget {
     return authState.when(
       data: (final user) {
         return Container(
-          width: 300,
+          width: 296,
+          height: MediaQuery.of(context).orientation == Orientation.landscape ? MediaQuery.of(context).size.height * 0.7 : null,
           decoration: BoxDecoration(
             color: Colors.grey[900],
             borderRadius: BorderRadius.circular(24),
@@ -90,7 +92,7 @@ class ProfileDropdown extends ConsumerWidget {
                   _buildUserSubscriptionInfo(firebaseService),
                 ] else ...[
                   // Policy and terms
-                  _buildPolicyAndTerms(),
+                  _buildPolicyAndTerms(context, firebaseService),
                   // New user offer
                   FutureBuilder<SharedPreferences>(future: SharedPreferences.getInstance(), builder: (final context, final snapshot) {
                     if (snapshot.connectionState == ConnectionState.done) {
@@ -188,20 +190,34 @@ class ProfileDropdown extends ConsumerWidget {
     }
   }
 
-  Widget _buildPolicyAndTerms() {
+  Widget _buildPolicyAndTerms(final BuildContext context, final FirebaseService firebaseService) {
     return Column(
       children: [
-        Text('By logging in, you agree to our',
+        Text(context.l10n.settings_byLoginYouAgree,
             style: TextStyle(color: Colors.grey[400])),
         TextButton(
-          onPressed: () {},
-          child: const Text('Privacy Policy',
-              style: TextStyle(color: Colors.white)),
+          onPressed: () async {
+            final Uri url = Uri.parse(firebaseService.remoteConfig.getString('privacy_url'));
+            if (await canLaunchUrl(url)) {
+              await launchUrl(url);
+            } else {
+              showToast(text: context.l10n.status_somethingWentWrong);
+            }
+          },
+          child: Text(context.l10n.settings_privacyPolicy,
+              style: const TextStyle(color: Colors.white)),
         ),
         TextButton(
-          onPressed: () {},
-          child: const Text('Terms of Service',
-              style: TextStyle(color: Colors.white)),
+          onPressed: () async {
+            final Uri url = Uri.parse(firebaseService.remoteConfig.getString('terms_url'));
+            if (await canLaunchUrl(url)) {
+              await launchUrl(url);
+            } else {
+              showToast(text: context.l10n.status_somethingWentWrong);
+            }
+          },
+          child: Text(context.l10n.settings_termsOfService,
+              style: const TextStyle(color: Colors.white)),
         ),
       ],
     );
