@@ -13,8 +13,6 @@ String parseInvoiceData(final List<String> listText) {
   double? totalAmount;
   double? taxAmount;
 
-  print(listText);
-
   for (final String i in listText) {
     if (companyRegex.hasMatch(i)) {
       invoiceCompany = assignCompany(i);

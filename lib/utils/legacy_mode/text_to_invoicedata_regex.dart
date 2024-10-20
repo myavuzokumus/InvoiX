@@ -21,4 +21,4 @@ final RegExp amountRegex = RegExp(
     r"^(\$|\₺|€|\*)?(0|[1-9][0-9]{0,2})(,\d{1,4})*(\.\d{1,2})?$|^(0|[1-9][0-9]{0,2})(,\d{1,4})*(\.\d{1,2})?(\$|\₺|TL|€|\*)?",
     caseSensitive: false);
 
-final RegExp invalidCompanyRegex = RegExp(r"A.Ş|A.S", caseSensitive: false);
+final RegExp invalidCompanyRegex = RegExp(r"A\.?\s*Ş\.?(?!\S)|AŞ(?!\S)|A\.?S\.?(?!\S)|aş(?=\s)", caseSensitive: false);

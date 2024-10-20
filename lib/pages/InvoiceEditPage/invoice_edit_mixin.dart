@@ -126,6 +126,7 @@ mixin _InvoiceEditPageMixin on ConsumerState<InvoiceEditPage> {
     companyTextController.text = invoiceDataService
         .invalidCompanyTypeExtractor(companyTextController.text);
 
+
     companyIdTextController.text = item.companyId;
     invoiceNoTextController.text = item.invoiceNo;
     dateTextController.text = updateYear(dateFormat.format(item.date));
@@ -147,11 +148,19 @@ mixin _InvoiceEditPageMixin on ConsumerState<InvoiceEditPage> {
 
         companyTextController.text =
             invoiceDataService.companyTypeExtractor(companyTextController.text);
+        print("EDİT 1");
+        print(companyTextController.text);
 
         companyTextController.text = invoiceDataService
             .invalidCompanyTypeExtractor(companyTextController.text);
+        print("EDİT 2");
+        print(companyTextController.text);
+
 
         companyTextController.text += " ${companySuffix.name}";
+        print("EDİT 3");
+        print(companyTextController.text);
+
 
         if (readMode != null) {
           for (final companyName in companyList) {
