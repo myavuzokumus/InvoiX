@@ -235,46 +235,42 @@ class _CompanyListState extends ConsumerState<CompanyList> with _CompanyListMixi
                   labelText: context.l10n.changeCompanyName_label,
                   labelStyle: const TextStyle(fontSize: 16),
                   hintText: context.l10n.changeCompanyName_enterName,
-                  suffixIconConstraints:
-                  const BoxConstraints(
-                      maxWidth: 82, maxHeight: 30),
-                  suffixIcon: Center(
-                    child: Padding(
-                      padding: const EdgeInsets.only(
-                          right: 8),
-                      child: DropdownButtonFormField<
-                          CompanyType>(
-                        value: companySuffix,
-                        alignment: Alignment.center,
-                        menuMaxHeight: 225,
-                        hint: Text(context.l10n.invoice_companyType),
-                        iconSize: 0,
-                        items: CompanyType.values.map(
-                                (final CompanyType value) {
-                              return DropdownMenuItem<
-                                  CompanyType>(
-                                value: value,
-                                child: Text(value.name),
-                              );
-                            }).toList(),
-                        onChanged:
-                            (final CompanyType? value) {
-                          companySuffix = value!;
-                        },
-                        decoration:
-                        const InputDecoration(
-                          contentPadding:
-                          EdgeInsets.symmetric(vertical: 4),
-                          filled: true,
-                        ),
-                        validator: (final value) {
-                          if (value == null) {
-                            return context.l10n.error_pleaseSelect(context.l10n.invoice_companyType);
-                          }
-                          return null;
-                        },
-                      ),
+                suffixIconConstraints: const BoxConstraints(
+                    maxWidth: 72),
+                  suffixIcon: DropdownButtonFormField<
+                      CompanyType>(
+                    value: companySuffix,
+                    isExpanded: true,
+                    alignment: Alignment.center,
+                    menuMaxHeight: 225,
+                    hint: Text(context.l10n.invoice_companyType),
+                    iconSize: 0,
+                    padding: const EdgeInsets.only(top: 8.0, right: 8.0, bottom: 8.0),
+                    items: CompanyType.values.map(
+                            (final CompanyType value) {
+                          return DropdownMenuItem<
+                              CompanyType>(
+                            value: value,
+                            alignment: Alignment.center,
+                            child: Text(value.name),
+                          );
+                        }).toList(),
+                    onChanged:
+                        (final CompanyType? value) {
+                      companySuffix = value!;
+                    },
+                    decoration:
+                    const InputDecoration(
+                      contentPadding:
+                      EdgeInsets.symmetric(vertical: 4),
+                      filled: true,
                     ),
+                    validator: (final value) {
+                      if (value == null) {
+                        return context.l10n.error_pleaseSelect(context.l10n.invoice_companyType);
+                      }
+                      return null;
+                    },
                   )),
               validator: (final value) {
                 if (value == null ||

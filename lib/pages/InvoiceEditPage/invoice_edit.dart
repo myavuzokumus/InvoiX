@@ -128,7 +128,7 @@ class _InvoiceEditPageState extends ConsumerState<InvoiceEditPage>
                                 runSpacing: 16.0,
                                 children: [
                                   Row(
-                                    mainAxisSize: MainAxisSize.min,
+                                    mainAxisSize: MainAxisSize.max,
                                     mainAxisAlignment:
                                         MainAxisAlignment.spaceBetween,
                                     children: [
@@ -138,46 +138,42 @@ class _InvoiceEditPageState extends ConsumerState<InvoiceEditPage>
                                           controller: companyTextController,
                                           decoration: InputDecoration(
                                               labelText: context.l10n.invoice_companyName,
-                                              suffixIconConstraints:
-                                                  const BoxConstraints(
-                                                      maxWidth: 82, maxHeight: 30),
-                                              suffixIcon: Center(
-                                                child: Padding(
-                                                  padding: const EdgeInsets.only(
-                                                      right: 8),
-                                                  child: DropdownButtonFormField<
+                                              suffixIconConstraints: const BoxConstraints(
+                                                  maxWidth: 72),
+                                              suffixIcon: DropdownButtonFormField<
+                                                  CompanyType>(
+                                                value: companySuffix,
+                                                isExpanded: true,
+                                                alignment: Alignment.center,
+                                                menuMaxHeight: 225,
+                                                hint: Text(context.l10n.invoice_companyType),
+                                                iconSize: 0,
+                                                padding: const EdgeInsets.only(top: 8.0, right: 8.0, bottom: 8.0),
+                                                items: CompanyType.values.map(
+                                                    (final CompanyType value) {
+                                                  return DropdownMenuItem<
                                                       CompanyType>(
-                                                    value: companySuffix,
+                                                    value: value,
                                                     alignment: Alignment.center,
-                                                    menuMaxHeight: 225,
-                                                    hint: Text(context.l10n.invoice_companyType),
-                                                    iconSize: 0,
-                                                    items: CompanyType.values.map(
-                                                        (final CompanyType value) {
-                                                      return DropdownMenuItem<
-                                                          CompanyType>(
-                                                        value: value,
-                                                        child: Text(value.name),
-                                                      );
-                                                    }).toList(),
-                                                    onChanged:
-                                                        (final CompanyType? value) {
-                                                      companySuffix = value!;
-                                                    },
-                                                    decoration:
-                                                        const InputDecoration(
-                                                      contentPadding:
-                                                      EdgeInsets.symmetric(vertical: 4),
-                                                      filled: true,
-                                                    ),
-                                                    validator: (final value) {
-                                                      if (value == null) {
-                                                        return context.l10n.error_pleaseSelect(context.l10n.invoice_companyType);
-                                                      }
-                                                      return null;
-                                                    },
-                                                  ),
+                                                    child: Text(value.name),
+                                                  );
+                                                }).toList(),
+                                                onChanged:
+                                                    (final CompanyType? value) {
+                                                  companySuffix = value!;
+                                                },
+                                                decoration:
+                                                    const InputDecoration(
+                                                  contentPadding:
+                                                  EdgeInsets.symmetric(vertical: 4),
+                                                  filled: true,
                                                 ),
+                                                validator: (final value) {
+                                                  if (value == null) {
+                                                    return context.l10n.error_pleaseSelect(context.l10n.invoice_companyType);
+                                                  }
+                                                  return null;
+                                                },
                                               )),
                                           validator: (final value) {
                                             if (value == null || value.isEmpty) {
