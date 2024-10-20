@@ -70,7 +70,25 @@ class _CompanyListState extends ConsumerState<CompanyList> with _CompanyListMixi
 
                   return Column(
                     children: [
-                      Flexible(
+                      Container(
+                        decoration: BoxDecoration(
+                          border: Border(
+                            bottom: BorderSide(
+                              color: Colors.white.withOpacity(0.3),
+                            ),
+                          ),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withOpacity(1),
+                              blurRadius: 10,
+                              offset: const Offset(0, 2),
+                            ),
+                            BoxShadow(
+                              color: Theme.of(context).scaffoldBackgroundColor,
+                              blurRadius: 10,
+                            ),
+                          ],
+                        ),
                         child: SingleChildScrollView(
                           scrollDirection: Axis.horizontal,
                           padding: const EdgeInsets.symmetric(horizontal: 20),
@@ -83,9 +101,8 @@ class _CompanyListState extends ConsumerState<CompanyList> with _CompanyListMixi
                         ),
                       ),
                       Expanded(
-                        flex: 2,
+                        flex: 6,
                         child: ListView.separated(
-                          clipBehavior: Clip.none,
                           padding: const EdgeInsets.only(
                               left: 10, right: 10, top: 5),
                           itemCount: companyList.length,

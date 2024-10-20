@@ -46,6 +46,7 @@ class _CompanyPageState extends ConsumerState<CompanyPage>
         type: ListType.company,
         title: "InvoiX",
         body: Stack(
+          clipBehavior: Clip.none,
           children: [
             Column(
               children: [
@@ -64,6 +65,7 @@ class _CompanyPageState extends ConsumerState<CompanyPage>
                     ),
                   ),
                   child: ExpansionTile(
+                    clipBehavior: Clip.none,
                     expansionAnimationStyle: AnimationStyle(
                       curve: Curves.easeInOut,
                       duration: const Duration(milliseconds: 600),
