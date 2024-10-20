@@ -49,20 +49,25 @@ class _InvoiceEditPageState extends ConsumerState<InvoiceEditPage>
       child: Scaffold(
         key: _scaffoldKey,
         endDrawerEnableOpenDragGesture: false,
-        endDrawer: NavigationDrawer(
+        endDrawer: Drawer(
+            child: Column(
+          mainAxisSize: MainAxisSize.min,
           children: [
-            CompanyList(
-              onTap: (String item) {
-                _scaffoldKey.currentState!.closeEndDrawer();
-                item = item.replaceAll(companyRegex, "");
-                setState(() {
-                  companyTextController.text = item;
-                  companySuffix = invoiceDataService.companyTypeFinder(item);
-                });
-              },
-            )
+            Flexible(
+              fit: FlexFit.loose,
+              child: CompanyList(
+                onTap: (String item) {
+                  _scaffoldKey.currentState!.closeEndDrawer();
+                  item = item.replaceAll(companyRegex, "");
+                  setState(() {
+                    companyTextController.text = item;
+                    companySuffix = invoiceDataService.companyTypeFinder(item);
+                  });
+                },
+              ),
+            ),
           ],
-        ),
+        )),
         body: GestureDetector(
           onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
           child: CustomScrollView(slivers: [
@@ -107,7 +112,8 @@ class _InvoiceEditPageState extends ConsumerState<InvoiceEditPage>
                     if (snapshot.connectionState == ConnectionState.done) {
                       if (snapshot.hasError) {
                         Future(() {
-                          showToast(text: snapshot.error.toString(),
+                          showToast(
+                              text: snapshot.error.toString(),
                               color: Colors.red);
                         });
                       }
@@ -137,18 +143,25 @@ class _InvoiceEditPageState extends ConsumerState<InvoiceEditPage>
                                           maxLength: 100,
                                           controller: companyTextController,
                                           decoration: InputDecoration(
-                                              labelText: context.l10n.invoice_companyName,
-                                              suffixIconConstraints: const BoxConstraints(
-                                                  maxWidth: 72),
-                                              suffixIcon: DropdownButtonFormField<
-                                                  CompanyType>(
+                                              labelText: context
+                                                  .l10n.invoice_companyName,
+                                              suffixIconConstraints:
+                                                  const BoxConstraints(
+                                                      maxWidth: 72),
+                                              suffixIcon:
+                                                  DropdownButtonFormField<
+                                                      CompanyType>(
                                                 value: companySuffix,
                                                 isExpanded: true,
                                                 alignment: Alignment.center,
                                                 menuMaxHeight: 225,
-                                                hint: Text(context.l10n.invoice_companyType),
+                                                hint: Text(context
+                                                    .l10n.invoice_companyType),
                                                 iconSize: 0,
-                                                padding: const EdgeInsets.only(top: 8.0, right: 8.0, bottom: 8.0),
+                                                padding: const EdgeInsets.only(
+                                                    top: 8.0,
+                                                    right: 8.0,
+                                                    bottom: 8.0),
                                                 items: CompanyType.values.map(
                                                     (final CompanyType value) {
                                                   return DropdownMenuItem<
@@ -165,19 +178,25 @@ class _InvoiceEditPageState extends ConsumerState<InvoiceEditPage>
                                                 decoration:
                                                     const InputDecoration(
                                                   contentPadding:
-                                                  EdgeInsets.symmetric(vertical: 4),
+                                                      EdgeInsets.symmetric(
+                                                          vertical: 4),
                                                   filled: true,
                                                 ),
                                                 validator: (final value) {
                                                   if (value == null) {
-                                                    return context.l10n.error_pleaseSelect(context.l10n.invoice_companyType);
+                                                    return context.l10n
+                                                        .error_pleaseSelect(context
+                                                            .l10n
+                                                            .invoice_companyType);
                                                   }
                                                   return null;
                                                 },
                                               )),
                                           validator: (final value) {
-                                            if (value == null || value.isEmpty) {
-                                              return context.l10n.error_pleaseEnterText;
+                                            if (value == null ||
+                                                value.isEmpty) {
+                                              return context
+                                                  .l10n.error_pleaseEnterText;
                                             }
                                             return null;
                                           },
@@ -185,7 +204,8 @@ class _InvoiceEditPageState extends ConsumerState<InvoiceEditPage>
                                       ),
                                       IconButton.filledTonal(
                                           onPressed: () {
-                                            _scaffoldKey.currentState!.openEndDrawer();
+                                            _scaffoldKey.currentState!
+                                                .openEndDrawer();
                                           },
                                           icon: const Icon(Icons.search)),
                                     ],
@@ -194,25 +214,32 @@ class _InvoiceEditPageState extends ConsumerState<InvoiceEditPage>
                                     maxLength: 50,
                                     controller: companyIdTextController,
                                     decoration: InputDecoration(
-                                        labelText: context.l10n.invoice_companyId),
+                                        labelText:
+                                            context.l10n.invoice_companyId),
                                   ),
                                   Row(
                                     mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
+                                        MainAxisAlignment.spaceBetween,
                                     crossAxisAlignment:
-                                    CrossAxisAlignment.start,
+                                        CrossAxisAlignment.start,
                                     children: [
                                       Expanded(
                                         child: TextFormField(
                                           maxLength: 50,
                                           controller: invoiceNoTextController,
                                           decoration: InputDecoration(
-                                              labelText: context.l10n.invoice_invoiceNo,
+                                              labelText: context
+                                                  .l10n.invoice_invoiceNo,
                                               suffixIcon: WarnIcon(
-                                                  message: context.l10n.error_validInput(context.l10n.invoice_invoiceNo))),
+                                                  message: context.l10n
+                                                      .error_validInput(context
+                                                          .l10n
+                                                          .invoice_invoiceNo))),
                                           validator: (final value) {
-                                            if (value == null || value.isEmpty) {
-                                              return context.l10n.error_pleaseEnterText;
+                                            if (value == null ||
+                                                value.isEmpty) {
+                                              return context
+                                                  .l10n.error_pleaseEnterText;
                                             }
                                             return null;
                                           },
@@ -220,33 +247,34 @@ class _InvoiceEditPageState extends ConsumerState<InvoiceEditPage>
                                       ),
                                       const SizedBox(width: 16),
                                       Flexible(
-                                        child: DropdownButtonFormField<
-                                            PriceUnit>(
+                                        child:
+                                            DropdownButtonFormField<PriceUnit>(
                                           value: priceUnit,
                                           menuMaxHeight: 225,
                                           hint: Text(context.l10n.invoice_unit),
                                           iconSize: 0,
-                                          items: PriceUnit.values.map(
-                                                  (final PriceUnit value) {
-                                                return DropdownMenuItem<
-                                                    PriceUnit>(
-                                                  value: value,
-                                                  child: Text(value.name),
-                                                );
-                                              }).toList(),
-                                          onChanged:
-                                              (final PriceUnit? value) {
-                                                priceUnit =
+                                          items: PriceUnit.values
+                                              .map((final PriceUnit value) {
+                                            return DropdownMenuItem<PriceUnit>(
+                                              value: value,
+                                              child: Text(value.name),
+                                            );
+                                          }).toList(),
+                                          onChanged: (final PriceUnit? value) {
+                                            priceUnit =
                                                 value ?? PriceUnit.Others;
                                           },
                                           decoration: InputDecoration(
-                                            labelText: context.l10n.invoice_unit,
+                                            labelText:
+                                                context.l10n.invoice_unit,
                                             isDense: true,
                                             filled: true,
                                           ),
                                           validator: (final value) {
                                             if (value == null) {
-                                              return context.l10n.error_pleaseSelect(context.l10n.invoice_unit);
+                                              return context.l10n
+                                                  .error_pleaseSelect(context
+                                                      .l10n.invoice_unit);
                                             }
                                             return null;
                                           },
@@ -266,10 +294,12 @@ class _InvoiceEditPageState extends ConsumerState<InvoiceEditPage>
                                           controller: dateTextController,
                                           readOnly: true,
                                           decoration: InputDecoration(
-                                              labelText: context.l10n.invoice_date,
+                                              labelText:
+                                                  context.l10n.invoice_date,
                                               suffixIcon: WarnIcon(
-                                                  message:
-                                                      context.l10n.error_validInput(context.l10n.invoice_date))),
+                                                  message: context.l10n
+                                                      .error_validInput(context
+                                                          .l10n.invoice_date))),
                                           onTap: () async {
                                             final DateTime today =
                                                 DateTime.now();
@@ -311,14 +341,18 @@ class _InvoiceEditPageState extends ConsumerState<InvoiceEditPage>
                                             InvoiceCategory>(
                                           value: invoiceCategory,
                                           menuMaxHeight: 225,
-                                          hint: Text(context.l10n.invoice_category, overflow: TextOverflow.ellipsis),
+                                          hint: Text(
+                                              context.l10n.invoice_category,
+                                              overflow: TextOverflow.ellipsis),
                                           iconSize: 0,
                                           items: InvoiceCategory.values.map(
                                               (final InvoiceCategory value) {
                                             return DropdownMenuItem<
                                                 InvoiceCategory>(
                                               value: value,
-                                              child: Text(value.translatedName, overflow: TextOverflow.ellipsis),
+                                              child: Text(value.translatedName,
+                                                  overflow:
+                                                      TextOverflow.ellipsis),
                                             );
                                           }).toList(),
                                           onChanged:
@@ -326,15 +360,17 @@ class _InvoiceEditPageState extends ConsumerState<InvoiceEditPage>
                                             invoiceCategory =
                                                 value ?? InvoiceCategory.Others;
                                           },
-
                                           decoration: InputDecoration(
-                                            labelText: context.l10n.invoice_category,
+                                            labelText:
+                                                context.l10n.invoice_category,
                                             isDense: true,
                                             filled: true,
                                           ),
                                           validator: (final value) {
                                             if (value == null) {
-                                              return context.l10n.error_pleaseSelect(context.l10n.invoice_category);
+                                              return context.l10n
+                                                  .error_pleaseSelect(context
+                                                      .l10n.invoice_category);
                                             }
                                             return null;
                                           },
@@ -366,10 +402,13 @@ class _InvoiceEditPageState extends ConsumerState<InvoiceEditPage>
                                             return null;
                                           },
                                           decoration: InputDecoration(
-                                              labelText: context.l10n.invoice_totalAmount,
+                                              labelText: context
+                                                  .l10n.invoice_totalAmount,
                                               suffixIcon: WarnIcon(
-                                                  message:
-                                                      context.l10n.error_validInput(context.l10n.invoice_totalAmount))),
+                                                  message: context.l10n
+                                                      .error_validInput(context
+                                                          .l10n
+                                                          .invoice_totalAmount))),
                                         ),
                                       ),
                                       const SizedBox(width: 16),
@@ -392,10 +431,13 @@ class _InvoiceEditPageState extends ConsumerState<InvoiceEditPage>
                                             return null;
                                           },
                                           decoration: InputDecoration(
-                                              labelText: context.l10n.invoice_taxAmount,
+                                              labelText: context
+                                                  .l10n.invoice_taxAmount,
                                               suffixIcon: WarnIcon(
-                                                  message:
-                                                      context.l10n.error_validInput(context.l10n.invoice_taxAmount))),
+                                                  message: context.l10n
+                                                      .error_validInput(context
+                                                          .l10n
+                                                          .invoice_taxAmount))),
                                         ),
                                       ),
                                     ],
