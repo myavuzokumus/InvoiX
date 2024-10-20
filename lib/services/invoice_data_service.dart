@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
 import 'package:invoix/l10n/localization_extension.dart';
@@ -183,10 +185,16 @@ class InvoiceDataService {
   }
 
   Future<void> deleteInvoiceData(final List<InvoiceData> invoiceData) async {
-    await remainingTimeBox.deleteAll(
-        invoiceData.map((final invoiceData) => invoiceData.imagePath));
-    await invoiceDataBox
-        .deleteAll(invoiceData.map((final invoiceData) => invoiceData.id));
+
+    for (final InvoiceData invoice in invoiceData) {
+      await remainingTimeBox.delete(invoice.imagePath);
+      await invoiceDataBox.delete(invoice.id);
+
+      final file = File(invoice.imagePath);
+      if (await file.exists()) {
+        await file.delete();
+      }
+    }
   }
 
   Future<void> deleteCompany(final String companyName) async {
