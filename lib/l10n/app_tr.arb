@@ -32,6 +32,7 @@
   "subsplan_newUserOfferDetails": "İlk kullanıma özel 30 AI Fatura okutma ve 10 AI fatura analizi ücretsiz!",
   "subsplan_plans": "Planlar",
 
+  "profile_plan": "Plan",
   "profile_remainingInvoiceReads": "Kalan Fatura Okumaları",
   "profile_remainingInvoiceAnalyses": "Kalan Fatura Analizleri",
   "profile_invoiceReads": "Fatura Okumaları",
@@ -187,6 +188,14 @@
   },
   "error_pleaseEnterText" : "Lütfen metin girin.",
   "error_switchingMode" : "Eski moda geçiş yapılıyor...",
+  "error_loadingData" : "Veri yüklenirken bir hata oluştu: {error}",
+  "@error_loadingData": {
+      "placeholders": {
+      "error": {
+          "type": "String"
+      }
+      }
+  },
 
   "warn_pleaseSelect" : "Bir {input} seçmelisiniz.",
   "@warn_pleaseSelect": {

@@ -72,16 +72,16 @@ class InvoiceCard extends ConsumerWidget {
                       physics: const NeverScrollableScrollPhysics(),
                       shrinkWrap: true,
                       children: <Widget>[
-                        if (selectionMode != null) Text("${context.l10n.invoice_companyName}\n${invoiceData.companyName}", overflow: TextOverflow.ellipsis,),
+                        if (selectionMode != null) Text("${context.l10n.invoice_companyName}\n${invoiceData.companyName}", overflow: TextOverflow.ellipsis),
                         if (selectionMode != null) const Divider(height: 2),
-                        Text("${context.l10n.invoice_date}\n${DateFormat("dd-MM-yyyy").format(invoiceData.date)}", overflow: TextOverflow.ellipsis,),
+                        Text("${context.l10n.invoice_date}\n${DateFormat("dd-MM-yyyy").format(invoiceData.date)}", overflow: TextOverflow.ellipsis),
                         const Divider(height: 2),
                         Row(
                           mainAxisAlignment: MainAxisAlignment.start,
                           children: [
-                            Text("${context.l10n.invoice_totalAmount}\n${invoiceData.unit} ${invoiceData.totalAmount}", overflow: TextOverflow.ellipsis,),
+                            Expanded(child: Text("${context.l10n.invoice_totalAmount}\n${invoiceData.unit} ${invoiceData.totalAmount}", overflow: TextOverflow.ellipsis,)),
                             const SizedBox(width: 16),
-                            Text("${context.l10n.invoice_taxAmount}\n${invoiceData.unit} ${invoiceData.taxAmount}", overflow: TextOverflow.ellipsis,),
+                            Expanded(child: Text("${context.l10n.invoice_taxAmount}\n${invoiceData.unit} ${invoiceData.taxAmount}", overflow: TextOverflow.ellipsis,)),
                           ],
                         ),
                       ],

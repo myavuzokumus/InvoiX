@@ -231,7 +231,7 @@ class ProfileDropdown extends ConsumerWidget {
           return const CircularProgressIndicator();
         }
         if (snapshot.hasError) {
-          return Text('Error loading data: ${snapshot.error}',
+          return Text(context.l10n.error_loadingData(snapshot.error.toString()),
               style: const TextStyle(color: Colors.red));
         }
         if (!snapshot.hasData || !snapshot.data!.exists) {
@@ -241,7 +241,7 @@ class ProfileDropdown extends ConsumerWidget {
         final userData = snapshot.data!.data()! as Map<String, dynamic>;
         return Column(
           children: [
-            _buildInfoTile("Plan", '${userData['subscriptionId'] ?? 'None'}'),
+            _buildInfoTile(context.l10n.profile_plan, '${userData['subscriptionId'] ?? 'None'}'),
             _buildInfoTile(context.l10n.profile_remainingInvoiceReads,
                 '${userData['aiInvoiceReads'] ?? 0}'),
             _buildInfoTile(context.l10n.profile_remainingInvoiceAnalyses,

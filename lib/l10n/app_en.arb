@@ -1,8 +1,8 @@
 {
   "@@locale": "en",
 
-  "loginError": "An error occurred while logging in: {error}",
-  "@loginError": {
+  "auth_loginError": "An error occurred while logging in: {error}",
+  "@auth_loginError": {
     "placeholders": {
       "error": {
         "type": "String"
@@ -32,6 +32,7 @@
   "subsplan_newUserOfferDetails": "30 AI invoice scans and 10 AI invoice analyses free for first-time use!",
   "subsplan_plans": "Plans",
 
+  "profile_plan": "Plan",
   "profile_remainingInvoiceReads": "Remaining Invoice Reads",
   "profile_remainingInvoiceAnalyses": "Remaining Invoice Analyses",
   "profile_invoiceReads": "Invoice Reads",
@@ -186,6 +187,14 @@
   },
   "error_pleaseEnterText" : "Please enter text.",
   "error_switchingMode" : "Switching to legacy mode...",
+  "error_loadingData" : "An error occurred while loading data: {error}",
+  "@error_loadingData": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
 
   "warn_pleaseSelect" : "You must choose a {input}.",
   "@warn_pleaseSelect": {

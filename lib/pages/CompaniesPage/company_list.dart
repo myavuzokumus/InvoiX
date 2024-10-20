@@ -71,6 +71,8 @@ class _CompanyListState extends ConsumerState<CompanyList> with _CompanyListMixi
                   return Column(
                     children: [
                       Container(
+                        width: double.infinity,
+                        alignment: Alignment.center,
                         decoration: BoxDecoration(
                           border: Border(
                             bottom: BorderSide(
