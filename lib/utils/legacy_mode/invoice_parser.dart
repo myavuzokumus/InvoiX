@@ -33,7 +33,7 @@ String parseInvoiceData(final List<String> listText) {
   }
 
   final Map<String, Object?> value = {
-    "companyName": invoiceCompany ?? "InvoiX",
+    "companyName": invoiceCompany == "" ? "InvoiX" : invoiceCompany ?? "InvoiX",
     "invoiceNo": invoiceNo,
     "date": invoiceDate,
     "totalAmount": totalAmount.toString(),
@@ -56,7 +56,14 @@ String assignDate(String date) {
     date = date.substring(matchedDate.start, matchedDate.end);
   }
 
-  return(dateFormat.format(dateParser(date)));
+  DateTime newDate;
+  try {
+    newDate = dateParser(date);
+  } catch (e) {
+    newDate = dateParser(DateTime.now().toString());
+  }
+
+  return(dateFormat.format(newDate));
 }
 
 
@@ -69,7 +76,7 @@ List<double> assignAmount(String amount, final List<String> listText) {
   amount = amount.replaceAll(" ", "").replaceAll(nonDigitRegex, "").replaceAll(",", ".");
   tax = tax.replaceAll(" ", "").replaceAll(nonDigitRegex, "").replaceAll(",", ".");
 
-  final double totalAmount = double.parse(amount);
+  final double totalAmount = double.tryParse(amount) ?? 0.0;
   final double taxAmount = double.tryParse(tax) ?? 0.0;
 
   return [totalAmount, taxAmount];

@@ -32,6 +32,7 @@
   "subsplan_newUserOfferDetails": "İlk kullanıma özel 30 AI Fatura okutma ve 10 AI fatura analizi ücretsiz!",
   "subsplan_plans": "Planlar",
 
+  "profile_plan": "Plan",
   "profile_remainingInvoiceReads": "Kalan Fatura Okumaları",
   "profile_remainingInvoiceAnalyses": "Kalan Fatura Analizleri",
   "profile_invoiceReads": "Fatura Okumaları",
@@ -49,11 +50,12 @@
   "settings_selectLanguage": "Dil Seç",
   "settings_deleteAccount": "Hesabı Sil",
   "settings_deleteAccountConfirmTitle": "Hesabı Sil",
-  "settings_deleteAccountConfirmMessage": "Hesabınızı silmek istediğinizden emin misiniz?\nBu işlem geri alınamaz.",
+  "settings_deleteAccountConfirmMessage": "Hesabınızı silmek istediğinizden emin misiniz?\nTüm verileriniz silinecektir.\nBu işlem geri alınamaz.",
   "settings_deleteAccountConfirmYes": "Evet, Hesabı Sil",
   "settings_deleteAccountError": "Hesabınızı silerken bir hata oluştu.",
   "settings_deleteAccountSuccess": "Hesabınız başarıyla silindi.",
   "settings_cancel": "Hayır, İptal",
+  "settings_byLoginYouAgree": "By logging in, you agree to our",
 
 
   "status_noInternetConnection": "İnternet Bağlantısı Yok!",
@@ -186,6 +188,14 @@
   },
   "error_pleaseEnterText" : "Lütfen metin girin.",
   "error_switchingMode" : "Eski moda geçiş yapılıyor...",
+  "error_loadingData" : "Veri yüklenirken bir hata oluştu: {error}",
+  "@error_loadingData": {
+      "placeholders": {
+      "error": {
+          "type": "String"
+      }
+      }
+  },
 
   "warn_pleaseSelect" : "Bir {input} seçmelisiniz.",
   "@warn_pleaseSelect": {

@@ -14,11 +14,11 @@ final RegExp companyRegex =
 final RegExp invoiceNoRegex = RegExp(r'NO\s*:\s*(\S+)', caseSensitive: false);
 
 final RegExp dateRegex = RegExp(
-    r"(0[1-9]|[12][0-9]|3[01])(\/|-|\.)(0[1-9]|1[1,2])(\/|-|\.)(19|20)\d{2}",
+    r"((?:(?:\d{4}|\d{2})[-/.](0[1-9]|1[0-2])[-/.](0[1-9]|[12][0-9]|3[01])|(?:0[1-9]|[12][0-9]|3[01])[-/.](?:0[1-9]|1[0-2])[-/.](?:\d{4}|\d{2})|(?:0[1-9]|1[0-2])[-/.](?:0[1-9]|[12][0-9]|3[01])[-/.](?:\d{4}|\d{2})))(?!\d)",
     caseSensitive: false);
 
 final RegExp amountRegex = RegExp(
     r"^(\$|\₺|€|\*)?(0|[1-9][0-9]{0,2})(,\d{1,4})*(\.\d{1,2})?$|^(0|[1-9][0-9]{0,2})(,\d{1,4})*(\.\d{1,2})?(\$|\₺|TL|€|\*)?",
     caseSensitive: false);
 
-final RegExp invalidCompanyRegex = RegExp(r"A.Ş|A.S", caseSensitive: false);
+final RegExp invalidCompanyRegex = RegExp(r"A\.?\s*Ş\.?(?!\S)|AŞ(?!\S)|A\.?S\.?(?!\S)|aş(?=\s)", caseSensitive: false);

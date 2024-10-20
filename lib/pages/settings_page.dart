@@ -2,10 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:invoix/l10n/localization_extension.dart';
 import 'package:invoix/pages/welcome_page.dart';
+import 'package:invoix/services/firebase_service.dart';
 import 'package:invoix/states/firebase_state.dart';
 import 'package:invoix/states/language_state.dart';
 import 'package:invoix/widgets/settings_button.dart';
 import 'package:invoix/widgets/toast.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class SettingsPage extends ConsumerWidget {
   const SettingsPage({super.key});
@@ -54,7 +56,7 @@ class SettingsPage extends ConsumerWidget {
               onPressed: () => _showDeleteAccountDialog(context, ref),
             );
           } else {
-            return _buildPolicyAndTerms(context);
+            return _buildPolicyAndTerms(context, firebaseService);
           }
         },
         separatorBuilder: (final context, final index) =>
@@ -63,18 +65,32 @@ class SettingsPage extends ConsumerWidget {
     );
   }
 
-  Widget _buildPolicyAndTerms(final BuildContext context) {
+  Widget _buildPolicyAndTerms(final BuildContext context, final FirebaseService firebaseService) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
         TextButton(
-          onPressed: () {},
+          onPressed: () async {
+            final Uri url = Uri.parse(firebaseService.remoteConfig.getString('privacy_url'));
+            if (await canLaunchUrl(url)) {
+              await launchUrl(url);
+            } else {
+              showToast(text: context.l10n.status_somethingWentWrong);
+            }
+          },
           child: Text(context.l10n.settings_privacyPolicy,
               style: const TextStyle(color: Colors.white)),
         ),
         TextButton(
-          onPressed: () {},
+          onPressed: () async {
+            final Uri url = Uri.parse(firebaseService.remoteConfig.getString('terms_url'));
+            if (await canLaunchUrl(url)) {
+              await launchUrl(url);
+            } else {
+              showToast(text: context.l10n.status_somethingWentWrong);
+            }
+          },
           child: Text(context.l10n.settings_termsOfService,
               style: const TextStyle(color: Colors.white)),
         ),

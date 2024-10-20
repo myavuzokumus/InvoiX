@@ -192,10 +192,10 @@ class _SummaryMainState extends ConsumerState<SummaryMain>
                 ],
               ),
             ),
-            const Divider(),
+            const Divider(height: 0,),
             Expanded(
               child: GridView.builder(
-                padding: const EdgeInsets.only(left: 20, right: 20),
+                padding: const EdgeInsets.only(left: 20, right: 20, bottom: 40, top: 10),
                 gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                   crossAxisCount: isLandscape ? 2 : 1,
                   mainAxisSpacing: 15,
@@ -256,10 +256,12 @@ class _SummaryMainState extends ConsumerState<SummaryMain>
         ),
         const SizedBox(width: 20),
         Flexible(
-          child: Wrap(
-            spacing: 12.0, // gap between adjacent chips
-            runSpacing: 12.0, // gap between lines
-            children: getIndicators(categoryTotals),
+          child: SingleChildScrollView(
+            child: Wrap(
+              spacing: 12.0, // gap between adjacent chips
+              runSpacing: 12.0, // gap between lines
+              children: getIndicators(categoryTotals),
+            ),
           ),
         ),
       ],

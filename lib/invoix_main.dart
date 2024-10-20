@@ -37,6 +37,7 @@ class _InvoixMainState extends ConsumerState<InvoixMain> with _InvoixMainMixin {
     final currentLocale = ref.watch(localeProvider);
 
     return MaterialApp(
+      debugShowCheckedModeBanner: false,
       title: 'InvoiX',
       scaffoldMessengerKey: scaffoldMessengerKey,
 
