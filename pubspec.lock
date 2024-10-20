@@ -42,10 +42,10 @@ packages:
     dependency: transitive
     description:
       name: args
-      sha256: "7cf60b9f0cc88203c5a190b4cd62a99feea42759a7fa695010eb5de1c0b2252a"
+      sha256: bf9f5caeea8d8fe6721a9c358dd8a5c1947b27f1cfaa18b39c301273594919e6
       url: "https://pub.dev"
     source: hosted
-    version: "2.5.0"
+    version: "2.6.0"
   async:
     dependency: transitive
     description:
@@ -218,10 +218,10 @@ packages:
     dependency: transitive
     description:
       name: convert
-      sha256: "0f08b14755d163f6e2134cb58222dd25ea2a2ee8a195e53983d57c075324d592"
+      sha256: b30acd5944035672bc15c6b7a8b47d773e41e2f17de064350988c5d02adb1c68
       url: "https://pub.dev"
     source: hosted
-    version: "3.1.1"
+    version: "3.1.2"
   cross_file:
     dependency: "direct main"
     description:
@@ -234,10 +234,10 @@ packages:
     dependency: transitive
     description:
       name: crypto
-      sha256: ec30d999af904f33454ba22ed9a86162b35e52b44ac4807d1d93c288041d7d27
+      sha256: "1e445881f28f22d6140f181e07737b22f1e099a5e1ff94b0af2f9e4a463f4855"
       url: "https://pub.dev"
     source: hosted
-    version: "3.0.5"
+    version: "3.0.6"
   dart_style:
     dependency: transitive
     description:
@@ -434,10 +434,10 @@ packages:
     dependency: transitive
     description:
       name: fixnum
-      sha256: "25517a4deb0c03aa0f32fd12db525856438902d9c16536311e76cdc57b31d7d1"
+      sha256: b6dc7065e46c974bc7c5f143080a6764ec7a4be6da1285ececdc37be96de53be
       url: "https://pub.dev"
     source: hosted
-    version: "1.1.0"
+    version: "1.1.1"
   fl_chart:
     dependency: "direct main"
     description:
@@ -468,10 +468,10 @@ packages:
     dependency: "direct main"
     description:
       name: flutter_riverpod
-      sha256: "0f1974eff5bbe774bf1d870e406fc6f29e3d6f1c46bd9c58e7172ff68a785d7d"
+      sha256: "711d916456563f715bde1e139d7cfdca009f8264befab3ac9f8ded8b6ec26405"
       url: "https://pub.dev"
     source: hosted
-    version: "2.5.1"
+    version: "2.5.3"
   flutter_test:
     dependency: "direct dev"
     description: flutter
@@ -638,10 +638,10 @@ packages:
     dependency: "direct main"
     description:
       name: image
-      sha256: "2237616a36c0d69aef7549ab439b833fb7f9fb9fc861af2cc9ac3eedddd69ca8"
+      sha256: f31d52537dc417fdcde36088fdf11d191026fd5e4fae742491ebd40e5a8bea7d
       url: "https://pub.dev"
     source: hosted
-    version: "4.2.0"
+    version: "4.3.0"
   in_app_purchase:
     dependency: "direct main"
     description:
@@ -670,10 +670,10 @@ packages:
     dependency: transitive
     description:
       name: in_app_purchase_storekit
-      sha256: e9a408da11d055f9af9849859e1251b2b0a2f84f256fa3bf1285c5614a397079
+      sha256: "96cfa71121f4294079586a2fab7363b01bdb4c3381d9b397012c2580b391281d"
       url: "https://pub.dev"
     source: hosted
-    version: "0.3.18+1"
+    version: "0.3.18+3"
   intl:
     dependency: "direct main"
     description:
@@ -750,10 +750,10 @@ packages:
     dependency: transitive
     description:
       name: logging
-      sha256: "623a88c9594aa774443aa3eb2d41807a48486b5613e67599fb4c41c0ad47c340"
+      sha256: c8245ada5f1717ed44271ed1c26b8ce85ca3228fd2ffdb75468ab01979309d61
       url: "https://pub.dev"
     source: hosted
-    version: "1.2.0"
+    version: "1.3.0"
   macros:
     dependency: transitive
     description:
@@ -878,10 +878,10 @@ packages:
     dependency: transitive
     description:
       name: permission_handler_android
-      sha256: "76e4ab092c1b240d31177bb64d2b0bea43f43d0e23541ec866151b9f7b2490fa"
+      sha256: "71bbecfee799e65aff7c744761a57e817e73b738fedf62ab7afd5593da21f9f1"
       url: "https://pub.dev"
     source: hosted
-    version: "12.0.12"
+    version: "12.0.13"
   permission_handler_apple:
     dependency: transitive
     description:
@@ -926,10 +926,10 @@ packages:
     dependency: transitive
     description:
       name: platform
-      sha256: "9b71283fc13df574056616011fb138fd3b793ea47cc509c189a6c3fa5f8a1a65"
+      sha256: "5d6b1b0036a5f331ebc77c850ebc8506cbc1e9416c27e59b439f917a902a4984"
       url: "https://pub.dev"
     source: hosted
-    version: "3.1.5"
+    version: "3.1.6"
   plugin_platform_interface:
     dependency: transitive
     description:
@@ -966,10 +966,10 @@ packages:
     dependency: transitive
     description:
       name: riverpod
-      sha256: f21b32ffd26a36555e501b04f4a5dca43ed59e16343f1a30c13632b2351dfa4d
+      sha256: c86fedfb45dd1da98ee6493dd9374325cdf494e7d523ebfb0c387eecc5f7b5c9
       url: "https://pub.dev"
     source: hosted
-    version: "2.5.1"
+    version: "2.5.3"
   shared_preferences:
     dependency: "direct main"
     description:
@@ -1115,26 +1115,26 @@ packages:
     dependency: transitive
     description:
       name: syncfusion_flutter_core
-      sha256: "7130fc3259247946b59fe9b76ee89500c775c3f7e5c1d0826f3105e1dd0bebf6"
+      sha256: becd190595cba56feac5ec17b805b35df9f006171c131c209f79b5c58fc780eb
       url: "https://pub.dev"
     source: hosted
-    version: "27.1.52"
+    version: "27.1.53"
   syncfusion_flutter_xlsio:
     dependency: "direct main"
     description:
       name: syncfusion_flutter_xlsio
-      sha256: "91f50081dacc079ed8caf3d29cc52b03ede382e2834926f400f47379f39b1497"
+      sha256: b064f1576dd4b9532580753cb6f8dcff25a1e1a09ec6bff0337d30941fed8a50
       url: "https://pub.dev"
     source: hosted
-    version: "27.1.52"
+    version: "27.1.53"
   syncfusion_officecore:
     dependency: transitive
     description:
       name: syncfusion_officecore
-      sha256: "26942ff6817df967173bc40d72ef21dfe02de64870fa4c4e15bc221a08b5ef1e"
+      sha256: "945c4f3f68450dff32ab9bcebba24ccd1b49e39ef315188e57f0aaddf16252dc"
       url: "https://pub.dev"
     source: hosted
-    version: "27.1.52"
+    version: "27.1.53"
   term_glyph:
     dependency: transitive
     description:
@@ -1171,10 +1171,10 @@ packages:
     dependency: transitive
     description:
       name: typed_data
-      sha256: facc8d6582f16042dd49f2463ff1bd6e2c9ef9f3d5da3d9b087e244a7b564b3c
+      sha256: f9049c039ebfeb4cf7a7104a675823cd72dba8297f264b6637062516699fa006
       url: "https://pub.dev"
     source: hosted
-    version: "1.3.2"
+    version: "1.4.0"
   uuid:
     dependency: "direct main"
     description:
