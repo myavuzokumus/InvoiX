@@ -2,7 +2,6 @@ part of 'invoix_main.dart';
 
 mixin _InvoixMainMixin on ConsumerState<InvoixMain> {
   bool _showWelcomePage = false;
-  late final SharedPreferences prefs;
 
   @override
   void initState() {
@@ -23,7 +22,7 @@ mixin _InvoixMainMixin on ConsumerState<InvoixMain> {
   }
 
   Future<void> _checkFirstSeen() async {
-    prefs = await SharedPreferences.getInstance();
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
     final bool seen = (prefs.getBool('seen') ?? false);
 
     setState(() {
@@ -32,9 +31,10 @@ mixin _InvoixMainMixin on ConsumerState<InvoixMain> {
   }
 
   Future<void> _onWelcomePageDone() async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
     setState(() {
       _showWelcomePage = false;
-      prefs.setBool('seen', false);
+      prefs.setBool('seen', true);
     });
   }
 }
