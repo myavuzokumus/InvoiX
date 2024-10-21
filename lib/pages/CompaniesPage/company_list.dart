@@ -103,7 +103,7 @@ class _CompanyListState extends ConsumerState<CompanyList> with _CompanyListMixi
                         ),
                       ),
                       Expanded(
-                        flex: 6,
+                        flex: 10,
                         child: ListView.separated(
                           padding: const EdgeInsets.only(
                               left: 10, right: 10, top: 5),

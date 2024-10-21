@@ -43,17 +43,27 @@ class _WelcomePageState extends State<WelcomePage> {
     return Scaffold(
       body: Stack(
         children: [
-          PageView.builder(
-            controller: _pageController,
-            onPageChanged: (final int page) {
-              setState(() {
-                _currentPage = page;
-              });
+          GestureDetector(
+            onTap: () {
+              if (_currentPage < welcomeData.length - 1) {
+                _pageController.nextPage(
+                  duration: const Duration(milliseconds: 300),
+                  curve: Curves.easeIn,
+                );
+              }
             },
-            itemCount: welcomeData.length,
-            itemBuilder: (final context, final index) {
-              return buildPageContent(welcomeData[index]);
-            },
+            child: PageView.builder(
+              controller: _pageController,
+              onPageChanged: (final int page) {
+                setState(() {
+                  _currentPage = page;
+                });
+              },
+              itemCount: welcomeData.length,
+              itemBuilder: (final context, final index) {
+                return SingleChildScrollView(child: buildPageContent(welcomeData[index]));
+              },
+            ),
           ),
           Positioned(
             bottom: 50.0,
@@ -95,7 +105,7 @@ class _WelcomePageState extends State<WelcomePage> {
 
   Widget buildPageContent(final Map<String, String> data) {
     return Padding(
-      padding: const EdgeInsets.all(40.0),
+      padding: const EdgeInsets.only(left: 40.0, right: 40.0, top: 120.0, bottom: 40),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
